@@ -1,0 +1,837 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Hindi (`hi`).
+class AppL10nHi extends AppL10n {
+  AppL10nHi([String locale = 'hi']) : super(locale);
+
+  @override
+  String get appName => 'जपमाला';
+
+  @override
+  String get tagline => 'आपके दैनिक नाम जप के लिए शांत डिजिटल माला';
+
+  @override
+  String get navJaap => 'जाप';
+
+  @override
+  String get navProgress => 'प्रगति';
+
+  @override
+  String get navStories => 'कथाएँ';
+
+  @override
+  String get navSettings => 'सेटिंग';
+
+  @override
+  String get ok => 'ठीक है';
+
+  @override
+  String get cancel => 'रद्द करें';
+
+  @override
+  String get save => 'सहेजें';
+
+  @override
+  String get delete => 'हटाएँ';
+
+  @override
+  String get edit => 'बदलें';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String get done => 'पूर्ण';
+
+  @override
+  String get next => 'आगे';
+
+  @override
+  String get skip => 'छोड़ें';
+
+  @override
+  String get retry => 'फिर कोशिश करें';
+
+  @override
+  String get custom => 'अपनी पसंद';
+
+  @override
+  String get active => 'सक्रिय';
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get yesterday => 'कल';
+
+  @override
+  String get on => 'चालू';
+
+  @override
+  String get off => 'बंद';
+
+  @override
+  String get somethingWentWrong => 'कुछ गड़बड़ हो गई';
+
+  @override
+  String get tapToCount => 'गिनने के लिए स्पर्श करें';
+
+  @override
+  String get todaysJaap => 'आज का जाप';
+
+  @override
+  String get undo => 'पूर्ववत';
+
+  @override
+  String get session => 'सत्र';
+
+  @override
+  String get more => 'और';
+
+  @override
+  String get malaComplete => 'माला पूर्ण';
+
+  @override
+  String malas(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मालाएँ',
+      one: '1 माला',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String malasCompleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count मालाएँ पूर्ण',
+      one: '1 माला पूर्ण',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String jaapCount(int count) {
+    return '$count जाप';
+  }
+
+  @override
+  String get nothingToUndo => 'पूर्ववत करने के लिए कुछ नहीं';
+
+  @override
+  String get countRemoved => 'गिनती हटाई गई';
+
+  @override
+  String get resetCurrentMala => 'वर्तमान माला रीसेट करें';
+
+  @override
+  String get resetCurrentMalaBody =>
+      'इस माला में गिने गए मनके हटा दिए जाएँगे। पूर्ण मालाएँ सुरक्षित रहेंगी।';
+
+  @override
+  String get addCountManually => 'गिनती स्वयं जोड़ें';
+
+  @override
+  String get addCount => 'गिनती जोड़ें';
+
+  @override
+  String get numberOfJaap => 'जाप की संख्या';
+
+  @override
+  String get meditationMode => 'ध्यान मोड';
+
+  @override
+  String get sessionElapsed => 'सत्र का समय';
+
+  @override
+  String get startSession => 'सत्र शुरू करें';
+
+  @override
+  String get endSession => 'सत्र समाप्त करें';
+
+  @override
+  String sessionSummary(int jaap, int minutes) {
+    return '$minutes मिनट में $jaap जाप';
+  }
+
+  @override
+  String get myMantras => 'मेरे मंत्र';
+
+  @override
+  String get addMantra => 'मंत्र जोड़ें';
+
+  @override
+  String get editMantra => 'मंत्र बदलें';
+
+  @override
+  String get mantraName => 'नाम';
+
+  @override
+  String get mantraDevanagari => 'देवनागरी';
+
+  @override
+  String get mantraTransliteration => 'उच्चारण';
+
+  @override
+  String get malaSize => 'माला का आकार';
+
+  @override
+  String beads(int count) {
+    return '$count मनके';
+  }
+
+  @override
+  String get nameRequired => 'कृपया नाम भरें';
+
+  @override
+  String get malaSizeInvalid => 'माला का आकार 1 से 10,000 के बीच होना चाहिए';
+
+  @override
+  String get builtInCannotDelete => 'अंतर्निहित मंत्र हटाए नहीं जा सकते';
+
+  @override
+  String get deleteMantraTitle => 'मंत्र हटाएँ?';
+
+  @override
+  String deleteMantraBody(String name) {
+    return '\"$name\" हटा दिया जाएगा। आपका जाप इतिहास सुरक्षित रहेगा।';
+  }
+
+  @override
+  String get setActive => 'सक्रिय करें';
+
+  @override
+  String get optional => 'वैकल्पिक';
+
+  @override
+  String get mySadhana => 'मेरी साधना';
+
+  @override
+  String get todaysGoal => 'आज का लक्ष्य';
+
+  @override
+  String get complete => 'पूर्ण';
+
+  @override
+  String dayStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन की लय',
+      one: '1 दिन की लय',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bestStreak => 'सर्वश्रेष्ठ लय';
+
+  @override
+  String sankalpDays(int days) {
+    return '$days दिन का संकल्प';
+  }
+
+  @override
+  String dayXofY(int current, int total) {
+    return 'दिन $current / $total';
+  }
+
+  @override
+  String daysCompleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन पूर्ण',
+      one: '1 दिन पूर्ण',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String startedOn(String date) {
+    return '$date से आरंभ';
+  }
+
+  @override
+  String get createNewSankalp => 'नया संकल्प लें';
+
+  @override
+  String get createSankalp => 'संकल्प बनाएँ';
+
+  @override
+  String get chooseMantra => 'मंत्र चुनें';
+
+  @override
+  String get dailyGoal => 'दैनिक लक्ष्य';
+
+  @override
+  String get duration => 'अवधि';
+
+  @override
+  String durationDays(int days) {
+    return '$days दिन';
+  }
+
+  @override
+  String get reminder => 'स्मरण';
+
+  @override
+  String get beginSadhana => 'साधना आरंभ करें';
+
+  @override
+  String get noSankalpTitle => 'संकल्प आरंभ करें';
+
+  @override
+  String get noSankalpBody =>
+      'संकल्प एक व्रत है — चुने हुए दिनों तक प्रतिदिन निश्चित संख्या में जाप करने का।';
+
+  @override
+  String get endSankalp => 'संकल्प समाप्त करें';
+
+  @override
+  String get endSankalpBody =>
+      'आपकी प्रगति सुरक्षित रहेगी, पर संकल्प सक्रिय नहीं रहेगा।';
+
+  @override
+  String get sankalpComplete => 'संकल्प पूर्ण';
+
+  @override
+  String jaapPerDay(int count) {
+    return 'प्रतिदिन $count जाप';
+  }
+
+  @override
+  String goalRemaining(int count) {
+    return '$count शेष';
+  }
+
+  @override
+  String get goalReached => 'आज का लक्ष्य पूर्ण';
+
+  @override
+  String get setDailyGoal => 'दैनिक लक्ष्य तय करें';
+
+  @override
+  String get sadhanaGoals => 'साधना लक्ष्य';
+
+  @override
+  String get progress => 'प्रगति';
+
+  @override
+  String get filterDaily => 'दैनिक';
+
+  @override
+  String get filterWeekly => 'साप्ताहिक';
+
+  @override
+  String get filterMonthly => 'मासिक';
+
+  @override
+  String get filterYearly => 'वार्षिक';
+
+  @override
+  String get totalJaap => 'कुल जाप';
+
+  @override
+  String get totalMalas => 'कुल मालाएँ';
+
+  @override
+  String get weeklyJaap => 'साप्ताहिक जाप';
+
+  @override
+  String get monthlyJaap => 'मासिक जाप';
+
+  @override
+  String get yearlyJaap => 'वार्षिक जाप';
+
+  @override
+  String get activity => 'सक्रियता';
+
+  @override
+  String ofGoal(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '/ $countString लक्ष्य';
+  }
+
+  @override
+  String get noJaapYet => 'अभी कोई जाप दर्ज नहीं';
+
+  @override
+  String get noJaapYetBody => 'पहला मनका ही यात्रा का आरंभ है।';
+
+  @override
+  String get dailyAverage => 'दैनिक औसत';
+
+  @override
+  String get activeDays => 'सक्रिय दिन';
+
+  @override
+  String get thisWeek => 'इस सप्ताह';
+
+  @override
+  String get thisMonth => 'इस माह';
+
+  @override
+  String get thisYear => 'इस वर्ष';
+
+  @override
+  String get allTime => 'आरंभ से';
+
+  @override
+  String get perMantra => 'मंत्र अनुसार';
+
+  @override
+  String get stories => 'कथाएँ';
+
+  @override
+  String get storiesSubtitle => 'मनन के लिए छोटी कथाएँ';
+
+  @override
+  String get popular => 'लोकप्रिय';
+
+  @override
+  String get read => 'पढ़ें';
+
+  @override
+  String get listen => 'सुनें';
+
+  @override
+  String get stopListening => 'रोकें';
+
+  @override
+  String get textSize => 'अक्षर का आकार';
+
+  @override
+  String get favorite => 'पसंदीदा';
+
+  @override
+  String get favorites => 'पसंदीदा';
+
+  @override
+  String get share => 'साझा करें';
+
+  @override
+  String get all => 'सभी';
+
+  @override
+  String minRead(int minutes) {
+    return '$minutes मिनट का पाठ';
+  }
+
+  @override
+  String get noFavoritesTitle => 'अभी कोई पसंदीदा नहीं';
+
+  @override
+  String get noFavoritesBody => 'किसी कथा पर हृदय चिह्न दबाकर उसे यहाँ रखें।';
+
+  @override
+  String get noStoriesFound => 'कोई कथा नहीं मिली';
+
+  @override
+  String get settings => 'सेटिंग';
+
+  @override
+  String get sectionJaap => 'जाप';
+
+  @override
+  String get sectionReminders => 'स्मरण';
+
+  @override
+  String get sectionAppearance => 'रूप';
+
+  @override
+  String get sectionBackup => 'बैकअप';
+
+  @override
+  String get sectionSupport => 'सहायता';
+
+  @override
+  String get sectionAbout => 'परिचय';
+
+  @override
+  String get resetCounts => 'गिनती रीसेट करें';
+
+  @override
+  String get jaapReminders => 'जाप स्मरण';
+
+  @override
+  String get streakReminder => 'लय स्मरण';
+
+  @override
+  String get goalReminder => 'लक्ष्य स्मरण';
+
+  @override
+  String get theme => 'थीम';
+
+  @override
+  String get themeSystem => 'सिस्टम';
+
+  @override
+  String get themeLight => 'उजला';
+
+  @override
+  String get themeDark => 'गहरा';
+
+  @override
+  String get haptics => 'कंपन';
+
+  @override
+  String get sound => 'ध्वनि';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get languageSystem => 'सिस्टम अनुसार';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageHindi => 'हिंदी';
+
+  @override
+  String get backupRestore => 'बैकअप और पुनर्स्थापना';
+
+  @override
+  String get exportMyData => 'मेरा डेटा निर्यात करें';
+
+  @override
+  String get rateApp => 'जपमाला को रेट करें';
+
+  @override
+  String get shareApp => 'जपमाला साझा करें';
+
+  @override
+  String get feedback => 'प्रतिक्रिया';
+
+  @override
+  String get privacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get terms => 'शर्तें';
+
+  @override
+  String get aboutApp => 'जपमाला के बारे में';
+
+  @override
+  String version(String version) {
+    return 'संस्करण $version';
+  }
+
+  @override
+  String get resetTodayTitle => 'आज का जाप रीसेट करें?';
+
+  @override
+  String get resetTodayBody =>
+      'आज दर्ज सारा जाप हट जाएगा। यह पूर्ववत नहीं हो सकता।';
+
+  @override
+  String get resetAllTitle => 'सारा जाप रीसेट करें?';
+
+  @override
+  String get resetAllBody =>
+      'आपका पूरा जाप इतिहास, मालाएँ और लय सदा के लिए मिट जाएँगी। यह पूर्ववत नहीं हो सकता।';
+
+  @override
+  String get resetToday => 'आज का रीसेट करें';
+
+  @override
+  String get resetEverything => 'सब कुछ रीसेट करें';
+
+  @override
+  String get resetDone => 'गिनती रीसेट हो गई';
+
+  @override
+  String get aboutBody =>
+      'जपमाला आपके दैनिक नाम जप के लिए एक शांत, निजी स्थान है। आपका सारा जाप केवल इसी उपकरण में सुरक्षित रहता है।';
+
+  @override
+  String get madeWith => 'श्रद्धा से निर्मित';
+
+  @override
+  String get reminders => 'स्मरण';
+
+  @override
+  String get addReminder => 'स्मरण जोड़ें';
+
+  @override
+  String get reminderTime => 'समय';
+
+  @override
+  String get everyDay => 'प्रतिदिन';
+
+  @override
+  String get noRemindersTitle => 'अभी कोई स्मरण नहीं';
+
+  @override
+  String get noRemindersBody =>
+      'प्रतिदिन एक ही समय पर कोमल स्मरण अभ्यास को आदत बना देता है।';
+
+  @override
+  String get notificationsBlocked =>
+      'जपमाला के लिए सूचनाएँ बंद हैं। उपकरण की सेटिंग में इन्हें चालू करें।';
+
+  @override
+  String get openSettings => 'सेटिंग खोलें';
+
+  @override
+  String get reminderNotificationTitle => 'जाप का समय';
+
+  @override
+  String get reminderNotificationBody => 'माला के संग कुछ शांत क्षण 🙏';
+
+  @override
+  String get streakNotificationTitle => 'अपनी लय बनाए रखें';
+
+  @override
+  String get streakNotificationBody =>
+      'आपने आज जाप नहीं किया। एक माला भी लय बनाए रखेगी।';
+
+  @override
+  String get goalNotificationTitle => 'बस थोड़ा शेष';
+
+  @override
+  String get goalNotificationBody =>
+      'आज का लक्ष्य पूरा करें और साधना पूर्ण करें।';
+
+  @override
+  String get createBackup => 'बैकअप बनाएँ';
+
+  @override
+  String get createBackupBody =>
+      'अपने सभी मंत्र, जाप इतिहास, लक्ष्य और सेटिंग की JSON फ़ाइल सहेजें।';
+
+  @override
+  String get restoreBackup => 'बैकअप से पुनर्स्थापित करें';
+
+  @override
+  String get restoreBackupBody =>
+      'पुनर्स्थापित करने के लिए जपमाला बैकअप फ़ाइल चुनें।';
+
+  @override
+  String get backupCreated => 'बैकअप बन गया';
+
+  @override
+  String get restoreWarningTitle => 'सारा डेटा बदलें?';
+
+  @override
+  String get restoreWarningBody =>
+      'पुनर्स्थापना जपमाला के वर्तमान सारे डेटा को बैकअप फ़ाइल के डेटा से बदल देगी।';
+
+  @override
+  String get restore => 'पुनर्स्थापित करें';
+
+  @override
+  String restoreSuccess(int count) {
+    return '$count जाप प्रविष्टियाँ पुनर्स्थापित हुईं';
+  }
+
+  @override
+  String get importInvalid => 'यह फ़ाइल मान्य जपमाला बैकअप नहीं है';
+
+  @override
+  String get exportShareText => 'मेरा जपमाला बैकअप';
+
+  @override
+  String get onb1Title => 'आपकी डिजिटल जप माला';
+
+  @override
+  String get onb1Body => 'हर नाम जप गिनने का एक शांत तरीका।';
+
+  @override
+  String get onb2Title => 'साधना को आदत बनाएँ';
+
+  @override
+  String get onb2Body => 'दैनिक लक्ष्य तय करें और जाप की लय बनाएँ।';
+
+  @override
+  String get onb3Title => 'बिना विघ्न जाप करें';
+
+  @override
+  String get onb3Body => 'स्वच्छ, शांत काउंटर के साथ ध्यान मोड में जाएँ।';
+
+  @override
+  String get onb4Title => 'जप आरंभ करें';
+
+  @override
+  String get onb4Body => 'आरंभ करने के लिए तैयार?';
+
+  @override
+  String get startJap => 'जप आरंभ करें';
+
+  @override
+  String get blackout => 'अंधकार';
+
+  @override
+  String get timer => 'समय';
+
+  @override
+  String get exitMeditation => 'ध्यान मोड से बाहर आएँ';
+
+  @override
+  String get tapAnywhere => 'गिनने के लिए कहीं भी स्पर्श करें';
+
+  @override
+  String semanticCounter(int count, int total) {
+    return 'जाप काउंटर। $total में से $count मनके। एक गिनने के लिए दो बार स्पर्श करें।';
+  }
+
+  @override
+  String get autoJaap => 'स्वतः जाप';
+
+  @override
+  String get autoJaapShort => 'स्वतः';
+
+  @override
+  String get autoJaapBody =>
+      'ऐप एक स्थिर गति से आपके लिए गिनती करता है, ताकि आप बिना हाथ लगाए साथ में जाप कर सकें।';
+
+  @override
+  String get autoJaapPace => 'गति';
+
+  @override
+  String autoJaapSeconds(int seconds) {
+    return '$seconds से.';
+  }
+
+  @override
+  String get autoJaapSpeak => 'स्वर में जाप';
+
+  @override
+  String get autoJaapSpeakHint => 'हर मनके से पहले फ़ोन मंत्र बोलेगा';
+
+  @override
+  String get autoJaapStopAfter => 'कब रुकें';
+
+  @override
+  String get autoJaapStopMala => 'एक माला';
+
+  @override
+  String get autoJaapStopGoal => 'दैनिक लक्ष्य';
+
+  @override
+  String get autoJaapStopNever => 'न रुकें';
+
+  @override
+  String get autoJaapStart => 'स्वतः जाप शुरू करें';
+
+  @override
+  String get autoJaapStopAction => 'स्वतः जाप रोकें';
+
+  @override
+  String counterCount(String count) {
+    return 'गिनती: $count';
+  }
+
+  @override
+  String counterMalas(String count) {
+    return 'मालाएँ: $count';
+  }
+
+  @override
+  String counterTotal(String count) {
+    return 'कुल: $count';
+  }
+
+  @override
+  String get autoJaapTapToStop =>
+      'स्वतः जाप चालू · रोकने के लिए कहीं भी स्पर्श करें';
+
+  @override
+  String get hideMantra => 'मंत्र छिपाएँ';
+
+  @override
+  String get showMantra => 'मंत्र दिखाएँ';
+
+  @override
+  String get changeTheme => 'थीम बदलें';
+
+  @override
+  String themeChanged(String name) {
+    return 'थीम: $name';
+  }
+
+  @override
+  String streakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन का क्रम',
+      one: '1 दिन का क्रम',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get menu => 'मेनू';
+
+  @override
+  String get autoJaapVoice => 'आवाज़';
+
+  @override
+  String get autoJaapVoiceDefault => 'डिफ़ॉल्ट हिंदी आवाज़';
+
+  @override
+  String get autoJaapChooseVoice => 'आवाज़ चुनें';
+
+  @override
+  String get autoJaapVoiceHintIos =>
+      'सबसे स्वाभाविक, शांत ध्वनि के लिए सेटिंग्स → एक्सेसिबिलिटी → स्पोकन कंटेंट → वॉइसेस → हिंदी में Enhanced या Premium हिंदी आवाज़ डाउनलोड करें, फिर यहाँ लौटें।';
+
+  @override
+  String get autoJaapVoiceHintAndroid =>
+      'अधिक स्वाभाविक ध्वनि के लिए सेटिंग्स → एक्सेसिबिलिटी → टेक्स्ट-टू-स्पीच में हिंदी आवाज़ इंस्टॉल करें।';
+
+  @override
+  String get autoJaapShowAllVoices => 'सभी भाषाएँ दिखाएँ';
+
+  @override
+  String get autoJaapNoVoices => 'इस डिवाइस पर कोई आवाज़ नहीं मिली।';
+
+  @override
+  String get autoJaapSpeed => 'गति';
+
+  @override
+  String get autoJaapPitch => 'स्वर';
+
+  @override
+  String get autoJaapSlow => 'धीमा';
+
+  @override
+  String get autoJaapFast => 'तेज़';
+
+  @override
+  String get autoJaapDeep => 'गहरा';
+
+  @override
+  String get autoJaapHigh => 'ऊँचा';
+
+  @override
+  String get autoJaapPreview => 'सुनें';
+
+  @override
+  String get autoJaapResetVoice => 'शांत डिफ़ॉल्ट पर लौटें';
+
+  @override
+  String get voiceQualityEnhanced => 'Enhanced';
+
+  @override
+  String get voiceQualityPremium => 'Premium';
+
+  @override
+  String get languagePunjabi => 'पंजाबी';
+
+  @override
+  String get languageEnglishIndia => 'अंग्रेज़ी (भारत)';
+}

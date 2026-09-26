@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launch window carries the app's own background colour, so the first
+     frame does not flash white before the counter appears. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/japmala_background" />
+</layer-list>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="japmala_background">#0F0F0E</color>
+    <color name="japmala_card">#1A1A19</color>
+    <color name="japmala_primary">#F5F4F1</color>
+    <color name="japmala_secondary">#9C9A94</color>
+    <color name="japmala_soft_saffron">#33260F</color>
+    <color name="japmala_track">#262624</color>
+</resources>

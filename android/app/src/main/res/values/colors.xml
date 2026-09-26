@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The JapMala palette, mirrored from lib/app/theme/app_colors.dart. -->
+    <color name="ic_launcher_background">#FAF6EE</color>
+    <color name="japmala_background">#F8F7F4</color>
+    <color name="japmala_card">#FFFFFF</color>
+    <color name="japmala_primary">#171717</color>
+    <color name="japmala_secondary">#777777</color>
+    <color name="japmala_saffron">#F5A623</color>
+    <color name="japmala_soft_saffron">#FFF1D6</color>
+    <color name="japmala_track">#EDEBE6</color>
+</resources>

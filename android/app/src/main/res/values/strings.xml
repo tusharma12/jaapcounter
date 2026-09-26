@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JapMala</string>
+    <string name="widget_description">Today\'s Jaap and the mala in progress.</string>
+    <string name="widget_today">Today</string>
+    <string name="widget_open">Open JapMala to count</string>
+</resources>

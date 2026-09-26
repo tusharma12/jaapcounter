@@ -1,0 +1,505 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../app/theme/app_colors.dart';
+import '../../../app/theme/app_dimens.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/providers.dart';
+import '../../../core/services/app_logger.dart';
+import '../../../core/utils/day_key.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_feedback.dart';
+import '../../../core/widgets/section_header.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../backup/presentation/backup_controllers.dart';
+import '../../jaap/presentation/jaap_controller.dart';
+import '../../mantras/presentation/mantra_controllers.dart';
+import '../../reminders/domain/reminder.dart';
+import '../../reminders/presentation/reminder_controllers.dart';
+import '../../reminders/presentation/reminders_screen.dart';
+import '../../sadhana/presentation/sadhana_controllers.dart';
+import 'settings_controller.dart';
+
+class SettingsScreen extends ConsumerWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppL10n.of(context);
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final version = ref.watch(appVersionProvider).value;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.settings)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          Insets.page,
+          Insets.md,
+          Insets.page,
+          Insets.xxxl,
+        ),
+        children: [
+          SectionHeader(l10n.sectionJaap),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.myMantras,
+                icon: Icons.format_list_bulleted_rounded,
+                onTap: () => context.push('/mantras'),
+              ),
+              _NavRow(
+                label: l10n.sadhanaGoals,
+                icon: Icons.auto_awesome_outlined,
+                onTap: () => context.push('/sadhana'),
+              ),
+              _NavRow(
+                label: l10n.resetCounts,
+                icon: Icons.restart_alt_rounded,
+                onTap: () => _showResetOptions(context, ref),
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
+          SectionHeader(l10n.sectionReminders),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.jaapReminders,
+                icon: Icons.notifications_none_rounded,
+                onTap: () => context.push('/reminders'),
+              ),
+              _SingletonReminderRow(
+                kind: ReminderKind.streak,
+                label: l10n.streakReminder,
+                defaultMinutes: 20 * 60,
+              ),
+              _SingletonReminderRow(
+                kind: ReminderKind.goal,
+                label: l10n.goalReminder,
+                defaultMinutes: 19 * 60,
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
+          SectionHeader(l10n.sectionAppearance),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.theme,
+                icon: Icons.contrast_rounded,
+                value: switch (settings.themeMode) {
+                  ThemeMode.light => l10n.themeLight,
+                  ThemeMode.dark => l10n.themeDark,
+                  ThemeMode.system => l10n.themeSystem,
+                },
+                onTap: () => _pickTheme(context, ref),
+              ),
+              _SwitchRow(
+                label: l10n.haptics,
+                icon: Icons.vibration_rounded,
+                value: settings.hapticsEnabled,
+                onChanged: controller.setHaptics,
+              ),
+              _SwitchRow(
+                label: l10n.sound,
+                icon: Icons.volume_up_outlined,
+                value: settings.soundEnabled,
+                onChanged: controller.setSound,
+              ),
+              _NavRow(
+                label: l10n.language,
+                icon: Icons.translate_rounded,
+                value: switch (settings.localeCode) {
+                  'en' => l10n.languageEnglish,
+                  'hi' => l10n.languageHindi,
+                  _ => l10n.languageSystem,
+                },
+                onTap: () => _pickLanguage(context, ref),
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
+          SectionHeader(l10n.sectionBackup),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.backupRestore,
+                icon: Icons.cloud_download_outlined,
+                onTap: () => context.push('/backup'),
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
+          SectionHeader(l10n.sectionSupport),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.rateApp,
+                icon: Icons.star_border_rounded,
+                onTap: () => _open(
+                  Theme.of(context).platform == TargetPlatform.iOS
+                      ? AppConstants.iosStoreUrl
+                      : AppConstants.androidStoreUrl,
+                ),
+              ),
+              _NavRow(
+                label: l10n.shareApp,
+                icon: Icons.ios_share_rounded,
+                onTap: () => SharePlus.instance.share(
+                  ShareParams(text: '${l10n.appName} — ${l10n.tagline}'),
+                ),
+              ),
+              _NavRow(
+                label: l10n.feedback,
+                icon: Icons.chat_bubble_outline_rounded,
+                onTap: () => _open(
+                  'mailto:${AppConstants.supportEmail}'
+                  '?subject=${Uri.encodeComponent(l10n.appName)}',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
+          SectionHeader(l10n.sectionAbout),
+          AppCardGroup(
+            children: [
+              _NavRow(
+                label: l10n.privacyPolicy,
+                icon: Icons.lock_outline_rounded,
+                onTap: () => _open(AppConstants.privacyPolicyUrl),
+              ),
+              _NavRow(
+                label: l10n.terms,
+                icon: Icons.description_outlined,
+                onTap: () => _open(AppConstants.termsUrl),
+              ),
+              _NavRow(
+                label: l10n.aboutApp,
+                icon: Icons.info_outline_rounded,
+                onTap: () => context.push('/about'),
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xl),
+          Center(
+            child: Text(
+              version == null ? '' : l10n.version(version),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _open(String url) async {
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not open $url', error, stack);
+    }
+  }
+
+  Future<void> _pickTheme(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final current = ref.read(settingsProvider).themeMode;
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final entry in {
+              ThemeMode.system: l10n.themeSystem,
+              ThemeMode.light: l10n.themeLight,
+              ThemeMode.dark: l10n.themeDark,
+            }.entries)
+              ListTile(
+                title: Text(entry.value),
+                trailing: entry.key == current
+                    ? const Icon(Icons.check_rounded)
+                    : null,
+                onTap: () {
+                  ref.read(settingsProvider.notifier).setThemeMode(entry.key);
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+            const SizedBox(height: Insets.lg),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final current = ref.read(settingsProvider).localeCode;
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final entry in <String?, String>{
+              null: l10n.languageSystem,
+              'en': l10n.languageEnglish,
+              'hi': l10n.languageHindi,
+            }.entries)
+              ListTile(
+                title: Text(entry.value),
+                trailing: entry.key == current
+                    ? const Icon(Icons.check_rounded)
+                    : null,
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await ref
+                      .read(settingsProvider.notifier)
+                      .setLocale(entry.key);
+                  // Notification copy is baked in at schedule time, so a new
+                  // language means rewriting what is already scheduled.
+                  if (context.mounted) {
+                    await ref
+                        .read(remindersProvider.notifier)
+                        .reschedule(RemindersScreen.copyFrom(AppL10n.of(context)));
+                  }
+                },
+              ),
+            const SizedBox(height: Insets.lg),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showResetOptions(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(l10n.resetToday),
+              leading: const Icon(Icons.today_rounded),
+              onTap: () async {
+                Navigator.of(sheetContext).pop();
+                await _resetToday(context, ref);
+              },
+            ),
+            ListTile(
+              title: Text(
+                l10n.resetEverything,
+                style: TextStyle(color: context.palette.danger),
+              ),
+              leading: Icon(
+                Icons.delete_outline_rounded,
+                color: context.palette.danger,
+              ),
+              onTap: () async {
+                Navigator.of(sheetContext).pop();
+                await _resetEverything(context, ref);
+              },
+            ),
+            const SizedBox(height: Insets.lg),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _resetToday(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final confirmed = await confirm(
+      context,
+      title: l10n.resetTodayTitle,
+      message: l10n.resetTodayBody,
+      confirmLabel: l10n.resetToday,
+      cancelLabel: l10n.cancel,
+      destructive: true,
+    );
+    if (!confirmed) return;
+
+    final today = DayKeys.of(ref.read(clockProvider)());
+    await ref.read(jaapRepositoryProvider).deleteDay(today);
+    _refresh(ref);
+    if (context.mounted) showAppSnack(context, l10n.resetDone);
+  }
+
+  Future<void> _resetEverything(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final confirmed = await confirm(
+      context,
+      title: l10n.resetAllTitle,
+      message: l10n.resetAllBody,
+      confirmLabel: l10n.resetEverything,
+      cancelLabel: l10n.cancel,
+      destructive: true,
+    );
+    if (!confirmed) return;
+
+    await ref.read(jaapRepositoryProvider).deleteAllEntries();
+    await ref.read(sadhanaRepositoryProvider).deleteAll();
+    _refresh(ref);
+    if (context.mounted) showAppSnack(context, l10n.resetDone);
+  }
+
+  void _refresh(WidgetRef ref) {
+    ref.invalidate(mantraListProvider);
+    ref.invalidate(jaapControllerProvider);
+    ref.invalidate(activeSadhanaProvider);
+    ref.read(ledgerRevisionProvider.notifier).bump();
+  }
+}
+
+class _NavRow extends StatelessWidget {
+  const _NavRow({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.value,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final String? value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final palette = context.palette;
+
+    return ListTile(
+      leading: Icon(icon, size: 20),
+      title: Text(label),
+      onTap: onTap,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (value != null)
+            Text(
+              value!,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: palette.secondaryText,
+              ),
+            ),
+          const SizedBox(width: Insets.xs),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: 20,
+            color: palette.tertiaryText,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SwitchRow extends StatelessWidget {
+  const _SwitchRow({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, size: 20),
+      title: Text(label),
+      onTap: () => onChanged(!value),
+      trailing: Switch(value: value, onChanged: onChanged),
+    );
+  }
+}
+
+/// The streak and goal reminders: one switch and one time each.
+class _SingletonReminderRow extends ConsumerWidget {
+  const _SingletonReminderRow({
+    required this.kind,
+    required this.label,
+    required this.defaultMinutes,
+  });
+
+  final ReminderKind kind;
+  final String label;
+  final int defaultMinutes;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppL10n.of(context);
+    final palette = context.palette;
+    final reminders = ref.watch(remindersProvider).value ?? const <Reminder>[];
+    final existing = reminders.where((r) => r.kind == kind).firstOrNull;
+    final enabled = existing?.enabled ?? false;
+    final minutes = existing?.minutes ?? defaultMinutes;
+    final time = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
+    final controller = ref.read(remindersProvider.notifier);
+
+    Future<void> apply({required bool on, int? newMinutes}) async {
+      if (on) await controller.requestPermission();
+      await controller.setSingleton(
+        kind: kind,
+        minutes: newMinutes ?? minutes,
+        enabled: on,
+      );
+      await controller.reschedule(RemindersScreen.copyFrom(l10n));
+    }
+
+    return ListTile(
+      leading: Icon(
+        kind == ReminderKind.streak
+            ? Icons.local_fire_department_outlined
+            : Icons.flag_outlined,
+        size: 20,
+      ),
+      title: Text(label),
+      subtitle: enabled ? Text(time.format(context)) : null,
+      onTap: !enabled
+          ? null
+          : () async {
+              final picked = await showTimePicker(
+                context: context,
+                initialTime: time,
+                helpText: l10n.reminderTime,
+              );
+              if (picked == null) return;
+              await apply(
+                on: true,
+                newMinutes: picked.hour * 60 + picked.minute,
+              );
+            },
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Switch(value: enabled, onChanged: (on) => apply(on: on)),
+          if (enabled)
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: palette.tertiaryText,
+            ),
+        ],
+      ),
+    );
+  }
+}
