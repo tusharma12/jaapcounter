@@ -27,16 +27,21 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp.router(
-          theme: AppTheme.light(),
-          routerConfig: router,
-          localizationsDelegates: const [
-            AppL10n.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppL10n.supportedLocales,
+        // Follows the language setting, as the real app does, so the
+        // English / हिन्दी switch shows on screen.
+        child: Consumer(
+          builder: (context, ref, _) => MaterialApp.router(
+            locale: ref.watch(settingsProvider).locale,
+            theme: AppTheme.light(),
+            routerConfig: router,
+            localizationsDelegates: const [
+              AppL10n.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppL10n.supportedLocales,
+          ),
         ),
       ),
     );
@@ -47,7 +52,17 @@ void main() {
       await tester.pumpAndSettle();
     }
     expect(find.text('Which mantra do you chant?'), findsOneWidget);
-    await tester.tap(find.text('राधा'));
+    expect(container.read(settingsProvider).localeCode, isNull);
+    await tester.tap(find.text('हिन्दी'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).localeCode, 'hi');
+    expect(find.text('राधा'), findsOneWidget, reason: 'mantras follow');
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).localeCode, 'en');
+    expect(find.text('राधा'), findsNothing);
+
+    await tester.tap(find.text('Radha'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();

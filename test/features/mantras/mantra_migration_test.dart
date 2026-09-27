@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:japmala/core/constants/built_in_mantras.dart';
 import 'package:japmala/core/database/app_database.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -137,5 +138,46 @@ void main() {
     expect(rows['plain']!['name'], 'Jai Mata Di');
     expect(rows['plain']!['description'], isNull);
     expect(rows['builtin.ram']!['name'], 'राम');
+  });
+
+  test('v7 adds the four new built-ins without touching Jaap', () async {
+    final dir = await Directory.systemTemp.createTemp('japmala');
+    addTearDown(() => dir.delete(recursive: true));
+    final factory = databaseFactoryFfi;
+    await factory.setDatabasesPath(dir.path);
+
+    // A v6 install: today's schema, but without the v7 mantras.
+    const added = [
+      'builtin.radhe-krishna',
+      'builtin.om-namo-narayanaya',
+      'builtin.om-sai-ram',
+      'builtin.om-dum-durgayei-namah',
+    ];
+    final v6 = await AppDatabase.open(factory: factory);
+    await v6.delete(
+      'mantras',
+      where: 'id IN (${List.filled(added.length, '?').join(', ')})',
+      whereArgs: added,
+    );
+    await v6.insert('jaap_entries', {
+      'id': 'e1',
+      'mantra_id': 'builtin.ram',
+      'count': 108,
+      'day': '2026-09-27',
+      'timestamp': 0,
+    });
+    await v6.setVersion(6);
+    await v6.close();
+
+    final db = await AppDatabase.open(factory: factory);
+    addTearDown(db.close);
+    final ids = {
+      for (final row in await db.query('mantras', columns: ['id']))
+        row['id'] as String,
+    };
+    expect(ids, containsAll(added));
+    expect(ids.length, BuiltInMantras.all.length);
+    expect(BuiltInMantras.all.length, 21);
+    expect(await db.query('jaap_entries'), hasLength(1));
   });
 }

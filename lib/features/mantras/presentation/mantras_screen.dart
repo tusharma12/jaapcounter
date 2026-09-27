@@ -6,6 +6,7 @@ import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/mantra.dart';
+import '../domain/mantra_names.dart';
 import 'mantra_controllers.dart';
 import 'mantra_editor_sheet.dart';
 import 'mantra_tile.dart';
@@ -21,7 +22,16 @@ class MantrasScreen extends ConsumerWidget {
     final active = ref.watch(activeMantraProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.myMantras)),
+      appBar: AppBar(
+        title: Text(l10n.myMantras),
+        actions: [
+          IconButton(
+            onPressed: () => _addOwn(context, ref),
+            tooltip: l10n.addMantra,
+            icon: const Icon(Icons.add_rounded),
+          ),
+        ],
+      ),
       body: AsyncView<List<Mantra>>(
         value: mantras,
         onRetry: () => ref.invalidate(mantraListProvider),
@@ -30,14 +40,11 @@ class MantrasScreen extends ConsumerWidget {
             Insets.page,
             Insets.sm,
             Insets.page,
-            Insets.xxxl * 2,
+            Insets.xl,
           ),
-          itemCount: list.length + 1,
+          itemCount: list.length,
           separatorBuilder: (_, _) => const SizedBox(height: Insets.md),
           itemBuilder: (context, index) {
-            if (index == list.length) {
-              return AddOwnMantraTile(onTap: () => _addOwn(context, ref));
-            }
             final mantra = list[index];
             return MantraTile(
               mantra: mantra,
@@ -52,11 +59,6 @@ class MantrasScreen extends ConsumerWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _addOwn(context, ref),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.addMantra),
-      ),
     );
   }
 
@@ -69,7 +71,7 @@ class MantrasScreen extends ConsumerWidget {
     final confirmed = await confirm(
       context,
       title: l10n.deleteMantraTitle,
-      message: l10n.deleteMantraBody(mantra.name),
+      message: l10n.deleteMantraBody(mantra.displayName(context)),
       confirmLabel: l10n.delete,
       cancelLabel: l10n.cancel,
       destructive: true,

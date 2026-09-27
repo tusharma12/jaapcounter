@@ -1,0 +1,769 @@
+// Generates the App Store and Google Play screenshots from the real app.
+//
+// Run with tool/screenshots.sh (it sets the font path and output folders).
+// Each shot drives the actual router, screens and database, seeded with a
+// believable 23-day practice, then frames the capture under a headline.
+//
+// Output:
+//   ios/fastlane/screenshots/en-US/          1320×2868 (6.9" iPhone)
+//   android/fastlane/metadata/android/en-US/images/phoneScreenshots/
+//                                            1080×1920
+import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:japmala/app/router.dart';
+import 'package:japmala/app/theme/app_theme.dart';
+import 'package:japmala/app/theme/app_themes.dart';
+import 'package:japmala/core/database/app_database.dart';
+import 'package:japmala/core/providers.dart';
+import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
+import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
+import 'package:japmala/features/settings/domain/counter_background.dart';
+import 'package:japmala/features/settings/presentation/settings_controller.dart';
+import 'package:japmala/l10n/app_localizations.dart';
+
+import '../test/support/test_harness.dart';
+
+/// The phone the app is captured on: iPhone 16 Pro sized, at 3×.
+const Size _device = Size(393, 852);
+const double _statusBar = 59;
+const double _homeIndicator = 34;
+
+/// "Today" in every shot: early on a Sunday morning.
+final DateTime _now = DateTime(2026, 9, 27, 6, 40);
+
+/// A headline line is a run of plain and highlighted words.
+typedef _Span = (String text, bool highlight);
+
+class _Shot {
+  const _Shot({
+    required this.file,
+    required this.headline,
+    required this.sub,
+    required this.capture,
+    this.night = false,
+    this.darkStatusBar = false,
+    this.badge,
+  });
+
+  final String file;
+  final List<_Span> headline;
+  final String sub;
+
+  /// Drives the app to the screen to capture.
+  final Future<void> Function(WidgetTester, ProviderContainer, GoRouter)
+  capture;
+
+  /// A midnight background instead of the maroon one.
+  final bool night;
+
+  /// White status-bar glyphs, for screens that are dark themselves.
+  final bool darkStatusBar;
+  final String? badge;
+}
+
+final _shots = <_Shot>[
+  _Shot(
+    file: '01_counter',
+    badge: 'No ads  •  Private  •  Works offline',
+    headline: [('Never lose count\nof your ', false), ('Naam Jap', true)],
+    sub: 'Tap anywhere. Every bead, counted.',
+    capture: (tester, c, router) async {},
+  ),
+  _Shot(
+    file: '02_streak',
+    headline: [
+      ('Build a ', false),
+      ('daily\nsadhana', true),
+      (' streak', false),
+    ],
+    sub: 'Streaks, charts and a daily habit grid',
+    capture: (tester, c, router) async {
+      router.go('/progress');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '03_blackout',
+    night: true,
+    darkStatusBar: true,
+    headline: [('Chant with your\n', false), ('eyes closed', true)],
+    sub: 'Pure black screen. One tap per bead.',
+    capture: (tester, c, router) async {
+      router.push('/blackout');
+      await _settle(tester);
+      await tester.tap(find.byKey(const ValueKey('blackout-show-mantra')));
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '04_mantras',
+    headline: [('21 sacred', true), (' mantras,\nor your own', false)],
+    sub: 'Ram, Radha, Shiva, Gayatri & more',
+    capture: (tester, c, router) async {
+      router.push('/mantras');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '05_sankalp',
+    headline: [('Take a ', false), ('Sankalp', true), ('.\nKeep it.', false)],
+    sub: 'A 40-day vow with a daily mala goal',
+    capture: (tester, c, router) async {
+      router.push('/sadhana');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '06_themes',
+    darkStatusBar: true,
+    headline: [('Make every jaap\n', false), ('beautiful', true)],
+    sub: '13 themes, bead mala, falling mantra',
+    capture: (tester, c, router) async {
+      await c.read(settingsProvider.notifier).setTheme(AppThemeId.meditative);
+      await c
+          .read(settingsProvider.notifier)
+          .setBackground(CounterBackground.cosmos);
+      await _settle(tester);
+      // Release a shower of mantras and catch it mid-fall.
+      final jaap = c.read(jaapControllerProvider.notifier);
+      for (var i = 0; i < 7; i++) {
+        jaap.count();
+        await tester.pump(const Duration(milliseconds: 260));
+      }
+      await tester.pump(const Duration(milliseconds: 900));
+    },
+  ),
+];
+
+Future<void> _settle(WidgetTester tester) async {
+  // Never pumpAndSettle: the counter's animations would keep it spinning.
+  for (var i = 0; i < 12; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+}
+
+Future<void> _loadFonts() async {
+  final root = Platform.environment['FLUTTER_ROOT'];
+  if (root == null) throw StateError('Run via tool/screenshots.sh');
+  final icons = FontLoader('MaterialIcons')
+    ..addFont(
+      Future.value(
+        ByteData.sublistView(
+          File(
+            '$root/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+          ).readAsBytesSync(),
+        ),
+      ),
+    );
+  await icons.load();
+  for (final f in Directory('assets/fonts').listSync().whereType<File>()) {
+    final name = f.uri.pathSegments.last;
+    final loader = FontLoader(
+      name.startsWith('Noto') ? 'NotoSansDevanagari' : 'Inter',
+    )..addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())));
+    await loader.load();
+  }
+}
+
+/// 23 days in a row of steady Jaap, a gap, and some earlier practice.
+Future<ProviderContainer> _seededApp() async {
+  final clock = TestClock(_now);
+  final container = await createTestContainer(clock: clock);
+  // In-memory databases are shared within the test isolate, so each shot
+  // starts from an empty one rather than piling onto the last.
+  await AppDatabase.clearAll(container.read(databaseProvider));
+  final settings = container.read(settingsProvider.notifier);
+  await settings.completeOnboarding();
+  await settings.setHaptics(false);
+  container.read(counterHintSeenProvider.notifier).markSeen();
+
+  final repo = container.read(jaapRepositoryProvider);
+  const streakDays = 23;
+  // Mostly the 10-mala goal or more; a few lighter days keep it believable.
+  const daily = [
+    1188,
+    1080,
+    1296,
+    1080,
+    1404,
+    1080,
+    1188,
+    1620,
+    1080,
+    1296,
+    1188,
+    1080,
+    1512,
+    1080,
+    1188,
+    1296,
+    1080,
+    1404,
+    1188,
+    1080,
+    1296,
+    1188,
+  ];
+  for (var d = streakDays - 1; d >= 1; d--) {
+    clock.set(_now.subtract(Duration(days: d)).copyWith(hour: 6));
+    await repo.addBeads(
+      mantraId: 'builtin.ram',
+      delta: daily[(streakDays - 1 - d) % daily.length],
+    );
+    if (d % 4 == 0) {
+      await repo.addBeads(mantraId: 'builtin.radha', delta: 216);
+    }
+  }
+  for (final d in [26, 27, 29, 30, 33, 34, 35]) {
+    clock.set(_now.subtract(Duration(days: d)).copyWith(hour: 7));
+    await repo.addBeads(mantraId: 'builtin.ram', delta: 540);
+  }
+
+  // A 40-day Sankalp begun on the first day of the streak.
+  await container
+      .read(sadhanaRepositoryProvider)
+      .create(
+        mantraId: 'builtin.ram',
+        dailyGoal: 1080,
+        durationDays: 40,
+        startAt: _now.subtract(const Duration(days: streakDays - 1)),
+      );
+
+  // This morning: five malas and part of the sixth.
+  clock.set(_now);
+  await repo.addBeads(mantraId: 'builtin.ram', delta: 612);
+  container.read(ledgerRevisionProvider.notifier).bump();
+  return container;
+}
+
+/// Captures the app itself at device size, 3×.
+Future<Uint8List> _captureApp(WidgetTester tester, _Shot shot) async {
+  tester.view.physicalSize = _device * 3;
+  tester.view.devicePixelRatio = 3;
+  tester.view.padding = const FakeViewPadding(
+    top: _statusBar * 3,
+    bottom: _homeIndicator * 3,
+  );
+  tester.view.viewPadding = const FakeViewPadding(
+    top: _statusBar * 3,
+    bottom: _homeIndicator * 3,
+  );
+
+  final container = await _seededApp();
+  await container.read(jaapControllerProvider.future);
+  final router = container.read(routerProvider);
+  const key = ValueKey('app');
+
+  await tester.pumpWidget(
+    RepaintBoundary(
+      key: key,
+      child: UncontrolledProviderScope(
+        container: container,
+        child: Consumer(
+          builder: (context, ref, _) {
+            final settings = ref.watch(settingsProvider);
+            final fixed = settings.themeId != AppThemeId.system;
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+              locale: const Locale('en'),
+              theme: fixed
+                  ? AppTheme.forId(settings.themeId)
+                  : AppTheme.light(),
+              darkTheme: fixed
+                  ? AppTheme.forId(settings.themeId)
+                  : AppTheme.dark(),
+              themeMode: settings.themeMode,
+              localizationsDelegates: const [
+                AppL10n.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppL10n.supportedLocales,
+            );
+          },
+        ),
+      ),
+    ),
+  );
+  await _settle(tester);
+  await shot.capture(tester, container, router);
+
+  late Uint8List bytes;
+  await tester.runAsync(() async {
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byKey(key),
+    );
+    final image = await boundary.toImage(pixelRatio: 3);
+    final data = await image.toByteData(format: ui.ImageByteFormat.png);
+    bytes = data!.buffer.asUint8List();
+  });
+  await container.read(jaapControllerProvider.notifier).flushPendingWrites();
+  // Unmount so the next shot starts from a clean tree.
+  await tester.pumpWidget(const SizedBox());
+  return bytes;
+}
+
+/// Frames a capture under its headline and writes the PNG.
+Future<void> _compose(
+  WidgetTester tester,
+  _Shot shot,
+  ui.Image screen, {
+  required Size canvas,
+  required String path,
+}) async {
+  tester.view.physicalSize = canvas * 3;
+  tester.view.devicePixelRatio = 3;
+  tester.view.padding = FakeViewPadding.zero;
+  tester.view.viewPadding = FakeViewPadding.zero;
+  const key = ValueKey('canvas');
+
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: RepaintBoundary(
+        key: key,
+        child: _StoreCanvas(shot: shot, screen: screen, size: canvas),
+      ),
+    ),
+  );
+  await tester.pump();
+
+  await tester.runAsync(() async {
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byKey(key),
+    );
+    final image = await boundary.toImage(pixelRatio: 3);
+    final data = await image.toByteData(format: ui.ImageByteFormat.png);
+    File(path)
+      ..parent.createSync(recursive: true)
+      ..writeAsBytesSync(data!.buffer.asUint8List());
+  });
+}
+
+class _StoreCanvas extends StatelessWidget {
+  const _StoreCanvas({
+    required this.shot,
+    required this.screen,
+    required this.size,
+  });
+
+  final _Shot shot;
+  final ui.Image screen;
+  final Size size;
+
+  static const _cream = Color(0xFFFFF4E2);
+  static const _saffron = Color(0xFFFFB23F);
+
+  @override
+  Widget build(BuildContext context) {
+    final w = size.width;
+    final h = size.height;
+    final tall = h / w > 2;
+    final headlineSize = w * (tall ? 0.092 : 0.082);
+    final phoneTop = h * (tall ? 0.268 : 0.305);
+    // The phone runs a little off the bottom edge, as if held up to you.
+    final phoneHeight = h - phoneTop + h * 0.035;
+    final phoneWidth = phoneHeight * (_device.width / _device.height);
+
+    final background = shot.night
+        ? const [Color(0xFF02030A), Color(0xFF0E1230), Color(0xFF1C1F45)]
+        : const [Color(0xFF2A0A04), Color(0xFF5A1A07), Color(0xFF8A3A0C)];
+
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: background,
+                ),
+              ),
+            ),
+          ),
+          // A soft glow behind the phone, the way a diya lights a room.
+          Positioned(
+            left: -w * 0.3,
+            right: -w * 0.3,
+            top: phoneTop - w * 0.25,
+            height: w * 1.3,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [
+                    _saffron.withValues(alpha: shot.night ? 0.16 : 0.28),
+                    _saffron.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: w * 0.07,
+            right: w * 0.07,
+            top: h * (tall ? 0.045 : 0.035),
+            child: Column(
+              children: [
+                if (shot.badge != null) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: w * 0.04,
+                      vertical: w * 0.013,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _saffron.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: _saffron.withValues(alpha: 0.55),
+                      ),
+                    ),
+                    child: Text(
+                      shot.badge!,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: w * 0.031,
+                        fontWeight: FontWeight.w600,
+                        color: _saffron,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: w * 0.035),
+                ] else
+                  SizedBox(height: w * 0.02),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      for (final (text, highlight) in shot.headline)
+                        TextSpan(
+                          text: text,
+                          style: TextStyle(
+                            color: highlight ? _saffron : _cream,
+                          ),
+                        ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.w800,
+                    height: 1.08,
+                    letterSpacing: -headlineSize * 0.025,
+                  ),
+                ),
+                SizedBox(height: w * 0.03),
+                Text(
+                  shot.sub,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: w * 0.041,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                    color: _cream.withValues(alpha: 0.78),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: phoneTop,
+            left: (w - phoneWidth) / 2,
+            width: phoneWidth,
+            height: phoneHeight,
+            child: _Phone(screen: screen, darkStatusBar: shot.darkStatusBar),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A plain modern iPhone: black bezel, rounded screen, dynamic island.
+class _Phone extends StatelessWidget {
+  const _Phone({required this.screen, required this.darkStatusBar});
+
+  final ui.Image screen;
+  final bool darkStatusBar;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = constraints.maxWidth / _device.width;
+        final bezel = 11 * scale;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0A0A),
+            borderRadius: BorderRadius.circular(60 * scale),
+            border: Border.all(color: const Color(0xFF3A3A3C), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.45),
+                blurRadius: 40 * scale,
+                offset: Offset(0, 18 * scale),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(bezel),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50 * scale),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  RawImage(image: screen, fit: BoxFit.cover),
+                  // The status bar and island, drawn at device scale.
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: _statusBar * scale,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        width: _device.width,
+                        height: _statusBar,
+                        child: _StatusBar(dark: darkStatusBar),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _StatusBar extends StatelessWidget {
+  const _StatusBar({required this.dark});
+
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = dark ? Colors.white : Colors.black;
+    return Stack(
+      children: [
+        Positioned(
+          left: 0,
+          width: 150,
+          top: 18,
+          child: Center(
+            child: Text(
+              '9:41',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 11,
+          left: (_device.width - 126) / 2,
+          width: 126,
+          height: 37,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        ),
+        Positioned(
+          right: 0,
+          width: 150,
+          top: 19,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.signal_cellular_alt_rounded, size: 18, color: color),
+              const SizedBox(width: 5),
+              Icon(Icons.wifi_rounded, size: 18, color: color),
+              const SizedBox(width: 5),
+              RotatedBox(
+                quarterTurns: 1,
+                child: Icon(Icons.battery_full_rounded, size: 22, color: color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Google Play's 1024×500 banner: icon, name and promise on the maroon.
+class _FeatureGraphic extends StatelessWidget {
+  const _FeatureGraphic({required this.icon});
+
+  final ui.Image icon;
+
+  @override
+  Widget build(BuildContext context) {
+    const cream = _StoreCanvas._cream;
+    const saffron = _StoreCanvas._saffron;
+    return SizedBox(
+      width: 1024,
+      height: 500,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2A0A04), Color(0xFF5A1A07), Color(0xFF8A3A0C)],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 72),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(64),
+                child: RawImage(image: icon, width: 280, height: 280),
+              ),
+              const SizedBox(width: 56),
+              const Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Naam Jap Counter',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 58,
+                        fontWeight: FontWeight.w800,
+                        height: 1.05,
+                        letterSpacing: -1.2,
+                        color: cream,
+                      ),
+                    ),
+                    Text(
+                      'Smaran',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 58,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                        letterSpacing: -1.2,
+                        color: saffron,
+                      ),
+                    ),
+                    SizedBox(height: 22),
+                    Text(
+                      'Your digital jap mala, always with you',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                        color: Color(0xC7FFF4E2),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _featureGraphic(WidgetTester tester, String path) async {
+  late ui.Image icon;
+  await tester.runAsync(() async {
+    icon = await decodeImageFromList(
+      File('appstore_assets/appicon-fullbleed.png').readAsBytesSync(),
+    );
+  });
+  tester.view.physicalSize = const Size(1024, 500);
+  tester.view.devicePixelRatio = 1;
+  tester.view.padding = FakeViewPadding.zero;
+  tester.view.viewPadding = FakeViewPadding.zero;
+  const key = ValueKey('feature');
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: RepaintBoundary(
+        key: key,
+        child: _FeatureGraphic(icon: icon),
+      ),
+    ),
+  );
+  await tester.pump();
+  await tester.runAsync(() async {
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byKey(key),
+    );
+    final image = await boundary.toImage();
+    final data = await image.toByteData(format: ui.ImageByteFormat.png);
+    File(path)
+      ..parent.createSync(recursive: true)
+      ..writeAsBytesSync(data!.buffer.asUint8List());
+  });
+}
+
+void main() {
+  testWidgets('store screenshots', (tester) async {
+    await tester.runAsync(_loadFonts);
+    addTearDown(tester.view.reset);
+
+    final root = Directory.current.path;
+    final iosDir = '$root/ios/fastlane/screenshots/en-US';
+    final playDir =
+        '$root/android/fastlane/metadata/android/en-US/images/phoneScreenshots';
+
+    await _featureGraphic(
+      tester,
+      '$root/android/fastlane/metadata/android/en-US/images/featureGraphic.png',
+    );
+
+    for (final shot in _shots) {
+      final bytes = await _captureApp(tester, shot);
+      late ui.Image screen;
+      await tester.runAsync(() async {
+        screen = await decodeImageFromList(bytes);
+      });
+      await _compose(
+        tester,
+        shot,
+        screen,
+        canvas: const Size(440, 956),
+        path: '$iosDir/${shot.file}.png',
+      );
+      await _compose(
+        tester,
+        shot,
+        screen,
+        canvas: const Size(360, 640),
+        path: '$playDir/${shot.file}.png',
+      );
+    }
+  });
+}

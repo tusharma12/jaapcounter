@@ -1,0 +1,108 @@
+# iOS release lanes for Naam Jap Counter – Smaran.
+#
+# Run from ios/:  bundle exec fastlane <lane>
+#
+# Authentication is an App Store Connect API key (no Apple ID / 2FA prompts).
+# Create one in App Store Connect → Users and Access → Integrations, role
+# "App Manager", then export:
+#
+#   ASC_KEY_ID        the key's ID, e.g. 2X9R4HXF34
+#   ASC_ISSUER_ID     the issuer UUID shown above the key list
+#   ASC_KEY_PATH      path to the downloaded AuthKey_XXXX.p8
+#
+# Signing stays Automatic, exactly as in Xcode; the key lets xcodebuild
+# create or refresh profiles on its own.
+
+default_platform(:ios)
+
+WORKSPACE = "Runner.xcworkspace"
+SCHEME = "Runner"
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+
+platform :ios do
+  def api_key
+    @api_key ||= app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: File.expand_path(ENV.fetch("ASC_KEY_PATH")),
+      in_house: false,
+    )
+  end
+
+  # One above whatever TestFlight already has, so uploads never collide.
+  def next_build_number
+    latest_testflight_build_number(api_key: api_key, initial_build_number: 0) + 1
+  end
+
+  # Flutter writes the version (pubspec.yaml) and the Dart build into the
+  # Xcode project; gym then archives and signs it.
+  def build_release
+    build = next_build_number
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "pub", "get")
+      sh("flutter", "build", "ios", "--release", "--no-codesign",
+         "--build-number=#{build}")
+    end
+    key = api_key
+    build_app(
+      workspace: WORKSPACE,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "#{PROJECT_ROOT}/build/fastlane",
+      output_name: "Smaran.ipa",
+      clean: false,
+      xcargs: [
+        "-allowProvisioningUpdates",
+        "-authenticationKeyID #{key[:key_id]}",
+        "-authenticationKeyIssuerID #{key[:issuer_id]}",
+        "-authenticationKeyPath #{File.expand_path(ENV.fetch('ASC_KEY_PATH'))}",
+      ].join(" "),
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    build_release
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Build, upload, and send metadata + screenshots to App Store Connect (not submitted)"
+  lane :release do
+    build_release
+    upload_to_app_store(
+      api_key: api_key,
+      force: true, # skip the HTML preview
+      submit_for_review: false,
+      automatic_release: false,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false,
+    )
+  end
+
+  desc "Upload store text only (fastlane/metadata)"
+  lane :metadata do
+    upload_to_app_store(
+      api_key: api_key,
+      force: true,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false,
+    )
+  end
+
+  desc "Upload screenshots only (fastlane/screenshots)"
+  lane :screenshots do
+    upload_to_app_store(
+      api_key: api_key,
+      force: true,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false,
+    )
+  end
+end

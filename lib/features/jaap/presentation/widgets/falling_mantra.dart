@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../mantras/domain/mantra.dart';
+import '../../../mantras/domain/mantra_names.dart';
 
 /// Sends the mantra drifting down the screen once for every bead counted.
 ///
@@ -110,6 +111,7 @@ class _FallingMantraState extends State<FallingMantra>
   Widget build(BuildContext context) {
     if (_particles.isEmpty) return const SizedBox.expand();
     final palette = context.palette;
+    final text = widget.mantra.displayName(context).replaceAll('\n', ' ');
     return IgnorePointer(
       child: RepaintBoundary(
         child: CustomPaint(
@@ -117,8 +119,8 @@ class _FallingMantraState extends State<FallingMantra>
           painter: _FallingPainter(
             particles: List.of(_particles),
             now: _now,
-            text: widget.mantra.name.replaceAll('\n', ' '),
-            devanagari: widget.mantra.isDevanagari,
+            text: text,
+            devanagari: Mantra.isDevanagariText(text),
             color: palette.saffron,
           ),
         ),

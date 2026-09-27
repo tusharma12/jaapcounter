@@ -10,7 +10,7 @@ import '../services/app_logger.dart';
 /// anywhere. [openTestDatabase] lets the same schema run in unit tests.
 abstract final class AppDatabase {
   static const String fileName = 'japmala.db';
-  static const int schemaVersion = 6;
+  static const int schemaVersion = 7;
 
   static Future<Database> open({DatabaseFactory? factory}) async {
     final f = factory ?? databaseFactory;
@@ -129,6 +129,11 @@ abstract final class AppDatabase {
     if (from < 6) {
       // v6 adds Sita Ram and five more built-ins; seeding ignores rows
       // already present, so nothing already chanted is touched.
+      await _seedBuiltInMantras(db);
+    }
+    if (from < 7) {
+      // v7 adds Radhe Krishna, Om Namo Narayanaya, Om Sai Ram and the Durga
+      // mantra, making 21.
       await _seedBuiltInMantras(db);
     }
   }

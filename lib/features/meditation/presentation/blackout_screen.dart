@@ -10,6 +10,7 @@ import '../../../core/widgets/async_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../jaap/presentation/jaap_state.dart';
+import '../../mantras/domain/mantra_names.dart';
 import '../../settings/presentation/settings_controller.dart';
 
 /// A pure black screen for chanting with the eyes closed or the phone face
@@ -186,7 +187,7 @@ class _MantraAndCount extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              state.mantra.name,
+              state.mantra.displayName(context),
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,

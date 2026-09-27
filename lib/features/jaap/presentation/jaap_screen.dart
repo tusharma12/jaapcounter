@@ -13,6 +13,7 @@ import '../../../core/widgets/mantra_text.dart';
 import '../../../core/widgets/stat_tile.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../mantras/presentation/mantra_editor_sheet.dart';
+import '../../mantras/domain/mantra_names.dart';
 import '../../mantras/presentation/mantras_screen.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
 import '../../settings/domain/mala_style.dart';
@@ -144,6 +145,9 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
         await context.push('/blackout');
       case _MenuAction.hideMantra:
         ref.read(hideMantraProvider.notifier).toggle();
+      case _MenuAction.fallingMantra:
+        final current = ref.read(settingsProvider).fallingMantra;
+        await ref.read(settingsProvider.notifier).setFallingMantra(!current);
       case _MenuAction.theme:
         await showThemePicker(context);
       case _MenuAction.background:
@@ -213,6 +217,7 @@ enum _MenuAction {
   meditation,
   blackout,
   hideMantra,
+  fallingMantra,
   theme,
   background,
   addCount,
@@ -304,7 +309,9 @@ class _CounterBody extends StatelessWidget {
                                   ),
                                   child: MantraText(
                                     state.mantra,
-                                    size: _mantraSize(state),
+                                    size: _mantraSize(
+                                      state.mantra.displayName(context),
+                                    ),
                                     weight: FontWeight.w700,
                                     maxLines: 4,
                                     color: palette.primaryText,
@@ -396,8 +403,7 @@ class _CounterBody extends StatelessWidget {
   }
 
   /// A single name is set large; a verse steps down so it still fits.
-  static double _mantraSize(JaapState state) {
-    final text = state.mantra.name;
+  static double _mantraSize(String text) {
     if (text.contains('\n') || text.length > 24) return 24;
     if (text.length > 10) return 36;
     return 64;
@@ -429,6 +435,9 @@ class _TopBar extends ConsumerWidget {
     final l10n = AppL10n.of(context);
     final palette = context.palette;
     final streak = ref.watch(streakProvider).value?.current ?? 0;
+    final fallingMantra = ref.watch(
+      settingsProvider.select((s) => s.fallingMantra),
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -447,10 +456,10 @@ class _TopBar extends ConsumerWidget {
           ),
           _StreakChip(days: streak),
           IconButton(
-            key: const ValueKey('counter-blackout'),
-            onPressed: () => onMenu(_MenuAction.blackout),
-            tooltip: l10n.blackoutMode,
-            icon: const Icon(Icons.dark_mode_outlined),
+            key: const ValueKey('counter-meditation'),
+            onPressed: () => onMenu(_MenuAction.meditation),
+            tooltip: l10n.meditationMode,
+            icon: const Icon(Icons.self_improvement_rounded),
             color: palette.secondaryText,
           ),
           IconButton(
@@ -500,6 +509,13 @@ class _TopBar extends ConsumerWidget {
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
                 hideMantra ? l10n.showMantra : l10n.hideMantra,
+              ),
+              _item(
+                _MenuAction.fallingMantra,
+                fallingMantra
+                    ? Icons.auto_awesome_motion_outlined
+                    : Icons.auto_awesome_motion_rounded,
+                fallingMantra ? l10n.stopFallingMantra : l10n.fallingMantra,
               ),
               _item(
                 _MenuAction.theme,
@@ -608,7 +624,7 @@ class _MantraChip extends ConsumerWidget {
             children: [
               Flexible(
                 child: Text(
-                  state.mantra.name,
+                  state.mantra.displayName(context),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(

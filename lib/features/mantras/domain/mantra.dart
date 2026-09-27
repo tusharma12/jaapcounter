@@ -40,6 +40,9 @@ class Mantra {
   /// Whether the mantra needs the Devanagari typeface to render well.
   bool get isDevanagari => _devanagari.hasMatch(name);
 
+  /// The same test for any text, such as a built-in's English name.
+  static bool isDevanagariText(String text) => _devanagari.hasMatch(text);
+
   bool get hasDescription => description != null && description!.isNotEmpty;
 
   Mantra copyWith({

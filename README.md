@@ -33,13 +33,14 @@ call in the app.
 ```bash
 flutter pub get
 flutter run                 # a connected device or simulator
-flutter test                # 113 tests
+flutter test                # 225 tests
 flutter analyze             # clean
 ```
 
 Requires Flutter 3.44 or newer (Dart 3.12). Android and iOS are the supported
 platforms; the iOS home screen widget needs one manual Xcode step, described
-in [docs/PLATFORM_SETUP.md](docs/PLATFORM_SETUP.md).
+in [docs/PLATFORM_SETUP.md](docs/PLATFORM_SETUP.md). Store releases and
+screenshots are covered in [docs/RELEASING.md](docs/RELEASING.md).
 
 ---
 
@@ -142,7 +143,7 @@ ledger behaviour is tested rather than mocked.
 
 ## Before publishing
 
-- Replace the debug signing config in `android/app/build.gradle.kts`.
-- Set your own bundle identifier and team in Xcode.
-- Point `AppConstants` at real privacy, terms, support and store URLs.
-- Add the iOS widget extension target ([docs/PLATFORM_SETUP.md](docs/PLATFORM_SETUP.md)).
+- Follow [docs/RELEASING.md](docs/RELEASING.md): App Store Connect API key,
+  Android upload key (`android/key.properties`) and Play service account.
+- Point `AppConstants` at real privacy, terms, support and store URLs; the
+  store listings use the same privacy and support URLs.

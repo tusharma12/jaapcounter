@@ -28,7 +28,7 @@
   "malasCompleted": "{count, plural, =1{1 माला पूर्ण} other{{count} मालाएँ पूर्ण}}",
   "@malasCompleted": { "placeholders": { "count": { "type": "int" } } },
   "jaapCount": "{count} जाप",
-  "@jaapCount": { "placeholders": { "count": { "type": "int" } } },
+  "@jaapCount": { "placeholders": { "count": { "type": "int", "format": "decimalPattern" } } },
   "nothingToUndo": "पूर्ववत करने के लिए कुछ नहीं",
   "countRemoved": "गिनती हटाई गई",
   "resetCurrentMala": "वर्तमान माला रीसेट करें",
@@ -226,7 +226,6 @@
   "streakDays": "{count, plural, =1{1 दिन का क्रम} other{{count} दिन का क्रम}}",
   "menu": "मेनू",
 
-  "languageHindi": "हिंदी",
 
   "chooseTheme": "थीम चुनें",
   "themeAuto": "स्वचालित",
@@ -275,6 +274,7 @@
   "mantraDescription": "विवरण",
   "mantraDescriptionHint": "अर्थ, स्रोत, या अपने लिए कोई नोट",
   "fallingMantra": "गिरता मंत्र",
+  "stopFallingMantra": "गिरता मंत्र रोकें",
   "malaStyle": "माला की शैली",
   "malaStyleBeads": "मनके",
   "malaStyleRing": "प्रगति वलय",

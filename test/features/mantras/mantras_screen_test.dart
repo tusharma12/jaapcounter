@@ -25,9 +25,9 @@ void main() {
   ) async {
     await pumpLibrary(tester);
 
-    expect(find.text('राम'), findsOneWidget);
-    expect(find.text('राधा'), findsOneWidget);
-    expect(find.text('ॐ नमः शिवाय'), findsOneWidget);
+    expect(find.text('Ram'), findsOneWidget);
+    expect(find.text('Radha'), findsOneWidget);
+    expect(find.text('Om Namah Shivaya'), findsOneWidget);
     expect(find.text('108 beads'), findsWidgets);
   });
 
@@ -41,7 +41,7 @@ void main() {
   testWidgets('tapping a mantra makes it the active one', (tester) async {
     await pumpLibrary(tester);
 
-    await tester.tap(find.text('राधा'));
+    await tester.tap(find.text('Radha'));
     await tester.pumpAndSettle();
 
     expect(container.read(activeMantraProvider)!.id, 'builtin.radha');
@@ -63,7 +63,11 @@ void main() {
   testWidgets('a custom mantra can be added and deleted', (tester) async {
     final created = await container
         .read(mantraListProvider.notifier)
-        .add(name: 'मेरा अपना मंत्र', description: 'My own mantra', malaSize: 27);
+        .add(
+          name: 'मेरा अपना मंत्र',
+          description: 'My own mantra',
+          malaSize: 27,
+        );
     await pumpLibrary(tester);
 
     await tester.scrollUntilVisible(find.text('मेरा अपना मंत्र'), 200);
@@ -76,6 +80,15 @@ void main() {
     expect(find.text('मेरा अपना मंत्र'), findsNothing);
   });
 
+  testWidgets('add mantra lives in the header, not a floating button', (
+    tester,
+  ) async {
+    await pumpLibrary(tester);
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(find.widgetWithIcon(AppBar, Icons.add_rounded), findsOneWidget);
+  });
+
   testWidgets('the quick picker switches mantra and closes', (tester) async {
     await usePhoneSurface(tester);
     await pumpScreen(tester, container, const MantraPickerSheet());
@@ -84,7 +97,7 @@ void main() {
     expect(find.byType(MantraTile), findsWidgets);
     expect(find.text('My Mantras'), findsOneWidget);
 
-    await tester.tap(find.text('ॐ नमः शिवाय'));
+    await tester.tap(find.text('Om Namah Shivaya'));
     await tester.pumpAndSettle();
 
     expect(

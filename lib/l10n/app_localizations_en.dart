@@ -87,7 +87,11 @@ class AppL10nEn extends AppL10n {
 
   @override
   String jaapCount(int count) {
-    return '$count Jaap';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString Jaap';
   }
 
   @override
@@ -419,7 +423,7 @@ class AppL10nEn extends AppL10n {
   String get languageEnglish => 'English';
 
   @override
-  String get languageHindi => 'Hindi';
+  String get languageHindi => 'हिन्दी';
 
   @override
   String get backupRestore => 'Backup & Restore';
@@ -813,6 +817,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get fallingMantra => 'Falling mantra';
+
+  @override
+  String get stopFallingMantra => 'Stop falling mantra';
 
   @override
   String get malaStyle => 'Mala style';

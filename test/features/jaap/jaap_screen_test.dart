@@ -34,7 +34,7 @@ void main() {
     await pumpJaap(tester);
 
     // Once large on the counter and once in the switcher above it.
-    expect(find.text('राम'), findsNWidgets(2));
+    expect(find.text('Ram'), findsNWidgets(2));
     expect(find.byType(MalaRing), findsOneWidget);
     expect(find.text("Today's Jaap"), findsOneWidget);
     expect(find.text('Tap anywhere to count'), findsOneWidget);
@@ -187,13 +187,36 @@ void main() {
     container.read(hideMantraProvider.notifier).set(true);
     await tester.pumpAndSettle();
     expect(find.byType(FallingMantra), findsOneWidget);
-    expect(find.text('राम'), findsOneWidget, reason: 'only the switcher');
+    expect(find.text('Ram'), findsOneWidget, reason: 'only the switcher');
 
     // Shown text, not falling.
     container.read(hideMantraProvider.notifier).set(false);
     await container.read(settingsProvider.notifier).setFallingMantra(false);
     await tester.pumpAndSettle();
     expect(find.byType(FallingMantra), findsNothing);
-    expect(find.text('राम'), findsNWidgets(2));
+    expect(find.text('Ram'), findsNWidgets(2));
+  });
+
+  testWidgets('the header opens meditation mode, the menu toggles falling '
+      'mantra', (tester) async {
+    await pumpJaap(tester);
+
+    expect(find.byIcon(Icons.self_improvement_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.dark_mode_outlined), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).fallingMantra, isTrue);
+
+    // On by default, so the menu offers to stop it.
+    await tester.tap(find.text('Stop falling mantra'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).fallingMantra, isFalse);
+
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Falling mantra'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).fallingMantra, isTrue);
   });
 }

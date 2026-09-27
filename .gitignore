@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release signing and store credentials
+/android/key.properties
+*.jks
+*.keystore
+*.p8
+/android/fastlane/play-store-key.json
+/ios/fastlane/report.xml
+/android/fastlane/report.xml
+/ios/fastlane/README.md
+/android/fastlane/README.md

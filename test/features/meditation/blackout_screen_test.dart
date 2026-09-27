@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
+import 'package:japmala/features/mantras/domain/mantra_names.dart';
 import 'package:japmala/features/meditation/presentation/blackout_screen.dart';
 
 import '../../support/test_harness.dart';
@@ -17,7 +18,12 @@ void main() {
         .value!
         .position
         .beadsInCurrentMala;
-    final mantra = container.read(jaapControllerProvider).value!.mantra.name;
+    // The app runs in English here, so the built-in shows as "Ram".
+    final mantra = container
+        .read(jaapControllerProvider)
+        .value!
+        .mantra
+        .nameIn('en');
 
     await pumpScreen(tester, container, const BlackoutScreen());
     await tester.pumpAndSettle();

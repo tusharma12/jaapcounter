@@ -15,6 +15,7 @@ import '../../../core/widgets/async_view.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../jaap/presentation/jaap_state.dart';
+import '../../mantras/domain/mantra_names.dart';
 import '../../jaap/presentation/widgets/mala_ring.dart';
 import '../../settings/presentation/settings_controller.dart';
 import 'blackout_screen.dart';
@@ -203,7 +204,7 @@ class _MeditationView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                state.mantra.name,
+                state.mantra.displayName(context),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 style: AppTypography.mantra(

@@ -73,13 +73,17 @@ class _Pill extends StatelessWidget {
           child: Container(
             height: 40,
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: Insets.lg),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: selected ? palette.background : palette.secondaryText,
+            padding: const EdgeInsets.symmetric(horizontal: Insets.sm),
+            // Four pills share a phone's width, so a long label ("Monthly",
+            // "मासिक") shrinks a little rather than losing its ending.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: selected ? palette.background : palette.secondaryText,
+                ),
               ),
             ),
           ),

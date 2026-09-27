@@ -35,10 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     // popping in on whichever page happens to be first.
     if (!_iconPrecached) {
       _iconPrecached = true;
-      precacheImage(
-        const AssetImage('assets/branding/app_icon.png'),
-        context,
-      );
+      precacheImage(const AssetImage('assets/branding/app_icon.png'), context);
     }
   }
 
@@ -230,6 +227,31 @@ class _StepHeader extends StatelessWidget {
   }
 }
 
+/// English or Hindi for the mantra names and the rest of the app. Shown here
+/// rather than buried in Settings, since it decides whether the list below
+/// is legible the moment it appears.
+class _LanguageToggle extends StatelessWidget {
+  const _LanguageToggle({required this.locale, required this.onChanged});
+
+  final String? locale;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return SegmentedButton<String>(
+      showSelectedIcon: false,
+      segments: [
+        ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
+        ButtonSegment(value: 'hi', label: Text(l10n.languageHindi)),
+      ],
+      // Shows the device's own language until the user picks one explicitly.
+      selected: {locale ?? Localizations.localeOf(context).languageCode},
+      onSelectionChanged: (selection) => onChanged(selection.first),
+    );
+  }
+}
+
 /// Which mantra the counter opens on. A tap chooses it at once, so even a
 /// user who skips from here starts on the mantra they picked.
 class _MantraPage extends ConsumerWidget {
@@ -243,13 +265,21 @@ class _MantraPage extends ConsumerWidget {
     final active = ref.watch(activeMantraProvider);
     final controller = ref.read(mantraListProvider.notifier);
 
+    final locale = ref.watch(settingsProvider.select((s) => s.localeCode));
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Insets.page),
       child: Column(
         children: [
           const SizedBox(height: Insets.lg),
           _StepHeader(title: l10n.onbMantraTitle, body: l10n.onbMantraBody),
-          const SizedBox(height: Insets.xl),
+          const SizedBox(height: Insets.md),
+          _LanguageToggle(
+            locale: locale,
+            onChanged: (code) =>
+                ref.read(settingsProvider.notifier).setLocale(code),
+          ),
+          const SizedBox(height: Insets.lg),
           Expanded(
             child: ListView(
               children: [

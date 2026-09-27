@@ -28,7 +28,7 @@
   "malasCompleted": "{count, plural, =1{1 Mala completed} other{{count} Malas completed}}",
   "@malasCompleted": { "placeholders": { "count": { "type": "int" } } },
   "jaapCount": "{count} Jaap",
-  "@jaapCount": { "placeholders": { "count": { "type": "int" } } },
+  "@jaapCount": { "placeholders": { "count": { "type": "int", "format": "decimalPattern" } } },
   "nothingToUndo": "Nothing to undo",
   "countRemoved": "Count removed",
   "resetCurrentMala": "Reset current mala",
@@ -230,7 +230,6 @@
   "@streakDays": { "placeholders": { "count": { "type": "int" } } },
   "menu": "Menu",
 
-  "languageHindi": "Hindi",
 
   "chooseTheme": "Choose Theme",
   "themeAuto": "Auto",
@@ -280,6 +279,7 @@
   "mantraDescription": "Description",
   "mantraDescriptionHint": "A meaning, a source, or a note to yourself",
   "fallingMantra": "Falling mantra",
+  "stopFallingMantra": "Stop falling mantra",
   "malaStyle": "Mala style",
   "malaStyleBeads": "Beads",
   "malaStyleRing": "Progress ring",

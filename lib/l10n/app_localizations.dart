@@ -808,7 +808,7 @@ abstract class AppL10n {
   /// No description provided for @languageHindi.
   ///
   /// In en, this message translates to:
-  /// **'Hindi'**
+  /// **'हिन्दी'**
   String get languageHindi;
 
   /// No description provided for @backupRestore.
@@ -1518,6 +1518,12 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Falling mantra'**
   String get fallingMantra;
+
+  /// No description provided for @stopFallingMantra.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop falling mantra'**
+  String get stopFallingMantra;
 
   /// No description provided for @malaStyle.
   ///

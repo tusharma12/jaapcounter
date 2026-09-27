@@ -132,7 +132,75 @@ abstract final class BuiltInMantras {
       isBuiltIn: true,
       sortOrder: 16,
     ),
+    Mantra(
+      id: 'builtin.radhe-krishna',
+      name: 'राधे कृष्ण',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 17,
+    ),
+    Mantra(
+      id: 'builtin.om-namo-narayanaya',
+      name: 'ॐ नमो नारायणाय',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 18,
+    ),
+    Mantra(
+      id: 'builtin.om-sai-ram',
+      name: 'ॐ साईं राम',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 19,
+    ),
+    Mantra(
+      id: 'builtin.om-dum-durgayei-namah',
+      name: 'ॐ दुं दुर्गायै नमः',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 20,
+    ),
   ];
+
+  /// Each built-in in Roman letters, shown when the app is in English. Kept
+  /// out of the database: the stored text stays the Devanagari one, and
+  /// only what the screen shows changes with the language.
+  static const Map<String, String> english = {
+    'builtin.ram': 'Ram',
+    'builtin.radha': 'Radha',
+    'builtin.om-namah-shivaya': 'Om Namah Shivaya',
+    'builtin.om-hanumate-namah': 'Om Hanumate Namah',
+    'builtin.hare-krishna': 'Hare Krishna',
+    'builtin.hare-krishna-mahamantra':
+        'Hare Krishna Hare Krishna Krishna Krishna Hare Hare\n'
+        'Hare Rama Hare Rama Rama Rama Hare Hare',
+    'builtin.om-namo-bhagavate-vasudevaya': 'Om Namo Bhagavate Vasudevaya',
+    'builtin.gayatri':
+        'Om Bhur Bhuvah Svah Tat Savitur Varenyam\n'
+        'Bhargo Devasya Dhimahi Dhiyo Yo Nah Prachodayat',
+    'builtin.mahamrityunjaya':
+        'Om Tryambakam Yajamahe Sugandhim Pushtivardhanam\n'
+        'Urvarukamiva Bandhanan Mrityor Mukshiya Maamritat',
+    'builtin.waheguru': 'Waheguru',
+    'builtin.satnam-waheguru': 'Satnam Waheguru',
+    'builtin.sita-ram': 'Sita Ram',
+    'builtin.shri-ram-jai-ram': 'Shri Ram Jai Ram Jai Jai Ram',
+    'builtin.om-gam-ganapataye-namah': 'Om Gam Ganapataye Namah',
+    'builtin.om-shri-mahalakshmyai-namah': 'Om Shri Mahalakshmyai Namah',
+    'builtin.om-aim-saraswatyai-namah': 'Om Aim Saraswatyai Namah',
+    'builtin.om': 'Om',
+    'builtin.radhe-krishna': 'Radhe Krishna',
+    'builtin.om-namo-narayanaya': 'Om Namo Narayanaya',
+    'builtin.om-sai-ram': 'Om Sai Ram',
+    'builtin.om-dum-durgayei-namah': 'Om Dum Durgayei Namah',
+  };
+
+  static final Map<String, String> _shipped = {
+    for (final mantra in all) mantra.id: mantra.name,
+  };
+
+  /// The text a built-in shipped with, or null for anything else.
+  static String? shippedName(String id) => _shipped[id];
 
   /// Built-ins that earlier versions shipped and this one no longer does.
   static const List<String> retiredIds = [

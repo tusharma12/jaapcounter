@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,7 @@ import '../../../core/constants/built_in_mantras.dart';
 import '../../../core/providers.dart';
 import '../../../core/services/app_logger.dart';
 import '../../../core/utils/day_key.dart';
+import '../../mantras/domain/mantra_names.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
 import '../../settings/presentation/settings_controller.dart';
@@ -55,6 +57,10 @@ class JaapController extends AsyncNotifier<JaapState> {
     });
     // The widget wears the app's theme, so a new theme repaints it too.
     ref.listen(settingsProvider.select((s) => s.themeId), (_, _) {
+      unawaited(_publishToWidget());
+    });
+    // And it names a built-in mantra in the app's language.
+    ref.listen(settingsProvider.select((s) => s.localeCode), (_, _) {
       unawaited(_publishToWidget());
     });
 
@@ -296,7 +302,10 @@ class JaapController extends AsyncNotifier<JaapState> {
       await ref
           .read(widgetServiceProvider)
           .publish(
-            mantraDisplay: current.mantra.name,
+            mantraDisplay: current.mantra.nameIn(
+              ref.read(settingsProvider).localeCode ??
+                  PlatformDispatcher.instance.locale.languageCode,
+            ),
             beadsInCurrentMala: current.position.beadsInCurrentMala,
             malaSize: current.mantra.malaSize,
             todayTotal: current.todayTotal,

@@ -15,6 +15,7 @@ import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/stat_tile.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../mantras/domain/mantra.dart';
+import '../../mantras/domain/mantra_names.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
 import '../../sadhana/domain/streak.dart';
 import '../../share/presentation/share_card.dart';
@@ -155,7 +156,7 @@ class _ProgressBody extends ConsumerWidget {
           AppCard(
             child: Column(
               children: [
-                for (final entry in _sortedMantraTotals(mantras))
+                for (final entry in _sortedMantraTotals(context, mantras))
                   Padding(
                     padding: const EdgeInsets.only(bottom: Insets.md),
                     child: _MantraTotalRow(
@@ -174,11 +175,14 @@ class _ProgressBody extends ConsumerWidget {
     );
   }
 
-  List<(String, int)> _sortedMantraTotals(List<Mantra> mantras) {
+  List<(String, int)> _sortedMantraTotals(
+    BuildContext context,
+    List<Mantra> mantras,
+  ) {
     final byId = {for (final mantra in mantras) mantra.id: mantra};
     final rows = <(String, int)>[
       for (final entry in data.totalsByMantra.entries)
-        (byId[entry.key]?.name ?? entry.key, entry.value),
+        (byId[entry.key]?.displayName(context) ?? entry.key, entry.value),
     ]..sort((a, b) => b.$2.compareTo(a.$2));
     return rows;
   }
@@ -211,7 +215,7 @@ class _PeriodBar extends ConsumerWidget {
     final byId = {for (final m in mantras) m.id: m};
     final filterName = data.mantraId == null
         ? l10n.allMantras
-        : (byId[data.mantraId]?.name ?? l10n.allMantras);
+        : (byId[data.mantraId]?.displayName(context) ?? l10n.allMantras);
 
     return Row(
       children: [
@@ -248,6 +252,11 @@ class _PeriodBar extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              // Compact, so "All mantras" fits beside the date range.
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: const EdgeInsets.symmetric(horizontal: Insets.xs),
+              labelPadding: const EdgeInsets.only(left: 2, right: Insets.xs),
               shape: const StadiumBorder(),
               side: BorderSide(
                 color: data.mantraId == null
@@ -293,7 +302,7 @@ class _PeriodBar extends ConsumerWidget {
               ),
               for (final entry in <(String?, String)>[
                 (null, l10n.allMantras),
-                for (final m in chanted) (m.id, m.name),
+                for (final m in chanted) (m.id, m.displayName(context)),
               ])
                 ListTile(
                   title: Text(entry.$2),
