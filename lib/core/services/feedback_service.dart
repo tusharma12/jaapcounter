@@ -2,8 +2,8 @@ import 'package:flutter/services.dart';
 
 /// Tap feedback for the counter.
 ///
-/// Haptics are the point of a digital mala — the bead should be felt, not just
-/// seen — so this is deliberately cheap to call on every single tap.
+/// Haptics are the point of a digital mala - the bead should be felt, not just
+/// seen - so this is deliberately cheap to call on every single tap.
 class FeedbackService {
   FeedbackService({required this.haptics, required this.sound});
 
@@ -42,7 +42,7 @@ class FeedbackService {
   /// Under ~120 ms, iPhones run two impacts together into one buzz.
   static const Duration pulseGap = Duration(milliseconds: 170);
 
-  /// An undo, a reset — something removed.
+  /// An undo, a reset - something removed.
   Future<void> removal() async {
     if (haptics) await HapticFeedback.lightImpact();
   }

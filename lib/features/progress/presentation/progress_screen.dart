@@ -25,7 +25,7 @@ import 'progress_providers.dart';
 import 'widgets/jaap_bar_chart.dart';
 import 'widgets/weekly_habit_grid.dart';
 
-/// "Am I becoming more consistent?" — that is the only question this screen
+/// "Am I becoming more consistent?" - that is the only question this screen
 /// is built to answer, so it leads with the streak and today, and keeps the
 /// rest to four figures, one chart and a calendar.
 class ProgressScreen extends ConsumerWidget {
@@ -323,7 +323,7 @@ class _PeriodBar extends ConsumerWidget {
   }
 }
 
-/// The period's chart — the week grid for Weekly, bars for the rest — and a
+/// The period's chart - the week grid for Weekly, bars for the rest - and a
 /// line under it saying what the selected day or month holds.
 class _ChartCard extends StatefulWidget {
   const _ChartCard({required this.data});

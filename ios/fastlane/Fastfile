@@ -39,9 +39,15 @@ platform :ios do
   def build_release
     build = next_build_number
     Dir.chdir(PROJECT_ROOT) do
-      sh("flutter", "pub", "get")
-      sh("flutter", "build", "ios", "--release", "--no-codesign",
-         "--build-number=#{build}")
+      # CocoaPods (invoked by `flutter build ios`) is its own Ruby gem, not
+      # part of this Gemfile; leaking our BUNDLE_GEMFILE/BUNDLE_PATH into it
+      # makes it think it's missing dependencies. Run flutter with the shell
+      # environment as it was before `bundle exec fastlane` touched it.
+      Bundler.with_original_env do
+        sh("flutter", "pub", "get")
+        sh("flutter", "build", "ios", "--release", "--no-codesign",
+           "--build-number=#{build}")
+      end
     end
     key = api_key
     build_app(

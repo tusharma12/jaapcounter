@@ -20,7 +20,7 @@ class AppSettings {
     this.background = CounterBackground.none,
     this.backgroundPhotoPath,
     this.backgroundDim = defaultBackgroundDim,
-    this.fallingMantra = true,
+    this.fallingMantra = false,
     this.malaStyle = MalaStyle.beads,
   });
 

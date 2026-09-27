@@ -1,4 +1,4 @@
 # Bundle id and team come from the Xcode project; the App Store Connect API
 # key (see Fastfile) replaces an Apple ID login.
-app_identifier("com.japmala.japmala")
+app_identifier("com.naamjapcounter.smaran")
 team_id("H47Y3CY9CT")

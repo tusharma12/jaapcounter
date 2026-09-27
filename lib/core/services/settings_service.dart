@@ -63,7 +63,7 @@ class SettingsService {
                 AppSettings.minBackgroundDim,
                 AppSettings.maxBackgroundDim,
               ),
-      fallingMantra: _prefs.getBool(_kFallingMantra) ?? true,
+      fallingMantra: _prefs.getBool(_kFallingMantra) ?? false,
       malaStyle:
           MalaStyle.tryParse(_prefs.getString(_kMalaStyle)) ?? MalaStyle.beads,
     );

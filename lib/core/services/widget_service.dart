@@ -10,7 +10,7 @@ import 'app_logger.dart';
 /// The widget reads these values straight from shared storage, so it renders
 /// current numbers without the Flutter engine ever starting.
 class WidgetService {
-  static const String iOSAppGroupId = 'group.com.japmala.japmala';
+  static const String iOSAppGroupId = 'group.com.naamjapcounter.smaran';
   static const String androidProviderName = 'JapMalaWidgetProvider';
   static const String iOSWidgetName = 'JapMalaWidget';
 
@@ -22,6 +22,30 @@ class WidgetService {
       await HomeWidget.setAppGroupId(iOSAppGroupId);
     }
     _configured = true;
+  }
+
+  /// Whether the launcher can be asked to place the widget directly, without
+  /// the user finding it themselves. Android 8+ on most launchers; iOS has
+  /// no such API, so this is always false there.
+  Future<bool> canRequestPin() async {
+    if (!Platform.isAndroid) return false;
+    try {
+      return await HomeWidget.isRequestPinWidgetSupported() ?? false;
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not check widget pin support', error, stack);
+      return false;
+    }
+  }
+
+  /// Asks the launcher to add the widget to the Home Screen. Only worth
+  /// calling after [canRequestPin] returns true; the launcher shows its own
+  /// confirmation, so nothing here reports success or failure back.
+  Future<void> requestPin() async {
+    try {
+      await HomeWidget.requestPinWidget(androidName: androidProviderName);
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not request the widget be pinned', error, stack);
+    }
   }
 
   Future<void> publish({

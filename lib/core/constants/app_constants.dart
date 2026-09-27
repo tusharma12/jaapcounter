@@ -22,11 +22,12 @@ abstract final class AppConstants {
   static const int backupSchemaVersion = 1;
   static const String backupFilePrefix = 'japmala-backup';
 
-  static const String supportEmail = 'hello@japmala.app';
-  static const String privacyPolicyUrl = 'https://japmala.app/privacy';
-  static const String termsUrl = 'https://japmala.app/terms';
+  static const String supportEmail = 'codivolabs@gmail.com';
+  static const String privacyPolicyUrl =
+      'https://codivolabs.com/apps/smaran/privacy';
+  static const String termsUrl = 'https://codivolabs.com/apps/smaran/terms';
   static const String androidStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.japmala.japmala';
+      'https://play.google.com/store/apps/details?id=com.naamjapcounter.smaran';
   static const String iosStoreUrl =
       'https://apps.apple.com/app/japmala/id0000000000';
 }

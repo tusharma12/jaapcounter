@@ -59,7 +59,7 @@ abstract final class MalaMath {
     );
   }
 
-  /// Malas represented by a bare count — used for lifetime and per-period
+  /// Malas represented by a bare count - used for lifetime and per-period
   /// statistics, where reset bases do not apply.
   static int malasIn(int jaap, int malaSize) {
     if (malaSize < 1) return 0;

@@ -26,7 +26,7 @@ class Story {
   int get wordCount =>
       paragraphs.fold(0, (sum, p) => sum + p.split(RegExp(r'\s+')).length);
 
-  /// Rounded up, and never zero — every story is at least a minute of quiet.
+  /// Rounded up, and never zero - every story is at least a minute of quiet.
   int get readingMinutes {
     final minutes = (wordCount / 180).ceil();
     return minutes < 1 ? 1 : minutes;

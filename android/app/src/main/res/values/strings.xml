@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Naamjapcounter</string>
+    <string name="app_name">NaamJapCounter</string>
     <string name="widget_description">Today\'s Jaap and the mala in progress.</string>
     <string name="widget_today">Today</string>
-    <string name="widget_open">Open Naamjapcounter to count</string>
+    <string name="widget_open">Open NaamJapCounter to count</string>
 </resources>

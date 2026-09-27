@@ -18,7 +18,7 @@ class AppCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
 
-  /// Draws the card in soft saffron — used for the one thing on a screen that
+  /// Draws the card in soft saffron - used for the one thing on a screen that
   /// deserves the accent.
   final bool accented;
 

@@ -4,8 +4,8 @@ import 'app_logger.dart';
 
 /// Reads stories aloud.
 ///
-/// Wrapped in one place because text-to-speech fails in ordinary ways — no
-/// voice for the language, a device with the engine disabled — and none of
+/// Wrapped in one place because text-to-speech fails in ordinary ways - no
+/// voice for the language, a device with the engine disabled - and none of
 /// those should surface as a crash.
 class SpeechService {
   SpeechService({FlutterTts? tts}) : _tts = tts ?? FlutterTts();

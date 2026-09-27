@@ -32,7 +32,7 @@ class SadhanaRepository {
     return rows.map(Sadhana.fromMap).toList();
   }
 
-  /// Starts a vow, retiring any vow already running — one active Sadhana at a
+  /// Starts a vow, retiring any vow already running - one active Sadhana at a
   /// time keeps "today's goal" unambiguous.
   Future<Sadhana> create({
     required String mantraId,

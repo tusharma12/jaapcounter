@@ -11,7 +11,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Naamjapcounter</string>
+	<string>NaamJapCounter</string>
 	<key>CFBundleName</key>
 	<string>JapMalaWidget</string>
 	<key>CFBundleIdentifier</key>

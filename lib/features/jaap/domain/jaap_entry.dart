@@ -21,7 +21,7 @@ enum JaapSource {
 
 /// One row of the append-only Jaap ledger.
 ///
-/// The ledger — not a single running total — is the source of truth. Every
+/// The ledger - not a single running total - is the source of truth. Every
 /// derived figure (current mala, today's total, lifetime malas, streaks) is
 /// computed from these rows, which is what makes undo, statistics, backup and
 /// history safe.

@@ -26,7 +26,7 @@ final jaapControllerProvider = AsyncNotifierProvider<JaapController, JaapState>(
 /// A tap updates the on-screen count synchronously and appends the write to a
 /// serialised queue. That ordering matters: the user's thumb is faster than
 /// SQLite, so the screen must never wait for a disk write, and the writes must
-/// never overtake each other. Nothing is dropped — a hundred rapid taps
+/// never overtake each other. Nothing is dropped - a hundred rapid taps
 /// produce exactly a hundred recorded beads.
 class JaapController extends AsyncNotifier<JaapState> {
   Future<void> _writes = Future<void>.value();
@@ -154,8 +154,8 @@ class JaapController extends AsyncNotifier<JaapState> {
     return true;
   }
 
-  /// Clears the mala in progress. Recorded Jaap is untouched — only the bead
-  /// position moves — so totals and streaks are unaffected.
+  /// Clears the mala in progress. Recorded Jaap is untouched - only the bead
+  /// position moves - so totals and streaks are unaffected.
   Future<void> resetCurrentMala() async {
     final current = state.value;
     if (current == null) return;
@@ -168,7 +168,7 @@ class JaapController extends AsyncNotifier<JaapState> {
     _notifyLedgerChanged();
   }
 
-  /// Adds beads counted somewhere else — a physical mala, a hand counter.
+  /// Adds beads counted somewhere else - a physical mala, a hand counter.
   Future<void> addManualCount(
     int amount, {
     JaapSource source = JaapSource.manual,

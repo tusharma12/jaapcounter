@@ -14,7 +14,7 @@ import '../domain/story.dart';
 import 'story_controllers.dart';
 
 /// Reading a story: wide margins, adjustable text, and the option to be read
-/// to. No related-content rail, no next-up — the story ends and that is it.
+/// to. No related-content rail, no next-up - the story ends and that is it.
 class StoryScreen extends ConsumerWidget {
   const StoryScreen({required this.storyId, super.key});
 

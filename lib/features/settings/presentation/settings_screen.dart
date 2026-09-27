@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -126,6 +128,11 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.dark_mode_outlined,
                 onTap: () => context.push('/blackout'),
               ),
+              _NavRow(
+                label: l10n.homeScreenWidget,
+                icon: Icons.widgets_outlined,
+                onTap: () => _showWidgetInfo(context, ref),
+              ),
             ],
           ),
           const SizedBox(height: Insets.xxl),
@@ -193,7 +200,7 @@ class SettingsScreen extends ConsumerWidget {
                 label: l10n.shareApp,
                 icon: Icons.ios_share_rounded,
                 onTap: () => SharePlus.instance.share(
-                  ShareParams(text: '${l10n.appName} — ${l10n.tagline}'),
+                  ShareParams(text: '${l10n.appName} - ${l10n.tagline}'),
                 ),
               ),
               _NavRow(
@@ -201,7 +208,7 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.chat_bubble_outline_rounded,
                 onTap: () => _open(
                   'mailto:${AppConstants.supportEmail}'
-                  '?subject=${Uri.encodeComponent(l10n.appName)}',
+                  '?subject=${Uri.encodeComponent(l10n.feedbackEmailSubject)}',
                 ),
               ),
             ],
@@ -321,6 +328,72 @@ class SettingsScreen extends ConsumerWidget {
               ),
             const SizedBox(height: Insets.lg),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Explains the home screen widget and, where the launcher supports it,
+  /// offers to place it directly. iOS has no such API: a phone there is
+  /// always shown the manual steps instead.
+  Future<void> _showWidgetInfo(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final canPin = await ref.read(widgetServiceProvider).canRequestPin();
+    if (!context.mounted) return;
+
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            Insets.page,
+            0,
+            Insets.page,
+            Insets.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.homeScreenWidget,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: Insets.md),
+              Text(
+                l10n.homeScreenWidgetBody,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.palette.secondaryText,
+                ),
+              ),
+              // Only Android can be asked to place it directly; everywhere
+              // else, including an unsupported launcher, gets the steps.
+              if (!canPin) ...[
+                const SizedBox(height: Insets.xl),
+                Text(
+                  Platform.isIOS
+                      ? l10n.homeScreenWidgetStepsIOS
+                      : l10n.homeScreenWidgetStepsAndroid,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+              const SizedBox(height: Insets.xxl),
+              if (canPin)
+                FilledButton(
+                  onPressed: () {
+                    ref.read(widgetServiceProvider).requestPin();
+                    Navigator.of(sheetContext).pop();
+                  },
+                  child: Text(l10n.addToHomeScreen),
+                )
+              else
+                OutlinedButton(
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  child: Text(l10n.close),
+                ),
+            ],
+          ),
         ),
       ),
     );

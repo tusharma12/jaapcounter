@@ -1,6 +1,6 @@
 /// A day key is a local calendar date rendered as `yyyy-MM-dd`.
 ///
-/// Everything that aggregates Jaap — totals, goals, streaks, the heatmap —
+/// Everything that aggregates Jaap - totals, goals, streaks, the heatmap -
 /// keys off this, so a bead counted at 23:59 belongs to that evening and not
 /// to the next UTC day.
 abstract final class DayKeys {

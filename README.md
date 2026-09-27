@@ -14,7 +14,7 @@ haptics, and every Jaap is stored only on the device.
 | --- | --- |
 | **Jaap** | The mala ring, current bead over mala size, today's total and malas, undo, timed sessions, manual entry, mala reset |
 | **Mantras** | Eight built-in mantras in Devanagari plus custom ones, each with its own mala size (27 / 54 / 108 / custom) |
-| **Sadhana** | A daily goal, and a Sankalp — a vow of *n* Jaap a day for *n* days — with day-by-day progress |
+| **Sadhana** | A daily goal, and a Sankalp - a vow of *n* Jaap a day for *n* days - with day-by-day progress |
 | **Progress** | Streak and best streak, today against the goal, a daily/weekly/monthly/yearly chart, lifetime totals, a month heatmap, a per-mantra breakdown |
 | **Meditation** | Distraction-free counting, a session timer, and a blackout mode for chanting with eyes closed |
 | **Stories** | Seven short original retellings, in English and Hindi, with favourites, adjustable text and read-aloud |
@@ -49,8 +49,8 @@ screenshots are covered in [docs/RELEASING.md](docs/RELEASING.md).
 This is the part worth understanding before changing anything.
 
 **The ledger is the source of truth.** There is no stored "current count".
-Every bead is appended to `jaap_entries`, and every figure the app shows —
-the bead on the ring, today's total, lifetime malas, the streak, the chart —
+Every bead is appended to `jaap_entries`, and every figure the app shows -
+the bead on the ring, today's total, lifetime malas, the streak, the chart -
 is derived from those rows by `MalaMath`. That is what makes undo, statistics,
 history and restore safe rather than approximate.
 
@@ -58,7 +58,7 @@ history and restore safe rather than approximate.
 on-screen state synchronously and appends the write to a serialised queue.
 Writes drain in order, are flushed when the app is backgrounded, and are
 awaited before anything reads back. A hundred rapid taps produce exactly a
-hundred recorded beads — there are tests for both the sequential and the
+hundred recorded beads - there are tests for both the sequential and the
 concurrent case.
 
 **Consecutive taps share a row.** Taps within two minutes increment one
@@ -110,7 +110,7 @@ never in widgets. State is Riverpod.
 ## Design
 
 The palette is a warm off-white ground with near-black text and **saffron as an
-accent only** — progress, the streak, calls to action, selected state, a
+accent only** - progress, the streak, calls to action, selected state, a
 completed mala. The classic light and dark palettes are defined as tokens in
 `lib/app/theme/app_colors.dart`; the other colour themes in the theme picker
 (Saffron, Lavender, Ocean…) are derived from a background and an accent in

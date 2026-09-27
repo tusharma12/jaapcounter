@@ -5,4 +5,4 @@
 -dontwarn com.dexterous.**
 
 # The home screen widget provider is referenced only from the manifest.
--keep class com.japmala.japmala.JapMalaWidgetProvider { *; }
+-keep class com.naamjapcounter.smaran.JapMalaWidgetProvider { *; }

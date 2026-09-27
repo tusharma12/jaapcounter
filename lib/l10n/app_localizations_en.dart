@@ -435,7 +435,7 @@ class AppL10nEn extends AppL10n {
   String get rateApp => 'Rate Smaran';
 
   @override
-  String get shareApp => 'Share Smaran';
+  String get shareApp => 'Invite Family and Friends';
 
   @override
   String get feedback => 'Feedback';
@@ -903,4 +903,25 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get exitBlackout => 'Exit blackout';
+
+  @override
+  String get feedbackEmailSubject => 'Smaran feedback';
+
+  @override
+  String get homeScreenWidget => 'Home screen widget';
+
+  @override
+  String get homeScreenWidgetBody =>
+      'See today\'s Jaap and your streak on your Home Screen, without opening the app.';
+
+  @override
+  String get homeScreenWidgetStepsAndroid =>
+      'Long-press an empty spot on your Home Screen, tap Widgets, then find Smaran.';
+
+  @override
+  String get homeScreenWidgetStepsIOS =>
+      'Long-press an empty spot on your Home Screen, tap the + in the corner, search for Smaran, then choose a size and tap Add Widget.';
+
+  @override
+  String get addToHomeScreen => 'Add to Home Screen';
 }

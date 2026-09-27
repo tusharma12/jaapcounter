@@ -1,4 +1,4 @@
-package com.japmala.japmala
+package com.naamjapcounter.smaran
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

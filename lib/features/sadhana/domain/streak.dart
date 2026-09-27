@@ -14,7 +14,7 @@ class StreakInfo {
   final int best;
 
   /// Whether today already qualifies. Until it does, the current streak is the
-  /// run that ended yesterday — so the number does not read as broken at 8am.
+  /// run that ended yesterday - so the number does not read as broken at 8am.
   final bool countedToday;
 
   static const empty = StreakInfo(current: 0, best: 0, countedToday: false);

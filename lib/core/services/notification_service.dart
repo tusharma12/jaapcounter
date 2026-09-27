@@ -29,7 +29,7 @@ class ScheduledReminder {
   final String body;
 }
 
-/// Local notifications. No server, no push tokens — the device schedules its
+/// Local notifications. No server, no push tokens - the device schedules its
 /// own reminders in the user's own time zone.
 class NotificationService {
   NotificationService({FlutterLocalNotificationsPlugin? plugin})

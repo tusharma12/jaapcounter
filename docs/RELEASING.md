@@ -30,7 +30,7 @@ cd ios && bundle install      # and the same in android/
 ### iOS: App Store Connect API key
 
 1. Create the app record in App Store Connect with bundle id
-   `com.japmala.japmala` (the name is `Naam Jap Counter – Smaran`).
+   `com.naamjapcounter.smaran` (the name is `Naam Jap Counter – Smaran`).
 2. Users and Access → Integrations → App Store Connect API → generate a key
    with the **App Manager** role. Download the `.p8` (only offered once).
 3. Export, e.g. in your shell profile:
@@ -71,7 +71,7 @@ pricing, and App Review contact name and phone.
    Without this file, release builds fall back to debug signing so
    `flutter run --release` keeps working, but the lanes refuse to upload.
 
-3. In Play Console, create the app `com.japmala.japmala`, enrol in Play App
+3. In Play Console, create the app `com.naamjapcounter.smaran`, enrol in Play App
    Signing, and **upload the first `.aab` by hand** (Google requires it).
 4. Google Cloud → create a service account and a JSON key. In Play Console →
    Users and permissions, invite that account with release permissions. Save
@@ -115,8 +115,11 @@ Regenerate after any visible UI change, then run the `screenshots` /
 
 ## Before the first release
 
-- `https://japmala.app/privacy` and `https://japmala.app` are the privacy
-  and support URLs in both listings and in the app. Both must be live pages
-  before review.
+- `https://codivolabs.com/apps/smaran/privacy` (privacy),
+  `https://codivolabs.com/apps/smaran/terms` (terms) and
+  `https://codivolabs.com/contact` (support) are used in both listings and
+  in the app. All three must be live pages before review. Play Console's
+  App content section also asks for the privacy policy URL and a support
+  contact (`codivolabs@gmail.com`) separately from these files.
 - Release notes: `ios/fastlane/metadata/*/release_notes.txt` and
   `android/fastlane/metadata/android/*/changelogs/default.txt`.

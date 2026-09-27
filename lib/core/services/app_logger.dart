@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
 /// Small logging seam. Everything the app logs goes through here so a crash
-/// reporter can be added later in one place — and so nothing is ever printed
+/// reporter can be added later in one place - and so nothing is ever printed
 /// with `print`.
 abstract final class AppLogger {
   static const String _name = 'japmala';

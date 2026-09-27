@@ -48,21 +48,28 @@ class _Shot {
     required this.headline,
     required this.sub,
     required this.capture,
-    this.night = false,
     this.darkStatusBar = false,
     this.badge,
+    this.lightCanvas = false,
+    this.headlineHi,
+    this.subHi,
   });
 
   final String file;
   final List<_Span> headline;
   final String sub;
 
+  /// Hindi headline/sub; null on the hero (reused as-is across locales).
+  final List<_Span>? headlineHi;
+  final String? subHi;
+
   /// Drives the app to the screen to capture.
   final Future<void> Function(WidgetTester, ProviderContainer, GoRouter)
   capture;
 
-  /// A midnight background instead of the maroon one.
-  final bool night;
+  /// The warm cream/peach cover background (matching the hero screenshot)
+  /// instead of the maroon gradient, with dark headline text.
+  final bool lightCanvas;
 
   /// White status-bar glyphs, for screens that are dark themselves.
   final bool darkStatusBar;
@@ -78,24 +85,76 @@ final _shots = <_Shot>[
     capture: (tester, c, router) async {},
   ),
   _Shot(
-    file: '02_streak',
+    file: '02_habit',
+    lightCanvas: true,
     headline: [
-      ('Build a ', false),
-      ('daily\nsadhana', true),
-      (' streak', false),
+      ('Build a Daily\nNaam Jap ', false),
+      ('Sadhana', true),
+      (' Habit', false),
     ],
-    sub: 'Streaks, charts and a daily habit grid',
+    sub: 'A simple and modern way to track your daily chants',
+    headlineHi: [('रोज़ नाम जप की\n', false), ('साधना', true), (' बनाएं', false)],
+    subHi: 'अपने दैनिक जप को सरल और आधुनिक तरीके से ट्रैक करें',
+    // The counter screen, mid-session: this morning's jaap already underway.
+    capture: (tester, c, router) async {},
+  ),
+  _Shot(
+    file: '03_streak',
+    lightCanvas: true,
+    headline: [
+      ('Track Your Progress.\n', false),
+      ('Stay Motivated.', true),
+    ],
+    sub: 'View your daily, weekly and total chant progress',
+    headlineHi: [
+      ('अपनी प्रगति देखें।\n', false),
+      ('प्रेरित रहें।', true),
+    ],
+    subHi: 'अपना दैनिक, साप्ताहिक और कुल जप देखें',
     capture: (tester, c, router) async {
       router.go('/progress');
       await _settle(tester);
     },
   ),
   _Shot(
-    file: '03_blackout',
-    night: true,
+    file: '04_mantras',
+    lightCanvas: true,
+    headline: [('21 Sacred', true), (' Mantras\n— or Your Own', false)],
+    sub: 'Ram, Radha, Shiva, Gayatri & more',
+    headlineHi: [
+      ('21 पवित्र मंत्र', true),
+      ('\n— या अपना खुद का', false),
+    ],
+    subHi: 'राम, राधा, शिव, गायत्री और भी बहुत कुछ',
+    capture: (tester, c, router) async {
+      router.push('/mantras');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '05_sankalp',
+    lightCanvas: true,
+    headline: [('Take a ', false), ('Sankalp', true), ('.\nKeep It.', false)],
+    sub: 'A 40-day vow with a daily mala goal',
+    headlineHi: [
+      ('एक ', false),
+      ('संकल्प', true),
+      (' लें।\nउसे निभाएं।', false),
+    ],
+    subHi: '40 दिनों की प्रतिज्ञा, रोज़ माला के लक्ष्य के साथ',
+    capture: (tester, c, router) async {
+      router.push('/sadhana');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '06_blackout',
+    lightCanvas: true,
     darkStatusBar: true,
-    headline: [('Chant with your\n', false), ('eyes closed', true)],
+    headline: [('Chant with Your\n', false), ('Eyes Closed', true)],
     sub: 'Pure black screen. One tap per bead.',
+    headlineHi: [('आंखें बंद करके\n', false), ('जप करें', true)],
+    subHi: 'पूरी तरह काली स्क्रीन। हर मनके पर एक टैप।',
     capture: (tester, c, router) async {
       router.push('/blackout');
       await _settle(tester);
@@ -104,33 +163,19 @@ final _shots = <_Shot>[
     },
   ),
   _Shot(
-    file: '04_mantras',
-    headline: [('21 sacred', true), (' mantras,\nor your own', false)],
-    sub: 'Ram, Radha, Shiva, Gayatri & more',
-    capture: (tester, c, router) async {
-      router.push('/mantras');
-      await _settle(tester);
-    },
-  ),
-  _Shot(
-    file: '05_sankalp',
-    headline: [('Take a ', false), ('Sankalp', true), ('.\nKeep it.', false)],
-    sub: 'A 40-day vow with a daily mala goal',
-    capture: (tester, c, router) async {
-      router.push('/sadhana');
-      await _settle(tester);
-    },
-  ),
-  _Shot(
-    file: '06_themes',
+    file: '07_themes',
     darkStatusBar: true,
-    headline: [('Make every jaap\n', false), ('beautiful', true)],
+    headline: [('Choose Your\n', false), ('Sacred Space', true)],
     sub: '13 themes, bead mala, falling mantra',
+    headlineHi: [('अपना ', false), ('पवित्र स्थान', true), ('\nचुनें', false)],
+    subHi: '13 थीम, माला के मनके, गिरते मंत्र',
     capture: (tester, c, router) async {
       await c.read(settingsProvider.notifier).setTheme(AppThemeId.meditative);
       await c
           .read(settingsProvider.notifier)
           .setBackground(CounterBackground.cosmos);
+      // Off by default; this shot exists to show it off.
+      await c.read(settingsProvider.notifier).setFallingMantra(true);
       await _settle(tester);
       // Release a shower of mantras and catch it mid-fall.
       final jaap = c.read(jaapControllerProvider.notifier);
@@ -245,7 +290,11 @@ Future<ProviderContainer> _seededApp() async {
 }
 
 /// Captures the app itself at device size, 3×.
-Future<Uint8List> _captureApp(WidgetTester tester, _Shot shot) async {
+Future<Uint8List> _captureApp(
+  WidgetTester tester,
+  _Shot shot,
+  Locale locale,
+) async {
   tester.view.physicalSize = _device * 3;
   tester.view.devicePixelRatio = 3;
   tester.view.padding = const FakeViewPadding(
@@ -274,7 +323,7 @@ Future<Uint8List> _captureApp(WidgetTester tester, _Shot shot) async {
             return MaterialApp.router(
               debugShowCheckedModeBanner: false,
               routerConfig: router,
-              locale: const Locale('en'),
+              locale: locale,
               theme: fixed
                   ? AppTheme.forId(settings.themeId)
                   : AppTheme.light(),
@@ -320,6 +369,7 @@ Future<void> _compose(
   ui.Image screen, {
   required Size canvas,
   required String path,
+  required bool hindi,
 }) async {
   tester.view.physicalSize = canvas * 3;
   tester.view.devicePixelRatio = 3;
@@ -332,7 +382,12 @@ Future<void> _compose(
       textDirection: TextDirection.ltr,
       child: RepaintBoundary(
         key: key,
-        child: _StoreCanvas(shot: shot, screen: screen, size: canvas),
+        child: _StoreCanvas(
+          shot: shot,
+          screen: screen,
+          size: canvas,
+          hindi: hindi,
+        ),
       ),
     ),
   );
@@ -355,14 +410,24 @@ class _StoreCanvas extends StatelessWidget {
     required this.shot,
     required this.screen,
     required this.size,
+    this.hindi = false,
   });
 
   final _Shot shot;
   final ui.Image screen;
   final Size size;
+  final bool hindi;
 
   static const _cream = Color(0xFFFFF4E2);
   static const _saffron = Color(0xFFFFB23F);
+
+  // The warm cream/peach cover, matching the hero screenshot's background.
+  static const _peachTop = Color(0xFFFFE9D6);
+  static const _peachMid = Color(0xFFFDD3C0);
+  static const _peachBottom = Color(0xFFEFC0AC);
+  static const _ink = Color(0xFF241608);
+  static const _inkMuted = Color(0xFF6E5B52);
+  static const _rust = Color(0xFFD9600F);
 
   @override
   Widget build(BuildContext context) {
@@ -375,9 +440,19 @@ class _StoreCanvas extends StatelessWidget {
     final phoneHeight = h - phoneTop + h * 0.035;
     final phoneWidth = phoneHeight * (_device.width / _device.height);
 
-    final background = shot.night
-        ? const [Color(0xFF02030A), Color(0xFF0E1230), Color(0xFF1C1F45)]
+    final background = shot.lightCanvas
+        ? const [_peachTop, _peachMid, _peachBottom]
         : const [Color(0xFF2A0A04), Color(0xFF5A1A07), Color(0xFF8A3A0C)];
+
+    final highlightColor = shot.lightCanvas ? _rust : _saffron;
+    final headlineColor = shot.lightCanvas ? _ink : _cream;
+    final subColor = shot.lightCanvas
+        ? _inkMuted
+        : _cream.withValues(alpha: 0.78);
+    final badgeColor = shot.lightCanvas ? _rust : _saffron;
+    final textFont = hindi ? 'NotoSansDevanagari' : 'Inter';
+    final headline = hindi ? (shot.headlineHi ?? shot.headline) : shot.headline;
+    final sub = hindi ? (shot.subHi ?? shot.sub) : shot.sub;
 
     return SizedBox(
       width: w,
@@ -397,22 +472,23 @@ class _StoreCanvas extends StatelessWidget {
             ),
           ),
           // A soft glow behind the phone, the way a diya lights a room.
-          Positioned(
-            left: -w * 0.3,
-            right: -w * 0.3,
-            top: phoneTop - w * 0.25,
-            height: w * 1.3,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    _saffron.withValues(alpha: shot.night ? 0.16 : 0.28),
-                    _saffron.withValues(alpha: 0),
-                  ],
+          if (!shot.lightCanvas)
+            Positioned(
+              left: -w * 0.3,
+              right: -w * 0.3,
+              top: phoneTop - w * 0.25,
+              height: w * 1.3,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      _saffron.withValues(alpha: 0.28),
+                      _saffron.withValues(alpha: 0),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
           Positioned(
             left: w * 0.07,
             right: w * 0.07,
@@ -426,10 +502,10 @@ class _StoreCanvas extends StatelessWidget {
                       vertical: w * 0.013,
                     ),
                     decoration: BoxDecoration(
-                      color: _saffron.withValues(alpha: 0.16),
+                      color: badgeColor.withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: _saffron.withValues(alpha: 0.55),
+                        color: badgeColor.withValues(alpha: 0.55),
                       ),
                     ),
                     child: Text(
@@ -438,7 +514,7 @@ class _StoreCanvas extends StatelessWidget {
                         fontFamily: 'Inter',
                         fontSize: w * 0.031,
                         fontWeight: FontWeight.w600,
-                        color: _saffron,
+                        color: badgeColor,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -449,18 +525,18 @@ class _StoreCanvas extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: [
-                      for (final (text, highlight) in shot.headline)
+                      for (final (text, highlight) in headline)
                         TextSpan(
                           text: text,
                           style: TextStyle(
-                            color: highlight ? _saffron : _cream,
+                            color: highlight ? highlightColor : headlineColor,
                           ),
                         ),
                     ],
                   ),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: textFont,
                     fontSize: headlineSize,
                     fontWeight: FontWeight.w800,
                     height: 1.08,
@@ -469,14 +545,14 @@ class _StoreCanvas extends StatelessWidget {
                 ),
                 SizedBox(height: w * 0.03),
                 Text(
-                  shot.sub,
+                  sub,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: textFont,
                     fontSize: w * 0.041,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
-                    color: _cream.withValues(alpha: 0.78),
+                    color: subColor,
                   ),
                 ),
               ],
@@ -729,41 +805,69 @@ Future<void> _featureGraphic(WidgetTester tester, String path) async {
   });
 }
 
+/// One localized run: which screens, which text, where it lands on disk.
+class _StoreLocale {
+  const _StoreLocale(this.code, this.iosDir, this.playDir);
+  final String code;
+  final String iosDir;
+  final String playDir;
+}
+
+const _locales = [
+  _StoreLocale('en', 'en-US', 'en-US'),
+  _StoreLocale('hi', 'hi', 'hi-IN'),
+];
+
 void main() {
   testWidgets('store screenshots', (tester) async {
     await tester.runAsync(_loadFonts);
     addTearDown(tester.view.reset);
 
     final root = Directory.current.path;
-    final iosDir = '$root/ios/fastlane/screenshots/en-US';
-    final playDir =
-        '$root/android/fastlane/metadata/android/en-US/images/phoneScreenshots';
 
     await _featureGraphic(
       tester,
       '$root/android/fastlane/metadata/android/en-US/images/featureGraphic.png',
     );
 
-    for (final shot in _shots) {
-      final bytes = await _captureApp(tester, shot);
-      late ui.Image screen;
-      await tester.runAsync(() async {
-        screen = await decodeImageFromList(bytes);
-      });
-      await _compose(
-        tester,
-        shot,
-        screen,
-        canvas: const Size(440, 956),
-        path: '$iosDir/${shot.file}.png',
-      );
-      await _compose(
-        tester,
-        shot,
-        screen,
-        canvas: const Size(360, 640),
-        path: '$playDir/${shot.file}.png',
-      );
+    for (final loc in _locales) {
+      final hindi = loc.code == 'hi';
+      final iosDir = '$root/ios/fastlane/screenshots/${loc.iosDir}';
+      final playDir =
+          '$root/android/fastlane/metadata/android/${loc.playDir}/images/phoneScreenshots';
+      Directory(iosDir).createSync(recursive: true);
+      Directory(playDir).createSync(recursive: true);
+
+      for (final shot in _shots) {
+        // The hero cover image (icon, name, hand with mala) is a hand-made
+        // graphic, localized by hand per locale; never overwrite it here.
+        if (shot.file == '01_counter') continue;
+        final bytes = await _captureApp(
+          tester,
+          shot,
+          Locale(loc.code),
+        );
+        late ui.Image screen;
+        await tester.runAsync(() async {
+          screen = await decodeImageFromList(bytes);
+        });
+        await _compose(
+          tester,
+          shot,
+          screen,
+          canvas: const Size(440, 956),
+          path: '$iosDir/${shot.file}.png',
+          hindi: hindi,
+        );
+        await _compose(
+          tester,
+          shot,
+          screen,
+          canvas: const Size(360, 640),
+          path: '$playDir/${shot.file}.png',
+          hindi: hindi,
+        );
+      }
     }
   });
 }

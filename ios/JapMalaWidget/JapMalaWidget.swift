@@ -11,7 +11,7 @@ import WidgetKit
 // alongside the counts. With the Auto theme none are written, and the widget
 // follows the system's light and dark instead, as the app does.
 
-private let appGroupId = "group.com.japmala.japmala"
+private let appGroupId = "group.com.naamjapcounter.smaran"
 
 /// Colours from the app's theme, or the system's when it is on Auto.
 struct WidgetTheme {
@@ -106,10 +106,17 @@ struct JapMalaWidgetView: View {
     var body: some View {
         let theme = entry.theme
         VStack(alignment: .leading, spacing: 10) {
-            Text(entry.mantra.replacingOccurrences(of: "\n", with: " "))
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(theme.text)
-                .lineLimit(1)
+            HStack(spacing: 6) {
+                Image("AppIcon")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 18, height: 18)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                Text(entry.mantra.replacingOccurrences(of: "\n", with: " "))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(theme.text)
+                    .lineLimit(1)
+            }
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text("\(entry.beads)")
@@ -156,7 +163,7 @@ struct JapMalaWidget: Widget {
         StaticConfiguration(kind: "JapMalaWidget", provider: JapMalaProvider()) { entry in
             JapMalaWidgetView(entry: entry)
         }
-        .configurationDisplayName("Naamjapcounter")
+        .configurationDisplayName("NaamJapCounter")
         .description("Today's Jaap and the mala in progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }

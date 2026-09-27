@@ -241,7 +241,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get noSankalpBody =>
-      'संकल्प एक व्रत है — चुने हुए दिनों तक प्रतिदिन निश्चित संख्या में जाप करने का।';
+      'संकल्प एक व्रत है - चुने हुए दिनों तक प्रतिदिन निश्चित संख्या में जाप करने का।';
 
   @override
   String get endSankalp => 'संकल्प समाप्त करें';
@@ -434,7 +434,7 @@ class AppL10nHi extends AppL10n {
   String get rateApp => 'स्मरण को रेट करें';
 
   @override
-  String get shareApp => 'स्मरण साझा करें';
+  String get shareApp => 'घरवालों और दोस्तों के साथ साझा करें';
 
   @override
   String get feedback => 'प्रतिक्रिया';
@@ -883,4 +883,25 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get exitBlackout => 'अंधकार मोड से बाहर';
+
+  @override
+  String get feedbackEmailSubject => 'स्मरण पर प्रतिक्रिया';
+
+  @override
+  String get homeScreenWidget => 'होम स्क्रीन विजेट';
+
+  @override
+  String get homeScreenWidgetBody =>
+      'बिना ऐप खोले अपनी होम स्क्रीन पर आज का जाप और अपनी लगातार साधना देखें।';
+
+  @override
+  String get homeScreenWidgetStepsAndroid =>
+      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, विजेट्स पर टैप करें, फिर स्मरण खोजें।';
+
+  @override
+  String get homeScreenWidgetStepsIOS =>
+      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, कोने में + पर टैप करें, स्मरण खोजें, फिर आकार चुनकर विजेट जोड़ें पर टैप करें।';
+
+  @override
+  String get addToHomeScreen => 'होम स्क्रीन पर जोड़ें';
 }

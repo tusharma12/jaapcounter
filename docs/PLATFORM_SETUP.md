@@ -10,19 +10,19 @@ reliably) and release signing.
 
 Already configured in this repository:
 
-- **Label and icon** — `@string/app_name`, adaptive launcher icon made
+- **Label and icon** - `@string/app_name`, adaptive launcher icon made
   from `appstore_assets/appicon.png`. The artwork is a full-colour
   illustration, so there is no monochrome layer for themed icons.
-- **Notifications** — `POST_NOTIFICATIONS`, plus `RECEIVE_BOOT_COMPLETED` and
+- **Notifications** - `POST_NOTIFICATIONS`, plus `RECEIVE_BOOT_COMPLETED` and
   the `flutter_local_notifications` boot receiver, so reminders survive a
   reboot or an app update.
-- **Desugaring** — `isCoreLibraryDesugaringEnabled` and `desugar_jdk_libs`,
+- **Desugaring** - `isCoreLibraryDesugaringEnabled` and `desugar_jdk_libs`,
   required by `flutter_local_notifications`.
-- **Widget** — `JapMalaWidgetProvider` (Kotlin), `layout/japmala_widget.xml`,
+- **Widget** - `JapMalaWidgetProvider` (Kotlin), `layout/japmala_widget.xml`,
   `xml/japmala_widget_info.xml`, registered as a receiver in the manifest.
-- **R8** — `proguard-rules.pro` keeps the notification plugin's Gson models
+- **R8** - `proguard-rules.pro` keeps the notification plugin's Gson models
   and the widget provider, which is only referenced from the manifest.
-- **Launch window** — the app's own background colour in both light and dark,
+- **Launch window** - the app's own background colour in both light and dark,
   so there is no white flash.
 
 Nothing further is needed to run or to build a widget-capable APK:
@@ -55,7 +55,7 @@ flutter build ios --release          # add --no-codesign to check it compiles
 The `JapMalaWidget` extension (source in `ios/JapMalaWidget/`) is part of the
 Xcode project and is embedded in the app by every `flutter build ios`:
 
-- **App Group** `group.com.japmala.japmala` is declared in both
+- **App Group** `group.com.naamjapcounter.smaran` is declared in both
   `Runner/Runner.entitlements` and `JapMalaWidget/JapMalaWidget.entitlements`,
   and must match `WidgetService.iOSAppGroupId` in
   `lib/core/services/widget_service.dart`. Automatic signing registers it the
@@ -95,8 +95,8 @@ The widget reads these from the shared app group, all written by
 
 | Permission | When | Why |
 | --- | --- | --- |
-| Notifications | The moment a reminder is switched on — never at first launch | Daily reminders, streak and goal nudges |
-| Nothing else | — | No camera, contacts, location, storage or network permission is requested |
+| Notifications | The moment a reminder is switched on - never at first launch | Daily reminders, streak and goal nudges |
+| Nothing else | - | No camera, contacts, location, storage or network permission is requested |
 
 Exact alarms are deliberately *not* requested: reminders use
 `AndroidScheduleMode.inexactAllowWhileIdle`, which a gentle daily nudge does

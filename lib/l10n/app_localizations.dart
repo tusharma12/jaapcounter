@@ -832,7 +832,7 @@ abstract class AppL10n {
   /// No description provided for @shareApp.
   ///
   /// In en, this message translates to:
-  /// **'Share Smaran'**
+  /// **'Invite Family and Friends'**
   String get shareApp;
 
   /// No description provided for @feedback.
@@ -1638,6 +1638,42 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Exit blackout'**
   String get exitBlackout;
+
+  /// No description provided for @feedbackEmailSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaran feedback'**
+  String get feedbackEmailSubject;
+
+  /// No description provided for @homeScreenWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get homeScreenWidget;
+
+  /// No description provided for @homeScreenWidgetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'See today\'s Jaap and your streak on your Home Screen, without opening the app.'**
+  String get homeScreenWidgetBody;
+
+  /// No description provided for @homeScreenWidgetStepsAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press an empty spot on your Home Screen, tap Widgets, then find Smaran.'**
+  String get homeScreenWidgetStepsAndroid;
+
+  /// No description provided for @homeScreenWidgetStepsIOS.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press an empty spot on your Home Screen, tap the + in the corner, search for Smaran, then choose a size and tap Add Widget.'**
+  String get homeScreenWidgetStepsIOS;
+
+  /// No description provided for @addToHomeScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Home Screen'**
+  String get addToHomeScreen;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

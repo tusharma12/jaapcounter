@@ -71,7 +71,7 @@ class RemindersController extends AsyncNotifier<List<Reminder>> {
     ref.invalidateSelf();
   }
 
-  /// Creates or moves the one reminder of a kind — used for the streak and
+  /// Creates or moves the one reminder of a kind - used for the streak and
   /// goal reminders, which are single switches in Settings.
   Future<void> setSingleton({
     required ReminderKind kind,

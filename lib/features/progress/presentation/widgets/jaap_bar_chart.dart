@@ -6,7 +6,7 @@ import '../../../../app/theme/app_dimens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/progress_models.dart';
 
-/// Jaap per bucket. Kept spare on purpose: no grid, no axis frame, no legend —
+/// Jaap per bucket. Kept spare on purpose: no grid, no axis frame, no legend -
 /// the question it answers is "am I becoming more consistent", and clutter
 /// makes that harder to see.
 ///

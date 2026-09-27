@@ -71,13 +71,13 @@ void main() {
     }
   });
 
-  test('falling mantra is on by default and can be switched off', () async {
+  test('falling mantra is off by default and can be switched on', () async {
     SharedPreferences.setMockInitialValues({});
     final service = SettingsService(await SharedPreferences.getInstance());
-    expect(service.read().fallingMantra, isTrue);
-
-    await service.write(service.read().copyWith(fallingMantra: false));
     expect(service.read().fallingMantra, isFalse);
+
+    await service.write(service.read().copyWith(fallingMantra: true));
+    expect(service.read().fallingMantra, isTrue);
   });
 
   test(
