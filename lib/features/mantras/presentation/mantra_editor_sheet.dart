@@ -104,9 +104,12 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
     final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
 
+    // Scrollable, so with the keyboard up every field can still be reached
+    // and a drag moves the form, not the sheet and the screen behind it.
     return SafeArea(
       top: false,
-      child: Padding(
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.fromLTRB(
           Insets.page,
           0,
@@ -129,6 +132,7 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
               // exactly as typed. A verse may run to several lines.
               TextFormField(
                 controller: _name,
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
                 textCapitalization: TextCapitalization.sentences,
                 autofocus: widget.existing == null,
                 minLines: 1,
@@ -143,6 +147,7 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
               _Label('${l10n.mantraDescription} · ${l10n.optional}'),
               TextFormField(
                 controller: _description,
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 minLines: 1,
@@ -197,35 +202,85 @@ Future<int?> showNumberPrompt(
   required int max,
   required String invalidMessage,
   String? helperText,
-}) async {
-  final controller = TextEditingController(text: '$initialValue');
-  final formKey = GlobalKey<FormState>();
-  final l10n = AppL10n.of(context);
-
-  final result = await showDialog<int>(
+}) {
+  return showDialog<int>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title),
+    builder: (context) => _NumberPrompt(
+      title: title,
+      initialValue: initialValue,
+      min: min,
+      max: max,
+      invalidMessage: invalidMessage,
+      helperText: helperText,
+    ),
+  );
+}
+
+/// Owns its text controller, so the controller outlives the dialog's closing
+/// animation instead of being disposed while the field is still on screen.
+class _NumberPrompt extends StatefulWidget {
+  const _NumberPrompt({
+    required this.title,
+    required this.initialValue,
+    required this.min,
+    required this.max,
+    required this.invalidMessage,
+    this.helperText,
+  });
+
+  final String title;
+  final int initialValue;
+  final int min;
+  final int max;
+  final String invalidMessage;
+  final String? helperText;
+
+  @override
+  State<_NumberPrompt> createState() => _NumberPromptState();
+}
+
+class _NumberPromptState extends State<_NumberPrompt> {
+  late final _controller = TextEditingController(
+    text: '${widget.initialValue}',
+  );
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState?.validate() ?? false) {
+      Navigator.of(context).pop(int.parse(_controller.text));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return AlertDialog(
+      // Scrolls when the keyboard and an error message leave little room.
+      scrollable: true,
+      title: Text(widget.title),
       content: Form(
-        key: formKey,
+        key: _formKey,
         child: TextFormField(
-          controller: controller,
+          controller: _controller,
           autofocus: true,
           keyboardType: TextInputType.number,
+          textInputAction: TextInputAction.done,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(helperText: helperText),
+          decoration: InputDecoration(helperText: widget.helperText),
           validator: (value) {
             final parsed = int.tryParse(value ?? '');
-            if (parsed == null || parsed < min || parsed > max) {
-              return invalidMessage;
+            if (parsed == null || parsed < widget.min || parsed > widget.max) {
+              return widget.invalidMessage;
             }
             return null;
           },
-          onFieldSubmitted: (_) {
-            if (formKey.currentState?.validate() ?? false) {
-              Navigator.of(context).pop(int.parse(controller.text));
-            }
-          },
+          onFieldSubmitted: (_) => _submit(),
         ),
       ),
       actions: [
@@ -233,17 +288,8 @@ Future<int?> showNumberPrompt(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancel),
         ),
-        TextButton(
-          onPressed: () {
-            if (formKey.currentState?.validate() ?? false) {
-              Navigator.of(context).pop(int.parse(controller.text));
-            }
-          },
-          child: Text(l10n.save),
-        ),
+        TextButton(onPressed: _submit, child: Text(l10n.save)),
       ],
-    ),
-  );
-  controller.dispose();
-  return result;
+    );
+  }
 }

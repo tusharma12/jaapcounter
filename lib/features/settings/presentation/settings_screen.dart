@@ -121,6 +121,11 @@ class SettingsScreen extends ConsumerWidget {
                 value: settings.fallingMantra,
                 onChanged: controller.setFallingMantra,
               ),
+              _NavRow(
+                label: l10n.blackoutMode,
+                icon: Icons.dark_mode_outlined,
+                onTap: () => context.push('/blackout'),
+              ),
             ],
           ),
           const SizedBox(height: Insets.xxl),

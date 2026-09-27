@@ -140,6 +140,8 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
         await _toggleSession(state);
       case _MenuAction.meditation:
         await context.push('/meditation');
+      case _MenuAction.blackout:
+        await context.push('/blackout');
       case _MenuAction.hideMantra:
         ref.read(hideMantraProvider.notifier).toggle();
       case _MenuAction.theme:
@@ -209,6 +211,7 @@ enum _MenuAction {
   autoJaap,
   session,
   meditation,
+  blackout,
   hideMantra,
   theme,
   background,
@@ -444,6 +447,13 @@ class _TopBar extends ConsumerWidget {
           ),
           _StreakChip(days: streak),
           IconButton(
+            key: const ValueKey('counter-blackout'),
+            onPressed: () => onMenu(_MenuAction.blackout),
+            tooltip: l10n.blackoutMode,
+            icon: const Icon(Icons.dark_mode_outlined),
+            color: palette.secondaryText,
+          ),
+          IconButton(
             onPressed: state.undoAvailable
                 ? () => onMenu(_MenuAction.undo)
                 : null,
@@ -478,6 +488,11 @@ class _TopBar extends ConsumerWidget {
                 _MenuAction.meditation,
                 Icons.self_improvement_rounded,
                 l10n.meditationMode,
+              ),
+              _item(
+                _MenuAction.blackout,
+                Icons.dark_mode_outlined,
+                l10n.blackoutMode,
               ),
               _item(
                 _MenuAction.hideMantra,

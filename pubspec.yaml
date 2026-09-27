@@ -1,5 +1,5 @@
 name: japmala
-description: "JapMala — your peaceful digital mala for daily Naam Jap."
+description: "Naam Jap Counter – Smaran: your peaceful digital mala for daily Naam Jap."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -46,6 +46,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   meta: ^1.16.0
   uuid: ^4.6.0
+  quick_actions: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,7 @@ flutter:
 
   assets:
     - assets/stories/
+    - assets/branding/
 
   fonts:
     - family: Inter

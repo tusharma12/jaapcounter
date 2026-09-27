@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/theme/app_themes.dart';
 import '../../../core/constants/built_in_mantras.dart';
 import '../../../core/providers.dart';
 import '../../../core/services/app_logger.dart';
@@ -52,6 +53,10 @@ class JaapController extends AsyncNotifier<JaapState> {
     ref.onDispose(() {
       _syncTimer?.cancel();
     });
+    // The widget wears the app's theme, so a new theme repaints it too.
+    ref.listen(settingsProvider.select((s) => s.themeId), (_, _) {
+      unawaited(_publishToWidget());
+    });
 
     return JaapState(
       mantra: mantra,
@@ -98,8 +103,14 @@ class JaapController extends AsyncNotifier<JaapState> {
       ),
     );
 
+    // The goal outranks the mala when one bead completes both.
+    final before = rolledOver ? 0 : current.todayTotal;
+    final goal = current.dailyGoal;
+    final crossedGoal = goal > 0 && before < goal && before + delta >= goal;
     final feedback = ref.read(feedbackProvider);
-    if (crossedMala) {
+    if (crossedGoal) {
+      feedback.goalReached();
+    } else if (crossedMala) {
       feedback.malaComplete();
     } else {
       feedback.bead();
@@ -291,6 +302,9 @@ class JaapController extends AsyncNotifier<JaapState> {
             todayTotal: current.todayTotal,
             todayMalas: current.todayMalas,
             streak: streak.current,
+            palette: AppThemeSpec.of(
+              ref.read(settingsProvider).themeId,
+            )?.palette,
           );
     } on Object catch (error, stack) {
       AppLogger.e('Could not publish widget data', error, stack);

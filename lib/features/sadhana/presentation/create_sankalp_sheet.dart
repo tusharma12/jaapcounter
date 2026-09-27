@@ -14,6 +14,7 @@ import '../../mantras/presentation/mantra_editor_sheet.dart';
 import '../../reminders/domain/reminder.dart';
 import '../../reminders/presentation/reminder_controllers.dart';
 import '../../reminders/presentation/reminders_screen.dart';
+import 'daily_goal_picker.dart';
 import 'sadhana_controllers.dart';
 
 Future<bool> showCreateSankalp(BuildContext context) async {
@@ -77,22 +78,12 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
           const SizedBox(height: Insets.xl),
 
           _FieldLabel(l10n.dailyGoal),
-          PresetSelector(
-            presets: AppConstants.dailyGoalPresets,
+          DailyGoalPicker(
+            // A new mantra means a new mala size: start its picker afresh.
+            key: ValueKey(mantra?.id),
             value: _dailyGoal,
-            customLabel: l10n.custom,
-            onSelected: (value) => setState(() => _dailyGoal = value),
-            onCustom: () async {
-              final value = await showNumberPrompt(
-                context,
-                title: l10n.dailyGoal,
-                initialValue: _dailyGoal,
-                min: 1,
-                max: 100000,
-                invalidMessage: l10n.numberOfJaap,
-              );
-              if (value != null) setState(() => _dailyGoal = value);
-            },
+            malaSize: mantra?.malaSize ?? AppConstants.defaultMalaSize,
+            onChanged: (value) => setState(() => _dailyGoal = value),
           ),
           const SizedBox(height: Insets.xl),
 

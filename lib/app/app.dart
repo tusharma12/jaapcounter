@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/providers.dart';
+import '../core/services/shortcut_service.dart';
 import '../features/jaap/presentation/auto_jaap_controller.dart';
 import '../features/jaap/presentation/jaap_controller.dart';
 import '../features/reminders/presentation/reminder_controllers.dart';
@@ -19,7 +21,7 @@ class JapMalaApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return MaterialApp.router(
-      title: 'JapMala',
+      title: 'Naam Jap Counter – Smaran',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
       // A fixed colour theme is handed in as both, so the device's light/dark
@@ -85,10 +87,22 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
     }
   }
 
+  /// A home screen shortcut, whether it launched the app or woke it. The
+  /// router's own redirect still sends a user who has not finished
+  /// onboarding there first.
+  void _openShortcut(String type) {
+    if (type != ShortcutService.blackout) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final router = ref.read(routerProvider);
+      if (router.state.matchedLocation != '/blackout') router.push('/blackout');
+    });
+    WidgetsBinding.instance.scheduleFrame();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Reminder text is written into the platform schedule, so it is refreshed
-    // once per launch in the app's current language.
+    // Reminder and shortcut text is handed to the platform, so it is
+    // refreshed once per launch in the app's current language.
     if (!_remindersSynced) {
       _remindersSynced = true;
       final l10n = AppL10n.of(context);
@@ -96,6 +110,12 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
         ref
             .read(remindersProvider.notifier)
             .reschedule(RemindersScreen.copyFrom(l10n));
+        ref
+            .read(shortcutServiceProvider)
+            .register(
+              blackoutLabel: l10n.blackoutMode,
+              onSelected: _openShortcut,
+            );
       });
     }
     return widget.child;

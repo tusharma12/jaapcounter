@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/day_key.dart';
 import '../../../core/providers.dart';
 import '../../../core/utils/formatters.dart';
@@ -14,11 +15,13 @@ import '../../../core/widgets/stat_tile.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../mantras/domain/mantra.dart';
-import '../../mantras/presentation/mantra_editor_sheet.dart';
+import '../../mantras/presentation/mantra_controllers.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../domain/sadhana.dart';
+import '../../share/presentation/share_card.dart';
 import '../domain/streak.dart';
 import 'create_sankalp_sheet.dart';
+import 'daily_goal_picker.dart';
 import 'sadhana_controllers.dart';
 
 /// The reason to come back tomorrow: today's goal, the streak, and the vow.
@@ -34,7 +37,16 @@ class SadhanaScreen extends ConsumerWidget {
     final completedDays = ref.watch(sankalpProgressProvider).value ?? 0;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.mySadhana)),
+      appBar: AppBar(
+        title: Text(l10n.mySadhana),
+        actions: [
+          IconButton(
+            tooltip: l10n.shareProgress,
+            onPressed: () => showShareCardSheet(context),
+            icon: const Icon(Icons.ios_share_rounded),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           Insets.page,
@@ -204,6 +216,13 @@ class _SankalpCard extends ConsumerWidget {
     final fraction = total == null
         ? 0.0
         : (completedDays / total).clamp(0.0, 1.0);
+    // The vow's own mantra decides what a mala is, not the one on screen.
+    final malaSize =
+        (ref.watch(mantraListProvider).value ?? const <Mantra>[])
+            .where((m) => m.id == sadhana.mantraId)
+            .firstOrNull
+            ?.malaSize ??
+        AppConstants.defaultMalaSize;
 
     return AppCard(
       accented: true,
@@ -220,7 +239,7 @@ class _SankalpCard extends ConsumerWidget {
           const SizedBox(height: Insets.lg),
           Text(
             total == null
-                ? l10n.jaapPerDay(sadhana.dailyGoal)
+                ? goalLabel(l10n, sadhana.dailyGoal, malaSize, locale)
                 : l10n.dayXofY(dayNumber, total),
             style: theme.textTheme.headlineSmall,
           ),
@@ -239,6 +258,13 @@ class _SankalpCard extends ConsumerWidget {
             Text(
               l10n.daysCompleted(completedDays),
               style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: Insets.xs),
+            Text(
+              goalLabel(l10n, sadhana.dailyGoal, malaSize, locale),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: palette.secondaryText,
+              ),
             ),
           ],
           const SizedBox(height: Insets.sm),
@@ -294,13 +320,12 @@ class _GoalRow extends ConsumerWidget {
 
     return AppCard(
       onTap: () async {
-        final value = await showNumberPrompt(
+        final value = await showDailyGoalSheet(
           context,
-          title: l10n.setDailyGoal,
-          initialValue: settings.fallbackDailyGoal,
-          min: 1,
-          max: 100000,
-          invalidMessage: l10n.numberOfJaap,
+          initial: settings.fallbackDailyGoal,
+          malaSize:
+              ref.read(activeMantraProvider)?.malaSize ??
+              AppConstants.defaultMalaSize,
         );
         if (value == null) return;
         await ref.read(settingsProvider.notifier).setFallbackDailyGoal(value);

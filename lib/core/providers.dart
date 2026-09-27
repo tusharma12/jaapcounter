@@ -9,6 +9,7 @@ import '../features/sadhana/data/sadhana_repository.dart';
 import '../features/stories/data/story_repository.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'services/shortcut_service.dart';
 import 'services/speech_service.dart';
 import 'services/widget_service.dart';
 import 'utils/day_key.dart';
@@ -21,6 +22,10 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
 
 final databaseProvider = Provider<Database>(
   (ref) => throw StateError('databaseProvider was not overridden'),
+);
+
+final shortcutServiceProvider = Provider<ShortcutService>(
+  (ref) => ShortcutService(),
 );
 
 /// Injected so date-sensitive behaviour can be tested.

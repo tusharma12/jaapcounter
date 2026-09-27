@@ -29,7 +29,7 @@ class BackupImportResult {
   final int jaap;
 }
 
-/// Raised when a chosen file is not a JapMala backup, or is from a newer
+/// Raised when a chosen file is not a Smaran backup, or is from a newer
 /// version than this app understands.
 class InvalidBackupException implements Exception {
   const InvalidBackupException([this.reason]);
@@ -112,7 +112,7 @@ class BackupService {
     }
 
     if (data['app'] != _appTag) {
-      throw const InvalidBackupException('not a JapMala backup');
+      throw const InvalidBackupException('not a Smaran backup');
     }
     final schema = data['schemaVersion'];
     if (schema is! int || schema > AppConstants.backupSchemaVersion) {

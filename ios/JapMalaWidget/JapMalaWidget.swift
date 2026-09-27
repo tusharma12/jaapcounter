@@ -1,20 +1,48 @@
 import SwiftUI
 import WidgetKit
 
-// The JapMala home screen widget.
+// The Smaran home screen widget.
 //
 // Values are written by the app into the shared app group (see
 // WidgetService in lib/core/services/widget_service.dart), so the widget
 // renders current numbers without launching the app.
 //
-// This file is not part of the Runner target. Add it to a Widget Extension
-// target in Xcode — docs/PLATFORM_SETUP.md has the steps.
+// It wears the theme chosen in the app: the app writes that theme's colours
+// alongside the counts. With the Auto theme none are written, and the widget
+// follows the system's light and dark instead, as the app does.
 
 private let appGroupId = "group.com.japmala.japmala"
 
-private enum Palette {
-    static let saffron = Color(red: 0.961, green: 0.651, blue: 0.137)
-    static let track = Color(red: 0.929, green: 0.922, blue: 0.902)
+/// Colours from the app's theme, or the system's when it is on Auto.
+struct WidgetTheme {
+    var background: Color = Color(.systemBackground)
+    var text: Color = .primary
+    var secondaryText: Color = .secondary
+    var accent: Color = Color(red: 0.961, green: 0.651, blue: 0.137)
+    var track: Color = Color(.systemGray5)
+    var streak: Color = .secondary
+
+    static func read(_ store: UserDefaults?) -> WidgetTheme {
+        var theme = WidgetTheme()
+        func color(_ key: String) -> Color? {
+            guard let store, store.object(forKey: key) != nil else { return nil }
+            let argb = UInt32(truncatingIfNeeded: store.integer(forKey: key))
+            return Color(
+                .sRGB,
+                red: Double((argb >> 16) & 0xFF) / 255,
+                green: Double((argb >> 8) & 0xFF) / 255,
+                blue: Double(argb & 0xFF) / 255,
+                opacity: Double((argb >> 24) & 0xFF) / 255
+            )
+        }
+        if let c = color("colorBackground") { theme.background = c }
+        if let c = color("colorText") { theme.text = c }
+        if let c = color("colorSecondaryText") { theme.secondaryText = c }
+        if let c = color("colorAccent") { theme.accent = c }
+        if let c = color("colorTrack") { theme.track = c }
+        if let c = color("colorStreak") { theme.streak = c }
+        return theme
+    }
 }
 
 struct JapMalaEntry: TimelineEntry {
@@ -25,6 +53,7 @@ struct JapMalaEntry: TimelineEntry {
     let todayTotal: Int
     let todayMalas: Int
     let streak: Int
+    var theme = WidgetTheme()
 
     var fraction: Double {
         guard malaSize > 0 else { return 0 }
@@ -60,12 +89,13 @@ struct JapMalaProvider: TimelineProvider {
         let store = UserDefaults(suiteName: appGroupId)
         return JapMalaEntry(
             date: Date(),
-            mantra: store?.string(forKey: "mantra") ?? "JapMala",
+            mantra: store?.string(forKey: "mantra") ?? "Smaran",
             beads: store?.integer(forKey: "beads") ?? 0,
             malaSize: max(store?.integer(forKey: "malaSize") ?? 108, 1),
             todayTotal: store?.integer(forKey: "todayTotal") ?? 0,
             todayMalas: store?.integer(forKey: "todayMalas") ?? 0,
-            streak: store?.integer(forKey: "streak") ?? 0
+            streak: store?.integer(forKey: "streak") ?? 0,
+            theme: WidgetTheme.read(store)
         )
     }
 }
@@ -74,24 +104,28 @@ struct JapMalaWidgetView: View {
     let entry: JapMalaEntry
 
     var body: some View {
+        let theme = entry.theme
         VStack(alignment: .leading, spacing: 10) {
-            Text(entry.mantra)
-                .font(.system(size: 16, weight: .medium))
+            Text(entry.mantra.replacingOccurrences(of: "\n", with: " "))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(theme.text)
                 .lineLimit(1)
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text("\(entry.beads)")
                     .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(theme.text)
+                    .monospacedDigit()
                 Text("/ \(entry.malaSize)")
                     .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(theme.secondaryText)
             }
 
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Palette.track)
+                    Capsule().fill(theme.track)
                     Capsule()
-                        .fill(Palette.saffron)
+                        .fill(theme.accent)
                         .frame(width: geometry.size.width * entry.fraction)
                 }
             }
@@ -99,18 +133,21 @@ struct JapMalaWidgetView: View {
 
             HStack(spacing: 6) {
                 Text("Today \(entry.todayTotal)")
+                    .foregroundStyle(theme.secondaryText)
                 if entry.todayMalas > 0 {
                     Text("· \(entry.todayMalas)×")
+                        .foregroundStyle(theme.secondaryText)
                 }
                 if entry.streak > 0 {
-                    Text("· 🔥 \(entry.streak)")
+                    Label("\(entry.streak)", systemImage: "flame.fill")
+                        .labelStyle(.titleAndIcon)
+                        .foregroundStyle(theme.streak)
                 }
             }
-            .font(.system(size: 12))
-            .foregroundStyle(.secondary)
+            .font(.system(size: 12, weight: .medium))
             .lineLimit(1)
         }
-        .containerBackground(for: .widget) { Color(.systemBackground) }
+        .containerBackground(for: .widget) { theme.background }
     }
 }
 
@@ -119,7 +156,7 @@ struct JapMalaWidget: Widget {
         StaticConfiguration(kind: "JapMalaWidget", provider: JapMalaProvider()) { entry in
             JapMalaWidgetView(entry: entry)
         }
-        .configurationDisplayName("JapMala")
+        .configurationDisplayName("Naamjapcounter")
         .description("Today's Jaap and the mala in progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }

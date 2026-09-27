@@ -1,0 +1,3 @@
+// The widget extension's only link to Flutter: the app's version and build
+// number, which an extension must share with the app it ships inside.
+#include "Generated.xcconfig"

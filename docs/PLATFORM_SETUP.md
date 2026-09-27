@@ -50,30 +50,26 @@ cd ios && pod install && cd ..
 flutter build ios --release          # add --no-codesign to check it compiles
 ```
 
-### Adding the home screen widget
+### The home screen widget
 
-The widget's source is written and ready at `ios/JapMalaWidget/`. It is not in
-the Xcode project, because adding a target rewrites `project.pbxproj` and that
-is not safe to do by script. In Xcode, once:
+The `JapMalaWidget` extension (source in `ios/JapMalaWidget/`) is part of the
+Xcode project and is embedded in the app by every `flutter build ios`:
 
-1. **File → New → Target… → Widget Extension.** Name it `JapMalaWidget`,
-   uncheck *Include Live Activity* and *Include Configuration App Intent*,
-   and set the embedding target to `Runner`.
-2. Delete the placeholder files Xcode generates in the new group, then drag in
-   `ios/JapMalaWidget/JapMalaWidget.swift` (target: `JapMalaWidget` only).
-   Use `ios/JapMalaWidget/Info.plist` for the extension's Info.plist.
-3. **Signing & Capabilities** for *both* `Runner` and `JapMalaWidget`:
-   add **App Groups** and tick `group.com.japmala.japmala`. This must match
-   `WidgetService.iOSAppGroupId` in
-   `lib/core/services/widget_service.dart`; if you change the identifier,
-   change it in three places — both targets and that constant.
-4. Set the extension's deployment target to iOS 17 (the widget uses
-   `containerBackground`), or lower it and remove that modifier.
+- **App Group** `group.com.japmala.japmala` is declared in both
+  `Runner/Runner.entitlements` and `JapMalaWidget/JapMalaWidget.entitlements`,
+  and must match `WidgetService.iOSAppGroupId` in
+  `lib/core/services/widget_service.dart`. Automatic signing registers it the
+  first time the app is built for a device.
+- **Version and build number** come from Flutter through
+  `ios/Flutter/Widget.xcconfig`, because an extension must carry the same
+  version as the app it ships in.
+- **Deployment target** is iOS 17, for `containerBackground`.
+- **Theme:** the app writes the chosen theme's colours with the counts; with
+  the Auto theme it writes none and the widget follows the system.
 
-The Dart side needs no changes: `WidgetService` already writes the values and
-calls `HomeWidget.updateWidget(iOSName: 'JapMalaWidget')`. Until the target
-exists, widget updates fail silently and are logged — counting is never
-affected.
+The target was added with the `xcodeproj` Ruby gem (bundled with CocoaPods).
+If it ever has to be recreated, the embed phase must sit before Flutter's
+*Thin Binary* script phase, or Xcode reports a build cycle.
 
 ---
 
@@ -84,13 +80,14 @@ The widget reads these from the shared app group, all written by
 
 | Key | Meaning |
 | --- | --- |
-| `mantra` | What to chant, as displayed (Devanagari where available) |
+| `mantra` | The mantra, exactly as the user wrote it |
 | `beads` | Beads in the mala currently in progress |
 | `malaSize` | Beads in one mala for that mantra |
 | `todayTotal` | Jaap counted today for that mantra |
 | `todayMalas` | Malas completed today |
 | `streak` | Current streak in days |
 | `updatedAt` | Epoch milliseconds of the last write |
+| `colorBackground`, `colorText`, `colorSecondaryText`, `colorAccent`, `colorTrack`, `colorStreak` | The chosen theme's colours as ARGB integers; absent on the Auto theme |
 
 ---
 
@@ -104,3 +101,11 @@ The widget reads these from the shared app group, all written by
 Exact alarms are deliberately *not* requested: reminders use
 `AndroidScheduleMode.inexactAllowWhileIdle`, which a gentle daily nudge does
 not need special permission for.
+
+## Home screen shortcut
+
+Long-pressing the app icon offers **Blackout mode** (`quick_actions`,
+registered from `lib/app/app.dart`). Its icon is
+`ios/Runner/Assets.xcassets/shortcut_blackout.imageset` on iOS and
+`android/app/src/main/res/drawable/shortcut_blackout.xml` on Android; both
+names must match the `icon` in `ShortcutService`.

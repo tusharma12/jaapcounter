@@ -100,7 +100,7 @@ abstract class AppL10n {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'JapMala'**
+  /// **'Naam Jap Counter – Smaran'**
   String get appName;
 
   /// No description provided for @tagline.
@@ -133,12 +133,6 @@ abstract class AppL10n {
   /// **'Settings'**
   String get navSettings;
 
-  /// No description provided for @ok.
-  ///
-  /// In en, this message translates to:
-  /// **'OK'**
-  String get ok;
-
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
@@ -168,12 +162,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
-
-  /// No description provided for @done.
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get done;
 
   /// No description provided for @next.
   ///
@@ -205,24 +193,6 @@ abstract class AppL10n {
   /// **'Active'**
   String get active;
 
-  /// No description provided for @today.
-  ///
-  /// In en, this message translates to:
-  /// **'Today'**
-  String get today;
-
-  /// No description provided for @yesterday.
-  ///
-  /// In en, this message translates to:
-  /// **'Yesterday'**
-  String get yesterday;
-
-  /// No description provided for @on.
-  ///
-  /// In en, this message translates to:
-  /// **'ON'**
-  String get on;
-
   /// No description provided for @off.
   ///
   /// In en, this message translates to:
@@ -253,29 +223,11 @@ abstract class AppL10n {
   /// **'Undo'**
   String get undo;
 
-  /// No description provided for @session.
-  ///
-  /// In en, this message translates to:
-  /// **'Session'**
-  String get session;
-
-  /// No description provided for @more.
-  ///
-  /// In en, this message translates to:
-  /// **'More'**
-  String get more;
-
   /// No description provided for @malaComplete.
   ///
   /// In en, this message translates to:
   /// **'Mala Complete'**
   String get malaComplete;
-
-  /// No description provided for @malas.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 Mala} other{{count} Malas}}'**
-  String malas(int count);
 
   /// No description provided for @malasCompleted.
   ///
@@ -337,12 +289,6 @@ abstract class AppL10n {
   /// **'Meditation mode'**
   String get meditationMode;
 
-  /// No description provided for @sessionElapsed.
-  ///
-  /// In en, this message translates to:
-  /// **'Session time'**
-  String get sessionElapsed;
-
   /// No description provided for @startSession.
   ///
   /// In en, this message translates to:
@@ -391,23 +337,11 @@ abstract class AppL10n {
   /// **'{count} beads'**
   String beads(int count);
 
-  /// No description provided for @nameRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a name'**
-  String get nameRequired;
-
   /// No description provided for @malaSizeInvalid.
   ///
   /// In en, this message translates to:
   /// **'Mala size must be between 1 and 10,000'**
   String get malaSizeInvalid;
-
-  /// No description provided for @builtInCannotDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Built-in mantras can\'t be deleted'**
-  String get builtInCannotDelete;
 
   /// No description provided for @deleteMantraTitle.
   ///
@@ -420,12 +354,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'\"{name}\" will be removed. Your recorded Jaap history is kept.'**
   String deleteMantraBody(String name);
-
-  /// No description provided for @setActive.
-  ///
-  /// In en, this message translates to:
-  /// **'Set as active'**
-  String get setActive;
 
   /// No description provided for @optional.
   ///
@@ -559,12 +487,6 @@ abstract class AppL10n {
   /// **'Your progress will be kept, but the Sankalp will no longer be active.'**
   String get endSankalpBody;
 
-  /// No description provided for @sankalpComplete.
-  ///
-  /// In en, this message translates to:
-  /// **'Sankalp Complete'**
-  String get sankalpComplete;
-
   /// No description provided for @jaapPerDay.
   ///
   /// In en, this message translates to:
@@ -684,30 +606,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Active days'**
   String get activeDays;
-
-  /// No description provided for @thisWeek.
-  ///
-  /// In en, this message translates to:
-  /// **'This week'**
-  String get thisWeek;
-
-  /// No description provided for @thisMonth.
-  ///
-  /// In en, this message translates to:
-  /// **'This month'**
-  String get thisMonth;
-
-  /// No description provided for @thisYear.
-  ///
-  /// In en, this message translates to:
-  /// **'This year'**
-  String get thisYear;
-
-  /// No description provided for @allTime.
-  ///
-  /// In en, this message translates to:
-  /// **'All time'**
-  String get allTime;
 
   /// No description provided for @perMantra.
   ///
@@ -928,13 +826,13 @@ abstract class AppL10n {
   /// No description provided for @rateApp.
   ///
   /// In en, this message translates to:
-  /// **'Rate JapMala'**
+  /// **'Rate Smaran'**
   String get rateApp;
 
   /// No description provided for @shareApp.
   ///
   /// In en, this message translates to:
-  /// **'Share JapMala'**
+  /// **'Share Smaran'**
   String get shareApp;
 
   /// No description provided for @feedback.
@@ -958,7 +856,7 @@ abstract class AppL10n {
   /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'About JapMala'**
+  /// **'About Smaran'**
   String get aboutApp;
 
   /// No description provided for @version.
@@ -1012,7 +910,7 @@ abstract class AppL10n {
   /// No description provided for @aboutBody.
   ///
   /// In en, this message translates to:
-  /// **'JapMala is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.'**
+  /// **'Smaran is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.'**
   String get aboutBody;
 
   /// No description provided for @madeWith.
@@ -1020,12 +918,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Made with devotion'**
   String get madeWith;
-
-  /// No description provided for @reminders.
-  ///
-  /// In en, this message translates to:
-  /// **'Reminders'**
-  String get reminders;
 
   /// No description provided for @addReminder.
   ///
@@ -1060,14 +952,8 @@ abstract class AppL10n {
   /// No description provided for @notificationsBlocked.
   ///
   /// In en, this message translates to:
-  /// **'Notifications are turned off for JapMala. Enable them in your device settings.'**
+  /// **'Notifications are turned off for Smaran. Enable them in your device settings.'**
   String get notificationsBlocked;
-
-  /// No description provided for @openSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Open settings'**
-  String get openSettings;
 
   /// No description provided for @reminderNotificationTitle.
   ///
@@ -1126,7 +1012,7 @@ abstract class AppL10n {
   /// No description provided for @restoreBackupBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose a JapMala backup file to restore.'**
+  /// **'Choose a Smaran backup file to restore.'**
   String get restoreBackupBody;
 
   /// No description provided for @backupCreated.
@@ -1144,7 +1030,7 @@ abstract class AppL10n {
   /// No description provided for @restoreWarningBody.
   ///
   /// In en, this message translates to:
-  /// **'Restoring will replace everything currently in JapMala with the contents of the backup file.'**
+  /// **'Restoring will replace everything currently in Smaran with the contents of the backup file.'**
   String get restoreWarningBody;
 
   /// No description provided for @restore.
@@ -1162,13 +1048,13 @@ abstract class AppL10n {
   /// No description provided for @importInvalid.
   ///
   /// In en, this message translates to:
-  /// **'This file is not a valid JapMala backup'**
+  /// **'This file is not a valid Smaran backup'**
   String get importInvalid;
 
   /// No description provided for @exportShareText.
   ///
   /// In en, this message translates to:
-  /// **'My JapMala backup'**
+  /// **'My Smaran backup'**
   String get exportShareText;
 
   /// No description provided for @onb1Title.
@@ -1206,18 +1092,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Enter meditation mode with a clean, peaceful counter.'**
   String get onb3Body;
-
-  /// No description provided for @onb4Title.
-  ///
-  /// In en, this message translates to:
-  /// **'Begin Your Jap'**
-  String get onb4Title;
-
-  /// No description provided for @onb4Body.
-  ///
-  /// In en, this message translates to:
-  /// **'Ready to begin?'**
-  String get onb4Body;
 
   /// No description provided for @startJap.
   ///
@@ -1260,12 +1134,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Auto Jaap'**
   String get autoJaap;
-
-  /// No description provided for @autoJaapShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Auto'**
-  String get autoJaapShort;
 
   /// No description provided for @autoJaapBody.
   ///
@@ -1680,6 +1548,90 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Show mantra on counter'**
   String get showMantraOnCounter;
+
+  /// No description provided for @goalUnitMalas.
+  ///
+  /// In en, this message translates to:
+  /// **'Malas'**
+  String get goalUnitMalas;
+
+  /// No description provided for @goalUnitJaap.
+  ///
+  /// In en, this message translates to:
+  /// **'Jaap'**
+  String get goalUnitJaap;
+
+  /// No description provided for @malaCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 mala} other{{count} malas}}'**
+  String malaCount(int count);
+
+  /// No description provided for @malasPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Malas a day'**
+  String get malasPerDay;
+
+  /// No description provided for @goalMalasPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{malas, plural, =1{1 mala} other{{malas} malas}} a day · {jaap} Jaap'**
+  String goalMalasPerDay(int malas, String jaap);
+
+  /// No description provided for @onbMantraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which mantra do you chant?'**
+  String get onbMantraTitle;
+
+  /// No description provided for @onbMantraBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick one to begin. You can add more at any time.'**
+  String get onbMantraBody;
+
+  /// No description provided for @onbGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily goal'**
+  String get onbGoalTitle;
+
+  /// No description provided for @onbGoalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Start small: a steady practice matters more than a big number. You can change it any time.'**
+  String get onbGoalBody;
+
+  /// No description provided for @shareProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my progress'**
+  String get shareProgress;
+
+  /// No description provided for @shareStreakLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'day streak'**
+  String get shareStreakLabel;
+
+  /// No description provided for @shareCardText.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}} of Naam Jap in a row, with Smaran 🙏'**
+  String shareCardText(int count);
+
+  /// No description provided for @blackoutMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Blackout mode'**
+  String get blackoutMode;
+
+  /// No description provided for @exitBlackout.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit blackout'**
+  String get exitBlackout;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

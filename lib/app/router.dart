@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/backup/presentation/backup_screen.dart';
 import '../features/jaap/presentation/jaap_screen.dart';
 import '../features/mantras/presentation/mantras_screen.dart';
+import '../features/meditation/presentation/blackout_screen.dart';
 import '../features/meditation/presentation/meditation_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/progress/presentation/progress_screen.dart';
@@ -43,6 +44,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/meditation',
         parentNavigatorKey: rootKey,
         builder: (context, state) => const MeditationScreen(),
+      ),
+      GoRoute(
+        path: '/blackout',
+        parentNavigatorKey: rootKey,
+        builder: (context, state) => const BlackoutScreen(),
       ),
       GoRoute(
         path: '/mantras',

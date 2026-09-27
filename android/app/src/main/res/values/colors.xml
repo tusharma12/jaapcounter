@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The JapMala palette, mirrored from lib/app/theme/app_colors.dart. -->
+    <!-- The Smaran palette, mirrored from lib/app/theme/app_colors.dart. -->
     <!-- Matches the saffron at the edge of the app icon artwork. -->
     <color name="ic_launcher_background">#FD9912</color>
     <color name="japmala_background">#F8F7F4</color>

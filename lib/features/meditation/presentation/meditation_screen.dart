@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../app/theme/app_colors.dart';
@@ -17,12 +17,12 @@ import '../../jaap/presentation/jaap_controller.dart';
 import '../../jaap/presentation/jaap_state.dart';
 import '../../jaap/presentation/widgets/mala_ring.dart';
 import '../../settings/presentation/settings_controller.dart';
+import 'blackout_screen.dart';
 
 /// Distraction-free chanting.
 ///
-/// Normal mode keeps the mantra, the count and three controls. Blackout keeps
-/// the mantra and the count, on black, and nothing else — for chanting with
-/// the phone face up and the eyes closed.
+/// The mantra, the count and three controls. Blackout opens
+/// [BlackoutScreen], the same one Settings offers.
 class MeditationScreen extends ConsumerStatefulWidget {
   const MeditationScreen({super.key});
 
@@ -38,7 +38,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     Duration(minutes: 30),
   ];
 
-  bool _blackout = false;
   final DateTime _enteredAt = DateTime.now();
   Duration? _timerTarget;
   Timer? _ticker;
@@ -59,7 +58,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   void dispose() {
     _ticker?.cancel();
     _applyWakelock(false);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -80,12 +78,12 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     }
   }
 
-  void _toggleBlackout() {
-    setState(() => _blackout = !_blackout);
-    SystemChrome.setEnabledSystemUIMode(
-      _blackout ? SystemUiMode.immersive : SystemUiMode.edgeToEdge,
-    );
-    ref.read(feedbackProvider).removal();
+  Future<void> _openBlackout() async {
+    await context.push('/blackout');
+    // Blackout releases the wakelock as it closes; this screen still wants it.
+    if (mounted) {
+      _applyWakelock(ref.read(settingsProvider).keepScreenOnInMeditation);
+    }
   }
 
   Future<void> _pickTimer() async {
@@ -137,32 +135,25 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     final palette = context.palette;
 
     return Scaffold(
-      backgroundColor: _blackout ? Colors.black : palette.background,
+      backgroundColor: palette.background,
       body: AsyncView<JaapState>(
         value: async,
         builder: (context, state) => GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (_) => ref.read(jaapControllerProvider.notifier).count(),
-          // Swiping down leaves, so blackout needs no visible chrome.
           onVerticalDragEnd: (details) {
             if ((details.primaryVelocity ?? 0) > 220) {
-              if (_blackout) {
-                _toggleBlackout();
-              } else {
-                Navigator.of(context).maybePop();
-              }
+              Navigator.of(context).maybePop();
             }
           },
           child: SafeArea(
-            child: _blackout
-                ? _BlackoutView(state: state, onExit: _toggleBlackout)
-                : _MeditationView(
-                    state: state,
-                    elapsed: DateTime.now().difference(_enteredAt),
-                    timerTarget: _timerTarget,
-                    onBlackout: _toggleBlackout,
-                    onTimer: _pickTimer,
-                  ),
+            child: _MeditationView(
+              state: state,
+              elapsed: DateTime.now().difference(_enteredAt),
+              timerTarget: _timerTarget,
+              onBlackout: _openBlackout,
+              onTimer: _pickTimer,
+            ),
           ),
         ),
       ),
@@ -280,71 +271,6 @@ class _MeditationView extends ConsumerWidget {
                 onTap: onBlackout,
               ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _BlackoutView extends StatelessWidget {
-  const _BlackoutView({required this.state, required this.onExit});
-
-  final JaapState state;
-  final VoidCallback onExit;
-
-  @override
-  Widget build(BuildContext context) {
-    final position = state.position;
-    const dim = Color(0xFF8A8A8A);
-
-    return Stack(
-      children: [
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                state.mantra.name,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                style: AppTypography.mantra(
-                  size: 26,
-                  color: const Color(0xFFE8E4DC),
-                ),
-              ),
-              const SizedBox(height: Insets.xxxl),
-              Text(
-                '${position.beadsInCurrentMala}',
-                style: const TextStyle(
-                  fontFamily: AppTypography.ui,
-                  fontSize: 88,
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFFF2EFE9),
-                  letterSpacing: -3,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-              const SizedBox(height: Insets.lg),
-              Text(
-                '${position.malaSize}',
-                style: const TextStyle(
-                  fontFamily: AppTypography.ui,
-                  fontSize: 17,
-                  color: dim,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          top: Insets.sm,
-          left: Insets.sm,
-          child: IconButton(
-            onPressed: onExit,
-            icon: const Icon(Icons.close_rounded, color: Color(0xFF3A3A3A)),
           ),
         ),
       ],

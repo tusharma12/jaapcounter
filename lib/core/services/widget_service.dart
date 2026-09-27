@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:home_widget/home_widget.dart';
 
+import '../../app/theme/app_colors.dart';
 import 'app_logger.dart';
 
 /// Pushes counter state to the home screen widgets.
@@ -30,6 +31,7 @@ class WidgetService {
     required int todayTotal,
     required int todayMalas,
     required int streak,
+    AppPalette? palette,
   }) async {
     try {
       await _ensureConfigured();
@@ -44,6 +46,17 @@ class WidgetService {
           'updatedAt',
           DateTime.now().millisecondsSinceEpoch,
         ),
+        // The chosen theme's colours as ARGB; absent for Auto, where the
+        // widget follows the system's light and dark like the app does.
+        for (final (key, color) in [
+          ('colorBackground', palette?.background),
+          ('colorText', palette?.primaryText),
+          ('colorSecondaryText', palette?.secondaryText),
+          ('colorAccent', palette?.saffron),
+          ('colorTrack', palette?.track),
+          ('colorStreak', palette?.secondary),
+        ])
+          HomeWidget.saveWidgetData<int>(key, color?.toARGB32()),
       ]);
       await HomeWidget.updateWidget(
         androidName: androidProviderName,

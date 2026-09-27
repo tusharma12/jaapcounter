@@ -16,16 +16,31 @@ class FeedbackService {
     if (sound) await SystemSound.play(SystemSoundType.click);
   }
 
-  /// A mala completed — a firmer, distinct signal so the user can keep their
-  /// eyes closed and still know.
+  /// A mala completed: two firm knocks, far enough apart to be felt as two,
+  /// so the user can keep their eyes closed and still know 108 has come.
   Future<void> malaComplete() async {
     if (haptics) {
-      await HapticFeedback.mediumImpact();
-      await Future<void>.delayed(const Duration(milliseconds: 90));
-      await HapticFeedback.mediumImpact();
+      await HapticFeedback.heavyImpact();
+      await Future<void>.delayed(pulseGap);
+      await HapticFeedback.heavyImpact();
     }
     if (sound) await SystemSound.play(SystemSoundType.alert);
   }
+
+  /// The day's goal reached: three knocks, one more than a mala, so the two
+  /// are never confused.
+  Future<void> goalReached() async {
+    if (haptics) {
+      for (var i = 0; i < 3; i++) {
+        if (i > 0) await Future<void>.delayed(pulseGap);
+        await HapticFeedback.heavyImpact();
+      }
+    }
+    if (sound) await SystemSound.play(SystemSoundType.alert);
+  }
+
+  /// Under ~120 ms, iPhones run two impacts together into one buzz.
+  static const Duration pulseGap = Duration(milliseconds: 170);
 
   /// An undo, a reset — something removed.
   Future<void> removal() async {

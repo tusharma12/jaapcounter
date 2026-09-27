@@ -17,6 +17,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../mantras/domain/mantra.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
 import '../../sadhana/domain/streak.dart';
+import '../../share/presentation/share_card.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
 import '../domain/progress_models.dart';
 import 'progress_providers.dart';
@@ -35,7 +36,16 @@ class ProgressScreen extends ConsumerWidget {
     final summary = ref.watch(progressSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.progress)),
+      appBar: AppBar(
+        title: Text(l10n.progress),
+        actions: [
+          IconButton(
+            tooltip: l10n.shareProgress,
+            onPressed: () => showShareCardSheet(context),
+            icon: const Icon(Icons.ios_share_rounded),
+          ),
+        ],
+      ),
       body: AsyncView<ProgressSummary>(
         value: summary,
         onRetry: () => ref.invalidate(progressSummaryProvider),

@@ -63,17 +63,17 @@ void main() {
   testWidgets('a custom mantra can be added and deleted', (tester) async {
     final created = await container
         .read(mantraListProvider.notifier)
-        .add(name: 'सीता राम', description: 'Sita Ram', malaSize: 27);
+        .add(name: 'मेरा अपना मंत्र', description: 'My own mantra', malaSize: 27);
     await pumpLibrary(tester);
 
-    await tester.scrollUntilVisible(find.text('सीता राम'), 200);
-    expect(find.text('सीता राम'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('मेरा अपना मंत्र'), 200);
+    expect(find.text('मेरा अपना मंत्र'), findsOneWidget);
     expect(find.text('27 beads'), findsOneWidget);
 
     await container.read(mantraListProvider.notifier).remove(created.id);
     await tester.pumpAndSettle();
 
-    expect(find.text('सीता राम'), findsNothing);
+    expect(find.text('मेरा अपना मंत्र'), findsNothing);
   });
 
   testWidgets('the quick picker switches mantra and closes', (tester) async {

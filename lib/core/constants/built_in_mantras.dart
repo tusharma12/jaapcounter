@@ -90,6 +90,48 @@ abstract final class BuiltInMantras {
       isBuiltIn: true,
       sortOrder: 10,
     ),
+    Mantra(
+      id: 'builtin.sita-ram',
+      name: 'सीता राम',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 11,
+    ),
+    Mantra(
+      id: 'builtin.shri-ram-jai-ram',
+      name: 'श्री राम जय राम जय जय राम',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 12,
+    ),
+    Mantra(
+      id: 'builtin.om-gam-ganapataye-namah',
+      name: 'ॐ गं गणपतये नमः',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 13,
+    ),
+    Mantra(
+      id: 'builtin.om-shri-mahalakshmyai-namah',
+      name: 'ॐ श्री महालक्ष्म्यै नमः',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 14,
+    ),
+    Mantra(
+      id: 'builtin.om-aim-saraswatyai-namah',
+      name: 'ॐ ऐं सरस्वत्यै नमः',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 15,
+    ),
+    Mantra(
+      id: 'builtin.om',
+      name: 'ॐ',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 16,
+    ),
   ];
 
   /// Built-ins that earlier versions shipped and this one no longer does.

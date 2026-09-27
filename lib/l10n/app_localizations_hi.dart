@@ -9,7 +9,7 @@ class AppL10nHi extends AppL10n {
   AppL10nHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get appName => 'जपमाला';
+  String get appName => 'नाम जप काउंटर – स्मरण';
 
   @override
   String get tagline => 'आपके दैनिक नाम जप के लिए शांत डिजिटल माला';
@@ -27,9 +27,6 @@ class AppL10nHi extends AppL10n {
   String get navSettings => 'सेटिंग';
 
   @override
-  String get ok => 'ठीक है';
-
-  @override
   String get cancel => 'रद्द करें';
 
   @override
@@ -43,9 +40,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get close => 'बंद करें';
-
-  @override
-  String get done => 'पूर्ण';
 
   @override
   String get next => 'आगे';
@@ -63,15 +57,6 @@ class AppL10nHi extends AppL10n {
   String get active => 'सक्रिय';
 
   @override
-  String get today => 'आज';
-
-  @override
-  String get yesterday => 'कल';
-
-  @override
-  String get on => 'चालू';
-
-  @override
   String get off => 'बंद';
 
   @override
@@ -87,24 +72,7 @@ class AppL10nHi extends AppL10n {
   String get undo => 'पूर्ववत';
 
   @override
-  String get session => 'सत्र';
-
-  @override
-  String get more => 'और';
-
-  @override
   String get malaComplete => 'माला पूर्ण';
-
-  @override
-  String malas(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count मालाएँ',
-      one: '1 माला',
-    );
-    return '$_temp0';
-  }
 
   @override
   String malasCompleted(int count) {
@@ -148,9 +116,6 @@ class AppL10nHi extends AppL10n {
   String get meditationMode => 'ध्यान मोड';
 
   @override
-  String get sessionElapsed => 'सत्र का समय';
-
-  @override
   String get startSession => 'सत्र शुरू करें';
 
   @override
@@ -179,13 +144,7 @@ class AppL10nHi extends AppL10n {
   }
 
   @override
-  String get nameRequired => 'कृपया नाम भरें';
-
-  @override
   String get malaSizeInvalid => 'माला का आकार 1 से 10,000 के बीच होना चाहिए';
-
-  @override
-  String get builtInCannotDelete => 'अंतर्निहित मंत्र हटाए नहीं जा सकते';
 
   @override
   String get deleteMantraTitle => 'मंत्र हटाएँ?';
@@ -194,9 +153,6 @@ class AppL10nHi extends AppL10n {
   String deleteMantraBody(String name) {
     return '\"$name\" हटा दिया जाएगा। आपका जाप इतिहास सुरक्षित रहेगा।';
   }
-
-  @override
-  String get setActive => 'सक्रिय करें';
 
   @override
   String get optional => 'वैकल्पिक';
@@ -291,9 +247,6 @@ class AppL10nHi extends AppL10n {
       'आपकी प्रगति सुरक्षित रहेगी, पर संकल्प सक्रिय नहीं रहेगा।';
 
   @override
-  String get sankalpComplete => 'संकल्प पूर्ण';
-
-  @override
   String jaapPerDay(int count) {
     return 'प्रतिदिन $count जाप';
   }
@@ -362,18 +315,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get activeDays => 'सक्रिय दिन';
-
-  @override
-  String get thisWeek => 'इस सप्ताह';
-
-  @override
-  String get thisMonth => 'इस माह';
-
-  @override
-  String get thisYear => 'इस वर्ष';
-
-  @override
-  String get allTime => 'आरंभ से';
 
   @override
   String get perMantra => 'मंत्र अनुसार';
@@ -486,10 +427,10 @@ class AppL10nHi extends AppL10n {
   String get exportMyData => 'मेरा डेटा निर्यात करें';
 
   @override
-  String get rateApp => 'जपमाला को रेट करें';
+  String get rateApp => 'स्मरण को रेट करें';
 
   @override
-  String get shareApp => 'जपमाला साझा करें';
+  String get shareApp => 'स्मरण साझा करें';
 
   @override
   String get feedback => 'प्रतिक्रिया';
@@ -501,7 +442,7 @@ class AppL10nHi extends AppL10n {
   String get terms => 'शर्तें';
 
   @override
-  String get aboutApp => 'जपमाला के बारे में';
+  String get aboutApp => 'स्मरण के बारे में';
 
   @override
   String version(String version) {
@@ -533,13 +474,10 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get aboutBody =>
-      'जपमाला आपके दैनिक नाम जप के लिए एक शांत, निजी स्थान है। आपका सारा जाप केवल इसी उपकरण में सुरक्षित रहता है।';
+      'स्मरण आपके दैनिक नाम जप के लिए एक शांत, निजी स्थान है। आपका सारा जाप केवल इसी उपकरण में सुरक्षित रहता है।';
 
   @override
   String get madeWith => 'श्रद्धा से निर्मित';
-
-  @override
-  String get reminders => 'स्मरण';
 
   @override
   String get addReminder => 'स्मरण जोड़ें';
@@ -559,10 +497,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'जपमाला के लिए सूचनाएँ बंद हैं। उपकरण की सेटिंग में इन्हें चालू करें।';
-
-  @override
-  String get openSettings => 'सेटिंग खोलें';
+      'स्मरण के लिए सूचनाएँ बंद हैं। उपकरण की सेटिंग में इन्हें चालू करें।';
 
   @override
   String get reminderNotificationTitle => 'जाप का समय';
@@ -596,7 +531,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get restoreBackupBody =>
-      'पुनर्स्थापित करने के लिए जपमाला बैकअप फ़ाइल चुनें।';
+      'पुनर्स्थापित करने के लिए स्मरण बैकअप फ़ाइल चुनें।';
 
   @override
   String get backupCreated => 'बैकअप बन गया';
@@ -606,7 +541,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'पुनर्स्थापना जपमाला के वर्तमान सारे डेटा को बैकअप फ़ाइल के डेटा से बदल देगी।';
+      'पुनर्स्थापना स्मरण के वर्तमान सारे डेटा को बैकअप फ़ाइल के डेटा से बदल देगी।';
 
   @override
   String get restore => 'पुनर्स्थापित करें';
@@ -617,10 +552,10 @@ class AppL10nHi extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'यह फ़ाइल मान्य जपमाला बैकअप नहीं है';
+  String get importInvalid => 'यह फ़ाइल मान्य स्मरण बैकअप नहीं है';
 
   @override
-  String get exportShareText => 'मेरा जपमाला बैकअप';
+  String get exportShareText => 'मेरा स्मरण बैकअप';
 
   @override
   String get onb1Title => 'आपकी डिजिटल जप माला';
@@ -639,12 +574,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get onb3Body => 'स्वच्छ, शांत काउंटर के साथ ध्यान मोड में जाएँ।';
-
-  @override
-  String get onb4Title => 'जप आरंभ करें';
-
-  @override
-  String get onb4Body => 'आरंभ करने के लिए तैयार?';
 
   @override
   String get startJap => 'जप आरंभ करें';
@@ -668,9 +597,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get autoJaap => 'स्वतः जाप';
-
-  @override
-  String get autoJaapShort => 'स्वतः';
 
   @override
   String get autoJaapBody =>
@@ -900,4 +826,54 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get showMantraOnCounter => 'काउंटर पर मंत्र दिखाएँ';
+
+  @override
+  String get goalUnitMalas => 'माला';
+
+  @override
+  String get goalUnitJaap => 'जाप';
+
+  @override
+  String malaCount(int count) {
+    return '$count माला';
+  }
+
+  @override
+  String get malasPerDay => 'प्रतिदिन माला';
+
+  @override
+  String goalMalasPerDay(int malas, String jaap) {
+    return 'प्रतिदिन $malas माला · $jaap जाप';
+  }
+
+  @override
+  String get onbMantraTitle => 'आप कौन सा मंत्र जपते हैं?';
+
+  @override
+  String get onbMantraBody =>
+      'शुरू करने के लिए एक चुनें। और मंत्र कभी भी जोड़ सकते हैं।';
+
+  @override
+  String get onbGoalTitle => 'आपका दैनिक लक्ष्य';
+
+  @override
+  String get onbGoalBody =>
+      'छोटे से शुरू करें: बड़ी संख्या से ज़्यादा ज़रूरी रोज़ का नियम है। इसे कभी भी बदल सकते हैं।';
+
+  @override
+  String get shareProgress => 'मेरी प्रगति साझा करें';
+
+  @override
+  String get shareStreakLabel => 'दिन लगातार';
+
+  @override
+  String shareCardText(int count) {
+    return 'स्मरण के साथ लगातार $count दिन नाम जाप 🙏';
+  }
+
+  @override
+  String get blackoutMode => 'अंधकार मोड';
+
+  @override
+  String get exitBlackout => 'अंधकार मोड से बाहर';
 }

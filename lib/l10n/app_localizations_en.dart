@@ -9,7 +9,7 @@ class AppL10nEn extends AppL10n {
   AppL10nEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'JapMala';
+  String get appName => 'Naam Jap Counter – Smaran';
 
   @override
   String get tagline => 'Your peaceful digital mala for daily Naam Jap';
@@ -27,9 +27,6 @@ class AppL10nEn extends AppL10n {
   String get navSettings => 'Settings';
 
   @override
-  String get ok => 'OK';
-
-  @override
   String get cancel => 'Cancel';
 
   @override
@@ -43,9 +40,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get close => 'Close';
-
-  @override
-  String get done => 'Done';
 
   @override
   String get next => 'Next';
@@ -63,15 +57,6 @@ class AppL10nEn extends AppL10n {
   String get active => 'Active';
 
   @override
-  String get today => 'Today';
-
-  @override
-  String get yesterday => 'Yesterday';
-
-  @override
-  String get on => 'ON';
-
-  @override
   String get off => 'OFF';
 
   @override
@@ -87,24 +72,7 @@ class AppL10nEn extends AppL10n {
   String get undo => 'Undo';
 
   @override
-  String get session => 'Session';
-
-  @override
-  String get more => 'More';
-
-  @override
   String get malaComplete => 'Mala Complete';
-
-  @override
-  String malas(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Malas',
-      one: '1 Mala',
-    );
-    return '$_temp0';
-  }
 
   @override
   String malasCompleted(int count) {
@@ -148,9 +116,6 @@ class AppL10nEn extends AppL10n {
   String get meditationMode => 'Meditation mode';
 
   @override
-  String get sessionElapsed => 'Session time';
-
-  @override
   String get startSession => 'Start session';
 
   @override
@@ -179,13 +144,7 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get nameRequired => 'Please enter a name';
-
-  @override
   String get malaSizeInvalid => 'Mala size must be between 1 and 10,000';
-
-  @override
-  String get builtInCannotDelete => 'Built-in mantras can\'t be deleted';
 
   @override
   String get deleteMantraTitle => 'Delete mantra?';
@@ -194,9 +153,6 @@ class AppL10nEn extends AppL10n {
   String deleteMantraBody(String name) {
     return '\"$name\" will be removed. Your recorded Jaap history is kept.';
   }
-
-  @override
-  String get setActive => 'Set as active';
 
   @override
   String get optional => 'optional';
@@ -291,9 +247,6 @@ class AppL10nEn extends AppL10n {
       'Your progress will be kept, but the Sankalp will no longer be active.';
 
   @override
-  String get sankalpComplete => 'Sankalp Complete';
-
-  @override
   String jaapPerDay(int count) {
     return '$count Jaap per day';
   }
@@ -363,18 +316,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get activeDays => 'Active days';
-
-  @override
-  String get thisWeek => 'This week';
-
-  @override
-  String get thisMonth => 'This month';
-
-  @override
-  String get thisYear => 'This year';
-
-  @override
-  String get allTime => 'All time';
 
   @override
   String get perMantra => 'By mantra';
@@ -487,10 +428,10 @@ class AppL10nEn extends AppL10n {
   String get exportMyData => 'Export My Data';
 
   @override
-  String get rateApp => 'Rate JapMala';
+  String get rateApp => 'Rate Smaran';
 
   @override
-  String get shareApp => 'Share JapMala';
+  String get shareApp => 'Share Smaran';
 
   @override
   String get feedback => 'Feedback';
@@ -502,7 +443,7 @@ class AppL10nEn extends AppL10n {
   String get terms => 'Terms';
 
   @override
-  String get aboutApp => 'About JapMala';
+  String get aboutApp => 'About Smaran';
 
   @override
   String version(String version) {
@@ -534,13 +475,10 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get aboutBody =>
-      'JapMala is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.';
+      'Smaran is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.';
 
   @override
   String get madeWith => 'Made with devotion';
-
-  @override
-  String get reminders => 'Reminders';
 
   @override
   String get addReminder => 'Add reminder';
@@ -560,10 +498,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'Notifications are turned off for JapMala. Enable them in your device settings.';
-
-  @override
-  String get openSettings => 'Open settings';
+      'Notifications are turned off for Smaran. Enable them in your device settings.';
 
   @override
   String get reminderNotificationTitle => 'Time for your Jaap';
@@ -597,7 +532,7 @@ class AppL10nEn extends AppL10n {
   String get restoreBackup => 'Restore from backup';
 
   @override
-  String get restoreBackupBody => 'Choose a JapMala backup file to restore.';
+  String get restoreBackupBody => 'Choose a Smaran backup file to restore.';
 
   @override
   String get backupCreated => 'Backup created';
@@ -607,7 +542,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'Restoring will replace everything currently in JapMala with the contents of the backup file.';
+      'Restoring will replace everything currently in Smaran with the contents of the backup file.';
 
   @override
   String get restore => 'Restore';
@@ -618,10 +553,10 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'This file is not a valid JapMala backup';
+  String get importInvalid => 'This file is not a valid Smaran backup';
 
   @override
-  String get exportShareText => 'My JapMala backup';
+  String get exportShareText => 'My Smaran backup';
 
   @override
   String get onb1Title => 'Your Digital Jap Mala';
@@ -641,12 +576,6 @@ class AppL10nEn extends AppL10n {
   @override
   String get onb3Body =>
       'Enter meditation mode with a clean, peaceful counter.';
-
-  @override
-  String get onb4Title => 'Begin Your Jap';
-
-  @override
-  String get onb4Body => 'Ready to begin?';
 
   @override
   String get startJap => 'Start Jap';
@@ -670,9 +599,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get autoJaap => 'Auto Jaap';
-
-  @override
-  String get autoJaapShort => 'Auto';
 
   @override
   String get autoJaapBody =>
@@ -902,4 +828,72 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get showMantraOnCounter => 'Show mantra on counter';
+
+  @override
+  String get goalUnitMalas => 'Malas';
+
+  @override
+  String get goalUnitJaap => 'Jaap';
+
+  @override
+  String malaCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count malas',
+      one: '1 mala',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get malasPerDay => 'Malas a day';
+
+  @override
+  String goalMalasPerDay(int malas, String jaap) {
+    String _temp0 = intl.Intl.pluralLogic(
+      malas,
+      locale: localeName,
+      other: '$malas malas',
+      one: '1 mala',
+    );
+    return '$_temp0 a day · $jaap Jaap';
+  }
+
+  @override
+  String get onbMantraTitle => 'Which mantra do you chant?';
+
+  @override
+  String get onbMantraBody =>
+      'Pick one to begin. You can add more at any time.';
+
+  @override
+  String get onbGoalTitle => 'Your daily goal';
+
+  @override
+  String get onbGoalBody =>
+      'Start small: a steady practice matters more than a big number. You can change it any time.';
+
+  @override
+  String get shareProgress => 'Share my progress';
+
+  @override
+  String get shareStreakLabel => 'day streak';
+
+  @override
+  String shareCardText(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0 of Naam Jap in a row, with Smaran 🙏';
+  }
+
+  @override
+  String get blackoutMode => 'Blackout mode';
+
+  @override
+  String get exitBlackout => 'Exit blackout';
 }

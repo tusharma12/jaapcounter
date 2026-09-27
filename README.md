@@ -1,4 +1,4 @@
-# JapMala
+# Naam Jap Counter – Smaran
 
 **Your peaceful digital mala for daily Naam Jap.**
 
