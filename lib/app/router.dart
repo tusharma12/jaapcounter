@@ -98,14 +98,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'favourites',
-                    builder: (context, state) =>
-                        const FavouriteStoriesScreen(),
+                    builder: (context, state) => const FavouriteStoriesScreen(),
                   ),
                   GoRoute(
                     path: ':storyId',
-                    builder: (context, state) => StoryScreen(
-                      storyId: state.pathParameters['storyId']!,
-                    ),
+                    builder: (context, state) =>
+                        StoryScreen(storyId: state.pathParameters['storyId']!),
                   ),
                 ],
               ),

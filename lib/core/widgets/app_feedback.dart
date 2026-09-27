@@ -66,9 +66,7 @@ Future<T?> showAppSheet<T>(
     useSafeArea: true,
     constraints: const BoxConstraints(maxWidth: 640),
     builder: (context) => Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: expand
           ? FractionallySizedBox(heightFactor: 0.92, child: builder(context))
           : builder(context),

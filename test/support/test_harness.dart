@@ -34,8 +34,13 @@ class TestClock {
 
   void advance(Duration duration) => _now = _now.add(duration);
 
-  void advanceDays(int days) =>
-      _now = DateTime(_now.year, _now.month, _now.day + days, _now.hour, _now.minute);
+  void advanceDays(int days) => _now = DateTime(
+    _now.year,
+    _now.month,
+    _now.day + days,
+    _now.hour,
+    _now.minute,
+  );
 
   String get today => DayKeys.of(_now);
 }

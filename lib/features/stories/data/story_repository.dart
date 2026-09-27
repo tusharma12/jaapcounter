@@ -18,8 +18,9 @@ class StoryRepository {
   Map<String, Object?>? _raw;
 
   Future<StoryLibrary> load(String localeCode) async {
-    final data = _raw ??= jsonDecode(await rootBundle.loadString(assetPath))
-        as Map<String, Object?>;
+    final data = _raw ??=
+        jsonDecode(await rootBundle.loadString(assetPath))
+            as Map<String, Object?>;
 
     final categories = (data['categories'] as List<Object?>? ?? const [])
         .cast<Map<String, Object?>>()

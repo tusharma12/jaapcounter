@@ -184,9 +184,7 @@ void main() {
     test('clears the beads in progress and keeps the totals', () async {
       await jaap.addBeads(mantraId: ram.id, delta: 150);
 
-      final base = await jaap.resetCurrentMala(
-        (await mantras.byId(ram.id))!,
-      );
+      final base = await jaap.resetCurrentMala((await mantras.byId(ram.id))!);
 
       expect(base, 42, reason: '150 beads is one mala plus 42');
       expect(await jaap.lifetimeFor(ram.id), 150);

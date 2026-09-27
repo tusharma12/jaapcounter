@@ -212,7 +212,7 @@ class _MeditationView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                state.mantra.display,
+                state.mantra.name,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 style: AppTypography.mantra(
@@ -225,6 +225,7 @@ class _MeditationView extends ConsumerWidget {
                 beads: position.beadsInCurrentMala,
                 malaSize: position.malaSize,
                 diameter: 232,
+                style: ref.watch(settingsProvider.select((s) => s.malaStyle)),
                 child: MalaRingLabel(
                   beads: position.beadsInCurrentMala,
                   malaSize: position.malaSize,
@@ -304,7 +305,7 @@ class _BlackoutView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                state.mantra.display,
+                state.mantra.name,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 style: AppTypography.mantra(
@@ -343,10 +344,7 @@ class _BlackoutView extends StatelessWidget {
           left: Insets.sm,
           child: IconButton(
             onPressed: onExit,
-            icon: const Icon(
-              Icons.close_rounded,
-              color: Color(0xFF3A3A3A),
-            ),
+            icon: const Icon(Icons.close_rounded, color: Color(0xFF3A3A3A)),
           ),
         ),
       ],

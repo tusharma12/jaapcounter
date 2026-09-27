@@ -47,7 +47,12 @@ abstract final class AppTypography {
     return TextTheme(
       // Counter numerals and other hero figures.
       displayLarge: base(72, FontWeight.w600, height: 1.05, letterSpacing: -2),
-      displayMedium: base(56, FontWeight.w600, height: 1.05, letterSpacing: -1.5),
+      displayMedium: base(
+        56,
+        FontWeight.w600,
+        height: 1.05,
+        letterSpacing: -1.5,
+      ),
       displaySmall: base(40, FontWeight.w600, height: 1.1, letterSpacing: -1),
       headlineLarge: base(30, FontWeight.w600, letterSpacing: -0.6),
       headlineMedium: base(24, FontWeight.w600, letterSpacing: -0.4),
@@ -61,7 +66,12 @@ abstract final class AppTypography {
       labelLarge: base(15, FontWeight.w600, letterSpacing: 0.2),
       labelMedium: base(13, FontWeight.w500, color: secondary),
       // Section headers in Settings.
-      labelSmall: base(11, FontWeight.w600, letterSpacing: 1.1, color: secondary),
+      labelSmall: base(
+        11,
+        FontWeight.w600,
+        letterSpacing: 1.1,
+        color: secondary,
+      ),
     );
   }
 }

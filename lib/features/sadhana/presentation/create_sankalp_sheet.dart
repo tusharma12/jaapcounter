@@ -122,7 +122,8 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
             trailing: Switch(
               value: _reminder != null,
               onChanged: (on) => setState(
-                () => _reminder = on ? const TimeOfDay(hour: 7, minute: 0) : null,
+                () =>
+                    _reminder = on ? const TimeOfDay(hour: 7, minute: 0) : null,
               ),
             ),
             onTap: _reminder == null
@@ -177,7 +178,13 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
                   align: TextAlign.start,
                   color: context.palette.primaryText,
                 ),
-                subtitle: Text(mantra.subtitle),
+                subtitle: mantra.hasDescription
+                    ? Text(
+                        mantra.description!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : null,
                 onTap: () => Navigator.of(sheetContext).pop(mantra),
               ),
           ],
@@ -195,13 +202,15 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
         ? null
         : _reminder!.hour * 60 + _reminder!.minute;
 
-    await ref.read(activeSadhanaProvider.notifier).begin(
-      mantraId: mantra.id,
-      dailyGoal: _dailyGoal,
-      durationDays: _durationDays,
-      reminderEnabled: reminderMinutes != null,
-      reminderMinutes: reminderMinutes,
-    );
+    await ref
+        .read(activeSadhanaProvider.notifier)
+        .begin(
+          mantraId: mantra.id,
+          dailyGoal: _dailyGoal,
+          durationDays: _durationDays,
+          reminderEnabled: reminderMinutes != null,
+          reminderMinutes: reminderMinutes,
+        );
 
     // A Sankalp with a reminder time also creates the reminder, so the vow
     // and the nudge cannot drift apart.
@@ -260,10 +269,7 @@ class _SelectorTile extends StatelessWidget {
             children: [
               Expanded(child: child),
               trailing ??
-                  Icon(
-                    Icons.expand_more_rounded,
-                    color: palette.tertiaryText,
-                  ),
+                  Icon(Icons.expand_more_rounded, color: palette.tertiaryText),
             ],
           ),
         ),

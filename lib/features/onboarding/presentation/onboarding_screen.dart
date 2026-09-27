@@ -46,26 +46,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final palette = context.palette;
 
     final pages = <_OnboardingPage>[
-      _OnboardingPage(
-        glyph: 'ॐ',
-        title: l10n.onb1Title,
-        body: l10n.onb1Body,
-      ),
-      _OnboardingPage(
-        glyph: '🔥',
-        title: l10n.onb2Title,
-        body: l10n.onb2Body,
-      ),
-      _OnboardingPage(
-        glyph: '🌙',
-        title: l10n.onb3Title,
-        body: l10n.onb3Body,
-      ),
-      _OnboardingPage(
-        glyph: '🙏',
-        title: l10n.onb4Title,
-        body: l10n.onb4Body,
-      ),
+      _OnboardingPage(glyph: 'ॐ', title: l10n.onb1Title, body: l10n.onb1Body),
+      _OnboardingPage(glyph: '🔥', title: l10n.onb2Title, body: l10n.onb2Body),
+      _OnboardingPage(glyph: '🌙', title: l10n.onb3Title, body: l10n.onb3Body),
+      _OnboardingPage(glyph: '🙏', title: l10n.onb4Title, body: l10n.onb4Body),
     ];
 
     final isLast = _page == pages.length - 1;

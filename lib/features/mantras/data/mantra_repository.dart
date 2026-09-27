@@ -38,16 +38,14 @@ class MantraRepository {
   /// activate what the user just added.
   Future<Mantra> create({
     required String name,
-    String? devanagari,
-    String? transliteration,
+    String? description,
     int malaSize = AppConstants.defaultMalaSize,
   }) async {
     final nextOrder = await _nextSortOrder();
     final mantra = Mantra(
       id: _newId(),
       name: name.trim(),
-      devanagari: _clean(devanagari),
-      transliteration: _clean(transliteration),
+      description: _clean(description),
       malaSize: malaSize.clamp(
         AppConstants.minMalaSize,
         AppConstants.maxMalaSize,

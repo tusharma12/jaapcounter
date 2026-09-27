@@ -88,7 +88,9 @@ abstract final class MalaMath {
       malaSize: malaSize,
       malaBase: malaBase,
     );
-    return (malaBase.clamp(0, lifetimeJaap) + p.beadsInCurrentMala)
-        .clamp(0, lifetimeJaap);
+    return (malaBase.clamp(0, lifetimeJaap) + p.beadsInCurrentMala).clamp(
+      0,
+      lifetimeJaap,
+    );
   }
 }

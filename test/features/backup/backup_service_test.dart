@@ -51,7 +51,11 @@ void main() {
       delta: 54,
       source: JaapSource.manual,
     );
-    await mantras.create(name: 'Sita Ram', devanagari: 'सीता राम', malaSize: 27);
+    await mantras.create(
+      name: 'सीता राम',
+      description: 'Sita Ram',
+      malaSize: 27,
+    );
     await sadhanas.create(
       mantraId: 'builtin.ram',
       dailyGoal: 216,
@@ -70,10 +74,7 @@ void main() {
     expect(data['schemaVersion'], 1);
     expect(data['appVersion'], '1.0.0');
     expect((data['jaapEntries'] as List).length, 2);
-    expect(
-      (data['mantras'] as List).length,
-      BuiltInMantras.all.length + 1,
-    );
+    expect((data['mantras'] as List).length, BuiltInMantras.all.length + 1);
     expect((data['sadhanas'] as List).length, 1);
     expect((data['reminders'] as List).length, 1);
     expect(data['favouriteStories'], ['squirrel-and-shri-ram']);
@@ -97,7 +98,9 @@ void main() {
     expect((await reminders.all()).single.minutes, 420);
     expect(settings.favouriteStoryIds(), ['squirrel-and-shri-ram']);
     expect(
-      (await mantras.all()).any((m) => m.name == 'Sita Ram'),
+      (await mantras.all()).any(
+        (m) => m.name == 'सीता राम' && m.description == 'Sita Ram',
+      ),
       isTrue,
       reason: 'custom mantras come back too',
     );
@@ -143,18 +146,21 @@ void main() {
     expect(restored.localeCode, 'hi');
   });
 
-  test('a backup with no mantras still leaves the built-ins in place', () async {
-    final json = jsonEncode({
-      'app': 'japmala',
-      'schemaVersion': 1,
-      'mantras': <Object>[],
-      'jaapEntries': <Object>[],
-    });
+  test(
+    'a backup with no mantras still leaves the built-ins in place',
+    () async {
+      final json = jsonEncode({
+        'app': 'japmala',
+        'schemaVersion': 1,
+        'mantras': <Object>[],
+        'jaapEntries': <Object>[],
+      });
 
-    await backup.restore(json);
+      await backup.restore(json);
 
-    expect((await mantras.all()).length, BuiltInMantras.all.length);
-  });
+      expect((await mantras.all()).length, BuiltInMantras.all.length);
+    },
+  );
 
   group('rejects files that are not ours', () {
     test('a file that is not JSON', () async {

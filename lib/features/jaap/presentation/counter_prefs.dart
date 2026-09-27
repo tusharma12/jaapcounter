@@ -26,8 +26,10 @@ class HideMantra extends Notifier<bool> {
   @override
   bool build() => ref.watch(settingsServiceProvider).hideMantra();
 
-  void toggle() {
-    state = !state;
-    ref.read(settingsServiceProvider).setHideMantra(state);
+  void toggle() => set(!state);
+
+  void set(bool hidden) {
+    state = hidden;
+    ref.read(settingsServiceProvider).setHideMantra(hidden);
   }
 }

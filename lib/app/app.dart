@@ -9,6 +9,7 @@ import '../features/settings/presentation/settings_controller.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
+import 'theme/app_themes.dart';
 
 class JapMalaApp extends ConsumerWidget {
   const JapMalaApp({super.key});
@@ -21,13 +22,20 @@ class JapMalaApp extends ConsumerWidget {
       title: 'JapMala',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      // A fixed colour theme is handed in as both, so the device's light/dark
+      // setting cannot swap it out.
+      theme: settings.themeId == AppThemeId.system
+          ? AppTheme.light()
+          : AppTheme.forId(settings.themeId),
+      darkTheme: settings.themeId == AppThemeId.system
+          ? AppTheme.dark()
+          : AppTheme.forId(settings.themeId),
       themeMode: settings.themeMode,
       locale: settings.locale,
       localizationsDelegates: AppL10n.localizationsDelegates,
       supportedLocales: AppL10n.supportedLocales,
-      builder: (context, child) => _AppLifecycle(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) =>
+          _AppLifecycle(child: child ?? const SizedBox.shrink()),
     );
   }
 }

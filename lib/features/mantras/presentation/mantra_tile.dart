@@ -7,8 +7,8 @@ import '../../../core/widgets/mantra_text.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/mantra.dart';
 
-/// One mantra in the library: the name large in Devanagari, the mala size and
-/// whether it is the one being chanted.
+/// One mantra in the library: the mantra large, its description if it has
+/// one, the mala size and whether it is the one being chanted.
 class MantraTile extends StatelessWidget {
   const MantraTile({
     required this.mantra,
@@ -55,13 +55,15 @@ class MantraTile extends StatelessWidget {
                     maxLines: 2,
                     color: palette.primaryText,
                   ),
-                  const SizedBox(height: Insets.xs),
-                  Text(
-                    mantra.subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  if (mantra.hasDescription) ...[
+                    const SizedBox(height: Insets.xs),
+                    Text(
+                      mantra.description!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
                   const SizedBox(height: Insets.md),
                   Row(
                     children: [
@@ -74,13 +76,14 @@ class MantraTile extends StatelessWidget {
                         Icon(
                           Icons.check_circle_rounded,
                           size: 15,
-                          color: palette.success,
+                          color: palette.saffron,
                         ),
                         const SizedBox(width: Insets.xs),
                         Text(
                           l10n.active,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: palette.success,
+                            color: palette.primaryText,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -91,7 +94,10 @@ class MantraTile extends StatelessWidget {
             ),
             if (onEdit != null || onDelete != null)
               PopupMenuButton<_MantraAction>(
-                icon: Icon(Icons.more_horiz_rounded, color: palette.tertiaryText),
+                icon: Icon(
+                  Icons.more_horiz_rounded,
+                  color: palette.tertiaryText,
+                ),
                 position: PopupMenuPosition.under,
                 onSelected: (action) => switch (action) {
                   _MantraAction.edit => onEdit?.call(),
@@ -121,3 +127,50 @@ class MantraTile extends StatelessWidget {
 }
 
 enum _MantraAction { edit, delete }
+
+/// Closes the mantra list, so a mantra that is not built in is never more
+/// than a scroll away.
+class AddOwnMantraTile extends StatelessWidget {
+  const AddOwnMantraTile({required this.onTap, super.key});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final theme = Theme.of(context);
+    final palette = context.palette;
+
+    return Semantics(
+      button: true,
+      child: AppCard(
+        onTap: onTap,
+        padding: const EdgeInsets.all(Insets.lg),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: palette.softSaffron,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.add_rounded, color: palette.saffron),
+            ),
+            const SizedBox(width: Insets.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.addOwnMantra, style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 2),
+                  Text(l10n.addOwnMantraHint, style: theme.textTheme.bodySmall),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

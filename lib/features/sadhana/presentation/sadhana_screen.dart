@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
 import '../../../core/utils/day_key.dart';
+import '../../../core/providers.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_feedback.dart';
@@ -75,7 +76,10 @@ class SadhanaScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(l10n.bestStreak, style: Theme.of(context).textTheme.bodyLarge),
+                    child: Text(
+                      l10n.bestStreak,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
                   Text(
                     l10n.dayStreak(streak.best),
@@ -177,7 +181,7 @@ class _TodayGoal extends StatelessWidget {
   }
 }
 
-class _SankalpCard extends StatelessWidget {
+class _SankalpCard extends ConsumerWidget {
   const _SankalpCard({
     required this.sadhana,
     required this.completedDays,
@@ -189,13 +193,13 @@ class _SankalpCard extends StatelessWidget {
   final VoidCallback onEnd;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
     final palette = context.palette;
     final locale = Localizations.localeOf(context).toLanguageTag();
     final total = sadhana.durationDays;
-    final today = DateTime.now();
+    final today = ref.watch(clockProvider)();
     final dayNumber = sadhana.dayNumber(today);
     final fraction = total == null
         ? 0.0
@@ -320,7 +324,10 @@ class _GoalRow extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(width: Insets.sm),
-          Icon(Icons.chevron_right_rounded, color: context.palette.tertiaryText),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: context.palette.tertiaryText,
+          ),
         ],
       ),
     );

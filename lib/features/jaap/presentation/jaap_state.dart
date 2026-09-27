@@ -57,7 +57,8 @@ class JaapState {
 
   bool get goalReached => dailyGoal > 0 && todayTotal >= dailyGoal;
 
-  int get goalRemaining => dailyGoal <= 0 ? 0 : (dailyGoal - todayTotal).clamp(0, dailyGoal);
+  int get goalRemaining =>
+      dailyGoal <= 0 ? 0 : (dailyGoal - todayTotal).clamp(0, dailyGoal);
 
   JaapState copyWith({
     Mantra? mantra,

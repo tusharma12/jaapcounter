@@ -22,11 +22,7 @@ Future<void> main() async {
   ]);
 
   FlutterError.onError = (details) {
-    AppLogger.e(
-      'Uncaught framework error',
-      details.exception,
-      details.stack,
-    );
+    AppLogger.e('Uncaught framework error', details.exception, details.stack);
     FlutterError.presentError(details);
   };
 

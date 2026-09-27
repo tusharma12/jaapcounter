@@ -15,12 +15,15 @@ import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../backup/presentation/backup_controllers.dart';
+import '../../jaap/presentation/counter_prefs.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
 import '../../reminders/domain/reminder.dart';
 import '../../reminders/presentation/reminder_controllers.dart';
 import '../../reminders/presentation/reminders_screen.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
+import '../domain/mala_style.dart';
+import 'appearance_sheets.dart';
 import 'settings_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -87,18 +90,49 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: Insets.xxl),
 
+          SectionHeader(l10n.sectionCounter),
+          AppCardGroup(
+            children: [
+              _SwitchRow(
+                label: l10n.showMantraOnCounter,
+                icon: Icons.text_fields_rounded,
+                value: !ref.watch(hideMantraProvider),
+                onChanged: (show) =>
+                    ref.read(hideMantraProvider.notifier).set(!show),
+              ),
+              _NavRow(
+                label: l10n.counterBackground,
+                icon: Icons.wallpaper_rounded,
+                value: backgroundName(l10n, settings.background),
+                onTap: () => showBackgroundPicker(context),
+              ),
+              _NavRow(
+                label: l10n.malaStyle,
+                icon: Icons.blur_circular_rounded,
+                value: switch (settings.malaStyle) {
+                  MalaStyle.beads => l10n.malaStyleBeads,
+                  MalaStyle.ring => l10n.malaStyleRing,
+                },
+                onTap: () => _pickMalaStyle(context, ref),
+              ),
+              _SwitchRow(
+                label: l10n.fallingMantra,
+                icon: Icons.auto_awesome_motion_outlined,
+                value: settings.fallingMantra,
+                onChanged: controller.setFallingMantra,
+              ),
+            ],
+          ),
+          const SizedBox(height: Insets.xxl),
+
           SectionHeader(l10n.sectionAppearance),
           AppCardGroup(
             children: [
               _NavRow(
                 label: l10n.theme,
                 icon: Icons.contrast_rounded,
-                value: switch (settings.themeMode) {
-                  ThemeMode.light => l10n.themeLight,
-                  ThemeMode.dark => l10n.themeDark,
-                  ThemeMode.system => l10n.themeSystem,
-                },
-                onTap: () => _pickTheme(context, ref),
+                value: themeName(l10n, settings.themeId),
+                onTap: () => showThemePicker(context),
               ),
               _SwitchRow(
                 label: l10n.haptics,
@@ -209,9 +243,9 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _pickTheme(BuildContext context, WidgetRef ref) async {
+  Future<void> _pickMalaStyle(BuildContext context, WidgetRef ref) async {
     final l10n = AppL10n.of(context);
-    final current = ref.read(settingsProvider).themeMode;
+    final current = ref.read(settingsProvider).malaStyle;
     await showAppSheet<void>(
       context,
       builder: (sheetContext) => SafeArea(
@@ -220,17 +254,20 @@ class SettingsScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final entry in {
-              ThemeMode.system: l10n.themeSystem,
-              ThemeMode.light: l10n.themeLight,
-              ThemeMode.dark: l10n.themeDark,
+              MalaStyle.beads: (
+                l10n.malaStyleBeads,
+                Icons.blur_circular_rounded,
+              ),
+              MalaStyle.ring: (l10n.malaStyleRing, Icons.donut_large_rounded),
             }.entries)
               ListTile(
-                title: Text(entry.value),
+                leading: Icon(entry.value.$2),
+                title: Text(entry.value.$1),
                 trailing: entry.key == current
                     ? const Icon(Icons.check_rounded)
                     : null,
                 onTap: () {
-                  ref.read(settingsProvider.notifier).setThemeMode(entry.key);
+                  ref.read(settingsProvider.notifier).setMalaStyle(entry.key);
                   Navigator.of(sheetContext).pop();
                 },
               ),
@@ -271,7 +308,9 @@ class SettingsScreen extends ConsumerWidget {
                   if (context.mounted) {
                     await ref
                         .read(remindersProvider.notifier)
-                        .reschedule(RemindersScreen.copyFrom(AppL10n.of(context)));
+                        .reschedule(
+                          RemindersScreen.copyFrom(AppL10n.of(context)),
+                        );
                   }
                 },
               ),
@@ -491,7 +530,10 @@ class _SingletonReminderRow extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Switch(value: enabled, onChanged: (on) => apply(on: on)),
+          Switch(
+            value: enabled,
+            onChanged: (on) => apply(on: on),
+          ),
           if (enabled)
             Icon(
               Icons.chevron_right_rounded,

@@ -51,8 +51,9 @@ class FavouriteStories extends Notifier<Set<String>> {
 }
 
 /// Which story is being read aloud, if any.
-final speakingStoryProvider =
-    NotifierProvider<SpeakingStory, String?>(SpeakingStory.new);
+final speakingStoryProvider = NotifierProvider<SpeakingStory, String?>(
+  SpeakingStory.new,
+);
 
 class SpeakingStory extends Notifier<String?> {
   @override

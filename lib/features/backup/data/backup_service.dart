@@ -91,9 +91,9 @@ class BackupService {
     final file = File(
       '${directory.path}/${AppConstants.backupFilePrefix}-$stamp.json',
     );
-    final json = const JsonEncoder.withIndent('  ').convert(
-      await buildBackup(),
-    );
+    final json = const JsonEncoder.withIndent(
+      '  ',
+    ).convert(await buildBackup());
     await file.writeAsString(json, flush: true);
     AppLogger.i('Wrote backup to ${file.path}');
     return file;

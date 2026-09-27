@@ -69,9 +69,8 @@ class Sadhana {
     return DayKeys.of(today).compareTo(last) > 0;
   }
 
-  Duration? get reminderTimeOfDay => reminderMinutes == null
-      ? null
-      : Duration(minutes: reminderMinutes!);
+  Duration? get reminderTimeOfDay =>
+      reminderMinutes == null ? null : Duration(minutes: reminderMinutes!);
 
   Sadhana copyWith({
     String? mantraId,

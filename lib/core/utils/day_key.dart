@@ -35,7 +35,10 @@ abstract final class DayKeys {
   static DateTime dateOnly(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
-  static DateTime startOfWeek(DateTime date, {int firstWeekday = DateTime.monday}) {
+  static DateTime startOfWeek(
+    DateTime date, {
+    int firstWeekday = DateTime.monday,
+  }) {
     final day = dateOnly(date);
     final delta = (day.weekday - firstWeekday + 7) % 7;
     return day.subtract(Duration(days: delta));

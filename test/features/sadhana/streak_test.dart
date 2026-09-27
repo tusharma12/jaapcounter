@@ -25,20 +25,18 @@ void main() {
     });
 
     test('counts today once the goal is met', () {
-      final streak = streakFor(
-        {'2026-09-03': 108},
-        today: DateTime(2026, 9, 3),
-      );
+      final streak = streakFor({
+        '2026-09-03': 108,
+      }, today: DateTime(2026, 9, 3));
 
       expect(streak.current, 1);
       expect(streak.countedToday, isTrue);
     });
 
     test('a day short of the goal does not count', () {
-      final streak = streakFor(
-        {'2026-09-03': 107},
-        today: DateTime(2026, 9, 3),
-      );
+      final streak = streakFor({
+        '2026-09-03': 107,
+      }, today: DateTime(2026, 9, 3));
 
       expect(streak.current, 0);
       expect(streak.countedToday, isFalse);
@@ -46,57 +44,53 @@ void main() {
 
     test('survives a morning before today has been chanted', () {
       // The habit is intact; today is simply not finished yet.
-      final streak = streakFor(
-        {'2026-09-01': 108, '2026-09-02': 216},
-        today: DateTime(2026, 9, 3, 8),
-      );
+      final streak = streakFor({
+        '2026-09-01': 108,
+        '2026-09-02': 216,
+      }, today: DateTime(2026, 9, 3, 8));
 
       expect(streak.current, 2);
       expect(streak.countedToday, isFalse);
     });
 
     test('breaks when a day was missed entirely', () {
-      final streak = streakFor(
-        {'2026-08-30': 108, '2026-09-02': 108, '2026-09-03': 108},
-        today: DateTime(2026, 9, 3),
-      );
+      final streak = streakFor({
+        '2026-08-30': 108,
+        '2026-09-02': 108,
+        '2026-09-03': 108,
+      }, today: DateTime(2026, 9, 3));
 
       expect(streak.current, 2);
     });
 
     test('runs across the end of a month', () {
-      final streak = streakFor(
-        {
-          '2026-08-30': 108,
-          '2026-08-31': 108,
-          '2026-09-01': 108,
-          '2026-09-02': 108,
-        },
-        today: DateTime(2026, 9, 2),
-      );
+      final streak = streakFor({
+        '2026-08-30': 108,
+        '2026-08-31': 108,
+        '2026-09-01': 108,
+        '2026-09-02': 108,
+      }, today: DateTime(2026, 9, 2));
 
       expect(streak.current, 4);
     });
 
     test('runs across the end of a year', () {
-      final streak = streakFor(
-        {
-          '2026-12-30': 108,
-          '2026-12-31': 108,
-          '2027-01-01': 108,
-          '2027-01-02': 108,
-        },
-        today: DateTime(2027, 1, 2),
-      );
+      final streak = streakFor({
+        '2026-12-30': 108,
+        '2026-12-31': 108,
+        '2027-01-01': 108,
+        '2027-01-02': 108,
+      }, today: DateTime(2027, 1, 2));
 
       expect(streak.current, 4);
     });
 
     test('runs across a leap day', () {
-      final streak = streakFor(
-        {'2028-02-28': 108, '2028-02-29': 108, '2028-03-01': 108},
-        today: DateTime(2028, 3, 1),
-      );
+      final streak = streakFor({
+        '2028-02-28': 108,
+        '2028-02-29': 108,
+        '2028-03-01': 108,
+      }, today: DateTime(2028, 3, 1));
 
       expect(streak.current, 3);
     });
@@ -114,30 +108,27 @@ void main() {
 
   group('best streak', () {
     test('is the longest run in the whole history', () {
-      final streak = streakFor(
-        {
-          // A five-day run in August.
-          '2026-08-01': 108,
-          '2026-08-02': 108,
-          '2026-08-03': 108,
-          '2026-08-04': 108,
-          '2026-08-05': 108,
-          // A two-day run now.
-          '2026-09-02': 108,
-          '2026-09-03': 108,
-        },
-        today: DateTime(2026, 9, 3),
-      );
+      final streak = streakFor({
+        // A five-day run in August.
+        '2026-08-01': 108,
+        '2026-08-02': 108,
+        '2026-08-03': 108,
+        '2026-08-04': 108,
+        '2026-08-05': 108,
+        // A two-day run now.
+        '2026-09-02': 108,
+        '2026-09-03': 108,
+      }, today: DateTime(2026, 9, 3));
 
       expect(streak.current, 2);
       expect(streak.best, 5);
     });
 
     test('is never below the current streak', () {
-      final streak = streakFor(
-        {'2026-09-02': 108, '2026-09-03': 108},
-        today: DateTime(2026, 9, 3),
-      );
+      final streak = streakFor({
+        '2026-09-02': 108,
+        '2026-09-03': 108,
+      }, today: DateTime(2026, 9, 3));
 
       expect(streak.best, 2);
     });

@@ -15,11 +15,13 @@ abstract final class AppColors {
   static const lightBackground = Color(0xFFF8F7F4);
   static const lightCard = Color(0xFFFFFFFF);
   static const lightPrimary = Color(0xFF171717);
-  static const lightSecondary = Color(0xFF777777);
+  static const lightSecondary = Color(0xFF707070);
   static const lightTertiary = Color(0xFFA3A3A3);
   static const lightSoftSaffron = Color(0xFFFFF1D6);
   static const lightDivider = Color(0xFFECEAE4);
   static const lightTrack = Color(0xFFEDEBE6);
+  static const lightSecondaryAccent = Color(0xFF6B5A43);
+  static const lightSoftSecondary = Color(0xFFF0EBE2);
 
   // Dark
   static const darkBackground = Color(0xFF0F0F0E);
@@ -30,6 +32,8 @@ abstract final class AppColors {
   static const darkSoftSaffron = Color(0xFF33260F);
   static const darkDivider = Color(0xFF2A2A28);
   static const darkTrack = Color(0xFF262624);
+  static const darkSecondaryAccent = Color(0xFFD8CBB5);
+  static const darkSoftSecondary = Color(0xFF26241F);
 }
 
 /// Semantic colours resolved for the active brightness, reachable from any
@@ -49,6 +53,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.danger,
     required this.divider,
     required this.track,
+    required this.secondary,
+    required this.softSecondary,
   });
 
   factory AppPalette.light() => const AppPalette(
@@ -64,6 +70,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     danger: AppColors.danger,
     divider: AppColors.lightDivider,
     track: AppColors.lightTrack,
+    secondary: AppColors.lightSecondaryAccent,
+    softSecondary: AppColors.lightSoftSecondary,
   );
 
   factory AppPalette.dark() => const AppPalette(
@@ -79,6 +87,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     danger: AppColors.danger,
     divider: AppColors.darkDivider,
     track: AppColors.darkTrack,
+    secondary: AppColors.darkSecondaryAccent,
+    softSecondary: AppColors.darkSoftSecondary,
   );
 
   final Color background;
@@ -94,6 +104,14 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color divider;
   final Color track;
 
+  /// A quiet companion to the accent, drawn from the theme's own hue: used
+  /// for the streak and other things that should stand out without
+  /// competing with progress and calls to action.
+  final Color secondary;
+
+  /// A surface tinted with [secondary], for pills and chips that carry it.
+  final Color softSecondary;
+
   @override
   AppPalette copyWith({
     Color? background,
@@ -108,6 +126,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? danger,
     Color? divider,
     Color? track,
+    Color? secondary,
+    Color? softSecondary,
   }) {
     return AppPalette(
       background: background ?? this.background,
@@ -122,6 +142,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
       danger: danger ?? this.danger,
       divider: divider ?? this.divider,
       track: track ?? this.track,
+      secondary: secondary ?? this.secondary,
+      softSecondary: softSecondary ?? this.softSecondary,
     );
   }
 
@@ -141,6 +163,8 @@ class AppPalette extends ThemeExtension<AppPalette> {
       danger: Color.lerp(danger, other.danger, t)!,
       divider: Color.lerp(divider, other.divider, t)!,
       track: Color.lerp(track, other.track, t)!,
+      secondary: Color.lerp(secondary, other.secondary, t)!,
+      softSecondary: Color.lerp(softSecondary, other.softSecondary, t)!,
     );
   }
 }

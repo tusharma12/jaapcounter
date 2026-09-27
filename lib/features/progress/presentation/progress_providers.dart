@@ -17,7 +17,61 @@ class ProgressPeriodController extends Notifier<ProgressPeriod> {
   @override
   ProgressPeriod build() => ProgressPeriod.weekly;
 
-  void select(ProgressPeriod period) => state = period;
+  /// A new period starts from today again: "last month" read as "last year"
+  /// would be a surprise.
+  void select(ProgressPeriod period) {
+    state = period;
+    ref.read(progressAnchorProvider.notifier).reset();
+  }
+}
+
+/// The day the selected period is shown around; null means today.
+final progressAnchorProvider =
+    NotifierProvider<ProgressAnchorController, DateTime?>(
+      ProgressAnchorController.new,
+    );
+
+class ProgressAnchorController extends Notifier<DateTime?> {
+  @override
+  DateTime? build() => null;
+
+  void reset() => state = null;
+
+  /// Moves one period back (negative) or forward. Landing on the last day of
+  /// the new period means a past month shows its whole length, and the
+  /// anchor is clamped so it never passes today.
+  void shift(int steps) {
+    final today = DayKeys.dateOnly(ref.read(clockProvider)());
+    final from = state ?? today;
+    final period = ref.read(progressPeriodProvider);
+    final target = switch (period) {
+      ProgressPeriod.daily => DateTime(from.year, from.month, from.day + steps),
+      ProgressPeriod.weekly => DateTime(
+        from.year,
+        from.month,
+        from.day + 7 * steps,
+      ),
+      ProgressPeriod.monthly => DayKeys.endOfMonth(
+        DateTime(from.year, from.month + steps),
+      ),
+      ProgressPeriod.yearly => DateTime(from.year + steps, 12, 31),
+    };
+    final (start, end) = _rangeFor(period, target);
+    if (start.isAfter(today)) return;
+    final landed = period == ProgressPeriod.daily ? target : end;
+    state = landed.isBefore(today) ? landed : null;
+  }
+}
+
+/// The mantra the statistics are narrowed to; null shows every mantra.
+final progressMantraFilterProvider =
+    NotifierProvider<ProgressMantraFilter, String?>(ProgressMantraFilter.new);
+
+class ProgressMantraFilter extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void select(String? mantraId) => state = mantraId;
 }
 
 /// Statistics for the selected period, recomputed whenever the ledger changes.
@@ -25,13 +79,21 @@ final progressSummaryProvider = FutureProvider<ProgressSummary>((ref) async {
   ref.watch(ledgerRevisionProvider);
 
   final period = ref.watch(progressPeriodProvider);
+  final filter = ref.watch(progressMantraFilterProvider);
   final repo = ref.watch(jaapRepositoryProvider);
-  final now = ref.watch(clockProvider)();
+  final today = DayKeys.dateOnly(ref.watch(clockProvider)());
+  final anchor = ref.watch(progressAnchorProvider) ?? today;
   final mantras = await ref.watch(mantraListProvider.future);
+  final byId = {for (final m in mantras) m.id: m};
 
-  final (rangeStart, rangeEnd) = _rangeFor(period, now);
-  final totalsByDay = await repo.totalsByDay();
+  final (rangeStart, rangeEnd) = _rangeFor(period, anchor);
   final totalsByMantra = await repo.totalsByMantra();
+  // A filter on a mantra with nothing recorded (or since deleted) shows all.
+  final mantraId = totalsByMantra.containsKey(filter) ? filter : null;
+  final totalsByDay = await repo.totalsByDay(mantraId: mantraId);
+  final allByDay = mantraId == null
+      ? totalsByDay
+      : await repo.totalsByDay(fromDay: DayKeys.of(today));
 
   int totalBetween(DateTime from, DateTime to) {
     var sum = 0;
@@ -41,86 +103,73 @@ final progressSummaryProvider = FutureProvider<ProgressSummary>((ref) async {
     return sum;
   }
 
-  final rangeTotal = totalBetween(rangeStart, rangeEnd);
-  final activeDays = DayKeys.keysInRange(rangeStart, rangeEnd)
-      .where((key) => (totalsByDay[key] ?? 0) > 0)
-      .length;
+  final activeDays = DayKeys.keysInRange(
+    rangeStart,
+    rangeEnd,
+  ).where((key) => (totalsByDay[key] ?? 0) > 0).length;
 
   // Malas are counted per mantra, because two mantras can use different mala
   // sizes and a single division would be wrong for both.
-  final byId = {for (final m in mantras) m.id: m};
   var lifetimeMalas = 0;
   for (final entry in totalsByMantra.entries) {
+    if (mantraId != null && entry.key != mantraId) continue;
     final size = byId[entry.key]?.malaSize ?? 108;
     lifetimeMalas += MalaMath.malasIn(entry.value, size);
   }
 
-  final defaultMalaSize = _representativeMalaSize(mantras);
-  final todayTotal = totalsByDay[DayKeys.of(now)] ?? 0;
+  final malaSize = mantraId == null
+      ? _representativeMalaSize(mantras)
+      : (byId[mantraId]?.malaSize ?? 108);
+  final todayTotal = allByDay[DayKeys.of(today)] ?? 0;
+  final buckets = _buckets(period, anchor, today, totalsByDay);
 
   return ProgressSummary(
     period: period,
+    today: today,
+    anchor: anchor,
     rangeStart: rangeStart,
     rangeEnd: rangeEnd,
-    rangeTotal: rangeTotal,
-    rangeMalas: MalaMath.malasIn(rangeTotal, defaultMalaSize),
+    rangeTotal: totalBetween(rangeStart, rangeEnd),
     todayTotal: todayTotal,
-    todayMalas: MalaMath.malasIn(todayTotal, defaultMalaSize),
+    todayMalas: MalaMath.malasIn(todayTotal, _representativeMalaSize(mantras)),
     lifetimeTotal: totalsByDay.values.fold(0, (a, b) => a + b),
     lifetimeMalas: lifetimeMalas,
     activeDaysInRange: activeDays,
-    buckets: _buckets(period, now, totalsByDay),
+    buckets: buckets,
+    focusIndex: _focusIndex(period, anchor, buckets),
     totalsByDay: totalsByDay,
     totalsByMantra: totalsByMantra,
     dailyGoal: ref.watch(dailyGoalProvider),
+    malaSize: malaSize,
+    mantraId: mantraId,
   );
 });
 
-/// Twelve months of daily totals for the activity heatmap.
-final heatmapMonthProvider =
-    NotifierProvider<HeatmapMonthController, DateTime>(
-      HeatmapMonthController.new,
-    );
-
-class HeatmapMonthController extends Notifier<DateTime> {
-  @override
-  DateTime build() => DayKeys.startOfMonth(ref.watch(clockProvider)());
-
-  void shift(int months) {
-    final now = ref.read(clockProvider)();
-    final next = DateTime(state.year, state.month + months);
-    // Never past the current month: there is nothing to show there yet.
-    if (next.isAfter(DayKeys.startOfMonth(now))) return;
-    state = next;
-  }
-}
-
-(DateTime, DateTime) _rangeFor(ProgressPeriod period, DateTime now) {
-  final today = DayKeys.dateOnly(now);
+(DateTime, DateTime) _rangeFor(ProgressPeriod period, DateTime anchor) {
+  final day = DayKeys.dateOnly(anchor);
   return switch (period) {
-    ProgressPeriod.daily => (today, today),
+    ProgressPeriod.daily => (day, day),
     ProgressPeriod.weekly => (
-      DayKeys.startOfWeek(today),
-      DayKeys.startOfWeek(today).add(const Duration(days: 6)),
+      DayKeys.startOfWeek(day),
+      DayKeys.startOfWeek(day).add(const Duration(days: 6)),
     ),
     ProgressPeriod.monthly => (
-      DayKeys.startOfMonth(today),
-      DayKeys.endOfMonth(today),
+      DayKeys.startOfMonth(day),
+      DayKeys.endOfMonth(day),
     ),
     ProgressPeriod.yearly => (
-      DayKeys.startOfYear(today),
-      DateTime(today.year, 12, 31),
+      DayKeys.startOfYear(day),
+      DateTime(day.year, 12, 31),
     ),
   };
 }
 
 List<ProgressBucket> _buckets(
   ProgressPeriod period,
-  DateTime now,
+  DateTime anchor,
+  DateTime today,
   Map<String, int> totalsByDay,
 ) {
-  final today = DayKeys.dateOnly(now);
-
   int sumOfDays(DateTime from, DateTime to) {
     var sum = 0;
     for (final key in DayKeys.keysInRange(from, to)) {
@@ -129,56 +178,68 @@ List<ProgressBucket> _buckets(
     return sum;
   }
 
+  ProgressBucket day(DateTime date, BucketGranularity granularity) =>
+      ProgressBucket(
+        start: date,
+        value: totalsByDay[DayKeys.of(date)] ?? 0,
+        granularity: granularity,
+        isCurrent: DayKeys.of(date) == DayKeys.of(today),
+        isFuture: date.isAfter(today),
+      );
+
   switch (period) {
-    // Both the day and week views show the seven days of this week, which is
-    // the shape people actually read a chanting habit in.
+    // The day against the six before it, so a single figure has context.
     case ProgressPeriod.daily:
-    case ProgressPeriod.weekly:
-      final start = DayKeys.startOfWeek(today);
       return List.generate(7, (i) {
-        final day = start.add(Duration(days: i));
-        return ProgressBucket(
-          start: day,
-          value: totalsByDay[DayKeys.of(day)] ?? 0,
-          granularity: BucketGranularity.day,
-          isCurrent: DayKeys.of(day) == DayKeys.of(today),
-        );
+        final date = DateTime(anchor.year, anchor.month, anchor.day - 6 + i);
+        return day(date, BucketGranularity.day);
       });
 
-    // Weeks of the current month, so a 31-day month stays readable.
+    case ProgressPeriod.weekly:
+      final start = DayKeys.startOfWeek(anchor);
+      return List.generate(7, (i) {
+        final date = DateTime(start.year, start.month, start.day + i);
+        return day(date, BucketGranularity.day);
+      });
+
+    // Every day of the month, and only that month, so the bars add up to
+    // the month's total.
     case ProgressPeriod.monthly:
-      final monthStart = DayKeys.startOfMonth(today);
-      final monthEnd = DayKeys.endOfMonth(today);
-      final buckets = <ProgressBucket>[];
-      var cursor = DayKeys.startOfWeek(monthStart);
-      while (!cursor.isAfter(monthEnd)) {
-        final weekEnd = cursor.add(const Duration(days: 6));
-        buckets.add(
-          ProgressBucket(
-            start: cursor,
-            value: sumOfDays(cursor, weekEnd),
-            granularity: BucketGranularity.week,
-            isCurrent:
-                !today.isBefore(cursor) && !today.isAfter(weekEnd),
-          ),
-        );
-        cursor = cursor.add(const Duration(days: 7));
-      }
-      return buckets;
+      final daysInMonth = DayKeys.endOfMonth(anchor).day;
+      return List.generate(
+        daysInMonth,
+        (i) => day(
+          DateTime(anchor.year, anchor.month, i + 1),
+          BucketGranularity.monthDay,
+        ),
+      );
 
     case ProgressPeriod.yearly:
       return List.generate(12, (i) {
-        final monthStart = DateTime(today.year, i + 1);
+        final monthStart = DateTime(anchor.year, i + 1);
         final monthEnd = DayKeys.endOfMonth(monthStart);
         return ProgressBucket(
           start: monthStart,
           value: sumOfDays(monthStart, monthEnd),
           granularity: BucketGranularity.month,
-          isCurrent: i + 1 == today.month,
+          isCurrent:
+              monthStart.year == today.year && monthStart.month == today.month,
+          isFuture: monthStart.isAfter(today),
         );
       });
   }
 }
+
+int _focusIndex(
+  ProgressPeriod period,
+  DateTime anchor,
+  List<ProgressBucket> buckets,
+) => switch (period) {
+  ProgressPeriod.daily => buckets.length - 1,
+  ProgressPeriod.weekly => anchor.weekday - DateTime.monday,
+  ProgressPeriod.monthly => anchor.day - 1,
+  ProgressPeriod.yearly => anchor.month - 1,
+};
 
 /// Mala size to divide a mixed-mantra total by: the active library's most
 /// common one, which is 108 in practice.

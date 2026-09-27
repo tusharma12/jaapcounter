@@ -63,7 +63,7 @@ void main() {
   testWidgets('a custom mantra can be added and deleted', (tester) async {
     final created = await container
         .read(mantraListProvider.notifier)
-        .add(name: 'Sita Ram', devanagari: 'सीता राम', malaSize: 27);
+        .add(name: 'सीता राम', description: 'Sita Ram', malaSize: 27);
     await pumpLibrary(tester);
 
     await tester.scrollUntilVisible(find.text('सीता राम'), 200);

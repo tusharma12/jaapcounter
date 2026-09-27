@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_typography.dart';
 import '../../features/mantras/domain/mantra.dart';
 
-/// Renders a mantra in Devanagari when we have it, at a size that makes it
-/// the most prominent thing on the screen.
+/// Renders a mantra in the typeface its script needs, at a size that makes
+/// it the most prominent thing on the screen.
 class MantraText extends StatelessWidget {
   const MantraText(
     this.mantra, {
@@ -25,7 +25,7 @@ class MantraText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = mantra.hasDevanagari
+    final style = mantra.isDevanagari
         ? AppTypography.mantra(size: size, weight: weight, color: color)
         : TextStyle(
             fontFamily: AppTypography.ui,
@@ -37,7 +37,7 @@ class MantraText extends StatelessWidget {
           );
 
     return Text(
-      mantra.display,
+      mantra.name,
       textAlign: align,
       maxLines: maxLines,
       overflow: TextOverflow.ellipsis,

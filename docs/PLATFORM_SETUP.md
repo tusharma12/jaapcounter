@@ -10,8 +10,9 @@ reliably) and release signing.
 
 Already configured in this repository:
 
-- **Label and icon** — `@string/app_name`, adaptive launcher icon with a
-  monochrome layer for themed icons.
+- **Label and icon** — `@string/app_name`, adaptive launcher icon made
+  from `appstore_assets/appicon.png`. The artwork is a full-colour
+  illustration, so there is no monochrome layer for themed icons.
 - **Notifications** — `POST_NOTIFICATIONS`, plus `RECEIVE_BOOT_COMPLETED` and
   the `flutter_local_notifications` boot receiver, so reminders survive a
   reboot or an app update.

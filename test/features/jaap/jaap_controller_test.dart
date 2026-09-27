@@ -168,9 +168,7 @@ void main() {
   });
 
   test('goal progress follows the standing daily goal', () async {
-    await container
-        .read(settingsProvider.notifier)
-        .setFallbackDailyGoal(3);
+    await container.read(settingsProvider.notifier).setFallbackDailyGoal(3);
     await container.read(jaapControllerProvider.future);
 
     controller().count();
@@ -191,11 +189,9 @@ void main() {
   test('a Sankalp goal takes over from the standing goal', () async {
     await container.read(jaapControllerProvider.future);
 
-    await container.read(activeSadhanaProvider.notifier).begin(
-      mantraId: 'builtin.ram',
-      dailyGoal: 1008,
-      durationDays: 40,
-    );
+    await container
+        .read(activeSadhanaProvider.notifier)
+        .begin(mantraId: 'builtin.ram', dailyGoal: 1008, durationDays: 40);
     final state = await container.read(jaapControllerProvider.future);
 
     expect(state.dailyGoal, 1008);
@@ -209,7 +205,10 @@ void main() {
     for (var i = 0; i < 4; i++) {
       controller().count();
     }
-    expect(container.read(jaapControllerProvider).value!.sessionRunning, isTrue);
+    expect(
+      container.read(jaapControllerProvider).value!.sessionRunning,
+      isTrue,
+    );
 
     clock.advance(const Duration(minutes: 6));
     final session = await controller().endSession();

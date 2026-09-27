@@ -92,13 +92,7 @@ class JaapRepository {
       where:
           'mantra_id = ? AND day = ? AND source = ? AND timestamp >= ? '
           'AND session_id IS ${sessionId == null ? 'NULL' : '?'}',
-      whereArgs: [
-        mantraId,
-        day,
-        source.name,
-        cutoff,
-        ?sessionId,
-      ],
+      whereArgs: [mantraId, day, source.name, cutoff, ?sessionId],
       orderBy: 'timestamp DESC, rowid DESC',
       limit: 1,
     );
@@ -132,7 +126,11 @@ class JaapRepository {
 
       // An undo that crosses a mala reset would leave the reset base above the
       // lifetime total; pull it back so the ledger stays authoritative.
-      final lifetime = await _sum(txn, where: 'mantra_id = ?', args: [mantraId]);
+      final lifetime = await _sum(
+        txn,
+        where: 'mantra_id = ?',
+        args: [mantraId],
+      );
       await txn.rawUpdate(
         'UPDATE mantras SET mala_base = ? WHERE id = ? AND mala_base > ?',
         [lifetime, mantraId, lifetime],
@@ -186,11 +184,7 @@ class JaapRepository {
 
   Future<int> dayTotal(String day, {String? mantraId}) {
     if (mantraId == null) return _sum(_db, where: 'day = ?', args: [day]);
-    return _sum(
-      _db,
-      where: 'day = ? AND mantra_id = ?',
-      args: [day, mantraId],
-    );
+    return _sum(_db, where: 'day = ? AND mantra_id = ?', args: [day, mantraId]);
   }
 
   /// Daily totals keyed by day, for goals, streaks, charts and the heatmap.
@@ -226,7 +220,10 @@ class JaapRepository {
     };
   }
 
-  Future<Map<String, int>> totalsByMantra({String? fromDay, String? toDay}) async {
+  Future<Map<String, int>> totalsByMantra({
+    String? fromDay,
+    String? toDay,
+  }) async {
     final where = <String>[];
     final args = <Object?>[];
     if (fromDay != null) {

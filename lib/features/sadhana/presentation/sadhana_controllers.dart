@@ -36,13 +36,15 @@ class ActiveSadhanaController extends AsyncNotifier<Sadhana?> {
     bool reminderEnabled = false,
     int? reminderMinutes,
   }) async {
-    final sadhana = await ref.read(sadhanaRepositoryProvider).create(
-      mantraId: mantraId,
-      dailyGoal: dailyGoal,
-      durationDays: durationDays,
-      reminderEnabled: reminderEnabled,
-      reminderMinutes: reminderMinutes,
-    );
+    final sadhana = await ref
+        .read(sadhanaRepositoryProvider)
+        .create(
+          mantraId: mantraId,
+          dailyGoal: dailyGoal,
+          durationDays: durationDays,
+          reminderEnabled: reminderEnabled,
+          reminderMinutes: reminderMinutes,
+        );
     // The goal a Sankalp sets becomes the app's daily goal from now on.
     await ref.read(settingsProvider.notifier).setFallbackDailyGoal(dailyGoal);
     ref.invalidateSelf();
@@ -104,10 +106,12 @@ final sankalpProgressProvider = FutureProvider<int>((ref) async {
   if (sadhana == null) return 0;
 
   final now = ref.watch(clockProvider)();
-  final totals = await ref.watch(jaapRepositoryProvider).totalsByDay(
-    fromDay: sadhana.startDay,
-    toDay: DayKeys.of(now),
-    mantraId: sadhana.mantraId,
-  );
+  final totals = await ref
+      .watch(jaapRepositoryProvider)
+      .totalsByDay(
+        fromDay: sadhana.startDay,
+        toDay: DayKeys.of(now),
+        mantraId: sadhana.mantraId,
+      );
   return totals.values.where((total) => total >= sadhana.dailyGoal).length;
 });

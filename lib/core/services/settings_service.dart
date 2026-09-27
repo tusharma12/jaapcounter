@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/theme/app_themes.dart';
 import '../../features/settings/domain/app_settings.dart';
+import '../../features/settings/domain/counter_background.dart';
+import '../../features/settings/domain/mala_style.dart';
 import '../constants/app_constants.dart';
 
 /// Key-value preferences. Anything that is a user choice rather than user
@@ -11,7 +13,15 @@ class SettingsService {
 
   final SharedPreferences _prefs;
 
-  static const _kThemeMode = 'settings.themeMode';
+  /// Written by versions that only knew light, dark and system; read once
+  /// so an upgrade keeps the user's choice.
+  static const _kLegacyThemeMode = 'settings.themeMode';
+  static const _kThemeId = 'settings.themeId';
+  static const _kBackground = 'settings.background';
+  static const _kBackgroundPhoto = 'settings.backgroundPhoto';
+  static const _kBackgroundDim = 'settings.backgroundDim';
+  static const _kFallingMantra = 'settings.fallingMantra';
+  static const _kMalaStyle = 'settings.malaStyle';
   static const _kLocale = 'settings.locale';
   static const _kHaptics = 'settings.haptics';
   static const _kSound = 'settings.sound';
@@ -27,7 +37,12 @@ class SettingsService {
 
   AppSettings read() {
     return AppSettings(
-      themeMode: _themeModeFrom(_prefs.getString(_kThemeMode)),
+      themeId:
+          AppThemeId.tryParse(_prefs.getString(_kThemeId)) ??
+          AppSettings.themeIdFromLegacyMode(
+            _prefs.getString(_kLegacyThemeMode),
+          ) ??
+          AppThemeId.system,
       localeCode: _prefs.getString(_kLocale),
       hapticsEnabled: _prefs.getBool(_kHaptics) ?? true,
       soundEnabled: _prefs.getBool(_kSound) ?? false,
@@ -37,11 +52,26 @@ class SettingsService {
           _prefs.getInt(_kDailyGoal) ?? AppConstants.defaultDailyGoal,
       storyTextScale: _prefs.getDouble(_kStoryTextScale) ?? 1.0,
       keepScreenOnInMeditation: _prefs.getBool(_kKeepAwake) ?? true,
+      background:
+          CounterBackground.tryParse(_prefs.getString(_kBackground)) ??
+          CounterBackground.none,
+      backgroundPhotoPath: _prefs.getString(_kBackgroundPhoto),
+      backgroundDim:
+          (_prefs.getDouble(_kBackgroundDim) ??
+                  AppSettings.defaultBackgroundDim)
+              .clamp(
+                AppSettings.minBackgroundDim,
+                AppSettings.maxBackgroundDim,
+              ),
+      fallingMantra: _prefs.getBool(_kFallingMantra) ?? true,
+      malaStyle:
+          MalaStyle.tryParse(_prefs.getString(_kMalaStyle)) ?? MalaStyle.beads,
     );
   }
 
   Future<void> write(AppSettings settings) async {
-    await _prefs.setString(_kThemeMode, settings.themeMode.name);
+    await _prefs.setString(_kThemeId, settings.themeId.name);
+    await _prefs.remove(_kLegacyThemeMode);
     if (settings.localeCode == null) {
       await _prefs.remove(_kLocale);
     } else {
@@ -58,6 +88,15 @@ class SettingsService {
     await _prefs.setInt(_kDailyGoal, settings.fallbackDailyGoal);
     await _prefs.setDouble(_kStoryTextScale, settings.storyTextScale);
     await _prefs.setBool(_kKeepAwake, settings.keepScreenOnInMeditation);
+    await _prefs.setString(_kBackground, settings.background.name);
+    if (settings.backgroundPhotoPath == null) {
+      await _prefs.remove(_kBackgroundPhoto);
+    } else {
+      await _prefs.setString(_kBackgroundPhoto, settings.backgroundPhotoPath!);
+    }
+    await _prefs.setDouble(_kBackgroundDim, settings.backgroundDim);
+    await _prefs.setBool(_kFallingMantra, settings.fallingMantra);
+    await _prefs.setString(_kMalaStyle, settings.malaStyle.name);
   }
 
   List<String> favouriteStoryIds() =>
@@ -66,7 +105,7 @@ class SettingsService {
   Future<void> setFavouriteStoryIds(List<String> ids) =>
       _prefs.setStringList(_kFavouriteStories, ids);
 
-  /// Automatic Jaap preferences, stored as `[intervalMs, speakAloud, stopAfter]`.
+  /// Automatic Jaap preferences, stored as `[intervalMs, _, stopAfter, ...]`.
   List<String> autoJaapConfig() => _prefs.getStringList(_kAutoJaap) ?? const [];
 
   Future<void> setAutoJaapConfig(List<String> values) =>
@@ -79,11 +118,6 @@ class SettingsService {
 
   bool hideMantra() => _prefs.getBool(_kHideMantra) ?? false;
 
-  Future<void> setHideMantra(bool hidden) => _prefs.setBool(_kHideMantra, hidden);
-
-  static ThemeMode _themeModeFrom(String? value) => switch (value) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
+  Future<void> setHideMantra(bool hidden) =>
+      _prefs.setBool(_kHideMantra, hidden);
 }

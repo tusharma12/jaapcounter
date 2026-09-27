@@ -379,24 +379,6 @@ abstract class AppL10n {
   /// **'Edit Mantra'**
   String get editMantra;
 
-  /// No description provided for @mantraName.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get mantraName;
-
-  /// No description provided for @mantraDevanagari.
-  ///
-  /// In en, this message translates to:
-  /// **'Devanagari'**
-  String get mantraDevanagari;
-
-  /// No description provided for @mantraTransliteration.
-  ///
-  /// In en, this message translates to:
-  /// **'Transliteration'**
-  String get mantraTransliteration;
-
   /// No description provided for @malaSize.
   ///
   /// In en, this message translates to:
@@ -673,12 +655,6 @@ abstract class AppL10n {
   /// **'Yearly Jaap'**
   String get yearlyJaap;
 
-  /// No description provided for @activity.
-  ///
-  /// In en, this message translates to:
-  /// **'Activity'**
-  String get activity;
-
   /// No description provided for @ofGoal.
   ///
   /// In en, this message translates to:
@@ -900,24 +876,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Theme'**
   String get theme;
-
-  /// No description provided for @themeSystem.
-  ///
-  /// In en, this message translates to:
-  /// **'System'**
-  String get themeSystem;
-
-  /// No description provided for @themeLight.
-  ///
-  /// In en, this message translates to:
-  /// **'Light'**
-  String get themeLight;
-
-  /// No description provided for @themeDark.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark'**
-  String get themeDark;
 
   /// No description provided for @haptics.
   ///
@@ -1327,18 +1285,6 @@ abstract class AppL10n {
   /// **'{seconds}s'**
   String autoJaapSeconds(int seconds);
 
-  /// No description provided for @autoJaapSpeak.
-  ///
-  /// In en, this message translates to:
-  /// **'Chant aloud'**
-  String get autoJaapSpeak;
-
-  /// No description provided for @autoJaapSpeakHint.
-  ///
-  /// In en, this message translates to:
-  /// **'The phone speaks the mantra before each bead'**
-  String get autoJaapSpeakHint;
-
   /// No description provided for @autoJaapStopAfter.
   ///
   /// In en, this message translates to:
@@ -1417,12 +1363,6 @@ abstract class AppL10n {
   /// **'Change theme'**
   String get changeTheme;
 
-  /// No description provided for @themeChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme: {name}'**
-  String themeChanged(String name);
-
   /// No description provided for @streakDays.
   ///
   /// In en, this message translates to:
@@ -1435,119 +1375,311 @@ abstract class AppL10n {
   /// **'Menu'**
   String get menu;
 
-  /// No description provided for @autoJaapVoice.
+  /// No description provided for @chooseTheme.
   ///
   /// In en, this message translates to:
-  /// **'Voice'**
-  String get autoJaapVoice;
+  /// **'Choose Theme'**
+  String get chooseTheme;
 
-  /// No description provided for @autoJaapVoiceDefault.
+  /// No description provided for @themeAuto.
   ///
   /// In en, this message translates to:
-  /// **'Default Hindi voice'**
-  String get autoJaapVoiceDefault;
+  /// **'Auto'**
+  String get themeAuto;
 
-  /// No description provided for @autoJaapChooseVoice.
+  /// No description provided for @themeWhite.
   ///
   /// In en, this message translates to:
-  /// **'Choose a voice'**
-  String get autoJaapChooseVoice;
+  /// **'White'**
+  String get themeWhite;
 
-  /// No description provided for @autoJaapVoiceHintIos.
+  /// No description provided for @themeBlack.
   ///
   /// In en, this message translates to:
-  /// **'For the most natural, soothing sound, download an Enhanced or Premium Hindi voice in Settings → Accessibility → Spoken Content → Voices → Hindi, then come back here.'**
-  String get autoJaapVoiceHintIos;
+  /// **'Black'**
+  String get themeBlack;
 
-  /// No description provided for @autoJaapVoiceHintAndroid.
+  /// No description provided for @themePastelPink.
   ///
   /// In en, this message translates to:
-  /// **'For a more natural sound, install a Hindi voice in Settings → Accessibility → Text-to-speech output.'**
-  String get autoJaapVoiceHintAndroid;
+  /// **'Pastel Pink'**
+  String get themePastelPink;
 
-  /// No description provided for @autoJaapShowAllVoices.
+  /// No description provided for @themeSpiritual.
   ///
   /// In en, this message translates to:
-  /// **'Show every language'**
-  String get autoJaapShowAllVoices;
+  /// **'Spiritual'**
+  String get themeSpiritual;
 
-  /// No description provided for @autoJaapNoVoices.
+  /// No description provided for @themeSaffron.
   ///
   /// In en, this message translates to:
-  /// **'No voices found on this device.'**
-  String get autoJaapNoVoices;
+  /// **'Saffron'**
+  String get themeSaffron;
 
-  /// No description provided for @autoJaapSpeed.
+  /// No description provided for @themePeaceful.
   ///
   /// In en, this message translates to:
-  /// **'Speed'**
-  String get autoJaapSpeed;
+  /// **'Peaceful'**
+  String get themePeaceful;
 
-  /// No description provided for @autoJaapPitch.
+  /// No description provided for @themeTerracotta.
   ///
   /// In en, this message translates to:
-  /// **'Pitch'**
-  String get autoJaapPitch;
+  /// **'Terracotta'**
+  String get themeTerracotta;
 
-  /// No description provided for @autoJaapSlow.
+  /// No description provided for @themeMeditative.
   ///
   /// In en, this message translates to:
-  /// **'Slow'**
-  String get autoJaapSlow;
+  /// **'Meditative'**
+  String get themeMeditative;
 
-  /// No description provided for @autoJaapFast.
+  /// No description provided for @themeNature.
   ///
   /// In en, this message translates to:
-  /// **'Fast'**
-  String get autoJaapFast;
+  /// **'Nature'**
+  String get themeNature;
 
-  /// No description provided for @autoJaapDeep.
+  /// No description provided for @themeRoseGold.
   ///
   /// In en, this message translates to:
-  /// **'Deep'**
-  String get autoJaapDeep;
+  /// **'Rose Gold'**
+  String get themeRoseGold;
 
-  /// No description provided for @autoJaapHigh.
+  /// No description provided for @themeOcean.
   ///
   /// In en, this message translates to:
-  /// **'High'**
-  String get autoJaapHigh;
+  /// **'Ocean'**
+  String get themeOcean;
 
-  /// No description provided for @autoJaapPreview.
+  /// No description provided for @themeLavender.
   ///
   /// In en, this message translates to:
-  /// **'Preview'**
-  String get autoJaapPreview;
+  /// **'Lavender'**
+  String get themeLavender;
 
-  /// No description provided for @autoJaapResetVoice.
+  /// No description provided for @themeCharcoal.
   ///
   /// In en, this message translates to:
-  /// **'Reset to soothing defaults'**
-  String get autoJaapResetVoice;
+  /// **'Charcoal'**
+  String get themeCharcoal;
 
-  /// No description provided for @voiceQualityEnhanced.
+  /// No description provided for @counterBackground.
   ///
   /// In en, this message translates to:
-  /// **'Enhanced'**
-  String get voiceQualityEnhanced;
+  /// **'Counter background'**
+  String get counterBackground;
 
-  /// No description provided for @voiceQualityPremium.
+  /// No description provided for @counterBackgroundBody.
   ///
   /// In en, this message translates to:
-  /// **'Premium'**
-  String get voiceQualityPremium;
+  /// **'Shown behind the mantra and beads on the counter.'**
+  String get counterBackgroundBody;
 
-  /// No description provided for @languagePunjabi.
+  /// No description provided for @backgroundNone.
   ///
   /// In en, this message translates to:
-  /// **'Punjabi'**
-  String get languagePunjabi;
+  /// **'None'**
+  String get backgroundNone;
 
-  /// No description provided for @languageEnglishIndia.
+  /// No description provided for @backgroundDawn.
   ///
   /// In en, this message translates to:
-  /// **'English (India)'**
-  String get languageEnglishIndia;
+  /// **'Dawn'**
+  String get backgroundDawn;
+
+  /// No description provided for @backgroundDusk.
+  ///
+  /// In en, this message translates to:
+  /// **'Dusk'**
+  String get backgroundDusk;
+
+  /// No description provided for @backgroundLotus.
+  ///
+  /// In en, this message translates to:
+  /// **'Lotus'**
+  String get backgroundLotus;
+
+  /// No description provided for @backgroundForest.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest'**
+  String get backgroundForest;
+
+  /// No description provided for @backgroundOcean.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get backgroundOcean;
+
+  /// No description provided for @backgroundCosmos.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosmos'**
+  String get backgroundCosmos;
+
+  /// No description provided for @backgroundPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'My photo'**
+  String get backgroundPhoto;
+
+  /// No description provided for @backgroundChoosePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a photo'**
+  String get backgroundChoosePhoto;
+
+  /// No description provided for @backgroundChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get backgroundChangePhoto;
+
+  /// No description provided for @backgroundRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get backgroundRemovePhoto;
+
+  /// No description provided for @backgroundDim.
+  ///
+  /// In en, this message translates to:
+  /// **'Dim background'**
+  String get backgroundDim;
+
+  /// No description provided for @backgroundDimHint.
+  ///
+  /// In en, this message translates to:
+  /// **'More dimming keeps the mantra easy to read.'**
+  String get backgroundDimHint;
+
+  /// No description provided for @addOwnMantra.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your own mantra'**
+  String get addOwnMantra;
+
+  /// No description provided for @addOwnMantraHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any name or mantra, in any script, with your own mala size'**
+  String get addOwnMantraHint;
+
+  /// No description provided for @legendLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get legendLess;
+
+  /// No description provided for @legendMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get legendMore;
+
+  /// No description provided for @allMantras.
+  ///
+  /// In en, this message translates to:
+  /// **'All mantras'**
+  String get allMantras;
+
+  /// No description provided for @previousPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousPeriod;
+
+  /// No description provided for @nextPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextPeriod;
+
+  /// No description provided for @showStatsFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Show statistics for'**
+  String get showStatsFor;
+
+  /// No description provided for @selectionSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} · {count} Jaap · {malas} malas'**
+  String selectionSummary(String label, String count, String malas);
+
+  /// No description provided for @dailyJaap.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Jaap'**
+  String get dailyJaap;
+
+  /// No description provided for @mantraText.
+  ///
+  /// In en, this message translates to:
+  /// **'Mantra'**
+  String get mantraText;
+
+  /// No description provided for @mantraTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. राम or Om Namah Shivaya'**
+  String get mantraTextHint;
+
+  /// No description provided for @mantraRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the mantra'**
+  String get mantraRequired;
+
+  /// No description provided for @mantraDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get mantraDescription;
+
+  /// No description provided for @mantraDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A meaning, a source, or a note to yourself'**
+  String get mantraDescriptionHint;
+
+  /// No description provided for @fallingMantra.
+  ///
+  /// In en, this message translates to:
+  /// **'Falling mantra'**
+  String get fallingMantra;
+
+  /// No description provided for @malaStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mala style'**
+  String get malaStyle;
+
+  /// No description provided for @malaStyleBeads.
+  ///
+  /// In en, this message translates to:
+  /// **'Beads'**
+  String get malaStyleBeads;
+
+  /// No description provided for @malaStyleRing.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress ring'**
+  String get malaStyleRing;
+
+  /// No description provided for @sectionCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'COUNTER'**
+  String get sectionCounter;
+
+  /// No description provided for @showMantraOnCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Show mantra on counter'**
+  String get showMantraOnCounter;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

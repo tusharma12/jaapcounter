@@ -60,7 +60,7 @@ final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),
 );
 
-/// Shared by story read-aloud and automatic Jaap, so only one voice speaks.
+/// Story read-aloud; one instance, so only one story speaks at a time.
 final speechServiceProvider = Provider<SpeechService>((ref) {
   final service = SpeechService();
   ref.onDispose(service.stop);

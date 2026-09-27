@@ -27,5 +27,6 @@ abstract final class AppConstants {
   static const String termsUrl = 'https://japmala.app/terms';
   static const String androidStoreUrl =
       'https://play.google.com/store/apps/details?id=com.japmala.japmala';
-  static const String iosStoreUrl = 'https://apps.apple.com/app/japmala/id0000000000';
+  static const String iosStoreUrl =
+      'https://apps.apple.com/app/japmala/id0000000000';
 }

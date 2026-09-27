@@ -41,11 +41,7 @@ class PillTabs<T> extends StatelessWidget {
         child: Row(children: pills),
       );
     }
-    return Row(
-      children: [
-        for (final pill in pills) Expanded(child: pill),
-      ],
-    );
+    return Row(children: [for (final pill in pills) Expanded(child: pill)]);
   }
 }
 

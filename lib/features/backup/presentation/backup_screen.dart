@@ -174,9 +174,7 @@ class _ActionCard extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: palette.secondaryText),
               const SizedBox(width: Insets.md),
-              Expanded(
-                child: Text(title, style: theme.textTheme.titleLarge),
-              ),
+              Expanded(child: Text(title, style: theme.textTheme.titleLarge)),
             ],
           ),
           const SizedBox(height: Insets.md),

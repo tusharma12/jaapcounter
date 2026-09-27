@@ -21,15 +21,14 @@ abstract final class Fmt {
   static String monthLabel(DateTime date, [String? locale]) =>
       DateFormat.yMMMM(locale).format(date);
 
-  static String weekdayInitial(DateTime date, [String? locale]) {
-    final s = DateFormat.E(locale).format(date);
-    return s.isEmpty ? '' : s.characters(0);
-  }
+  /// "Mon", "सोम".
+  static String weekdayShort(DateTime date, [String? locale]) =>
+      DateFormat.E(locale).format(date);
+
+  /// "Jan", "जन॰".
+  static String monthShort(DateTime date, [String? locale]) =>
+      DateFormat.MMM(locale).format(date);
 
   static String time(DateTime date, [String? locale]) =>
       DateFormat.jm(locale).format(date);
-}
-
-extension on String {
-  String characters(int index) => substring(index, index + 1);
 }

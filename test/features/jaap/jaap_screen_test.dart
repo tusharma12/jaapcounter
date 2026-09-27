@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
+import 'package:japmala/features/jaap/presentation/widgets/falling_mantra.dart';
+import 'package:japmala/features/settings/domain/mala_style.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
 import 'package:japmala/features/jaap/presentation/jaap_screen.dart';
 import 'package:japmala/features/jaap/presentation/widgets/mala_complete_overlay.dart';
@@ -30,7 +33,8 @@ void main() {
   testWidgets('shows the mantra, the mala and today\'s total', (tester) async {
     await pumpJaap(tester);
 
-    expect(find.text('राम'), findsOneWidget);
+    // Once large on the counter and once in the switcher above it.
+    expect(find.text('राम'), findsNWidgets(2));
     expect(find.byType(MalaRing), findsOneWidget);
     expect(find.text("Today's Jaap"), findsOneWidget);
     expect(find.text('Tap anywhere to count'), findsOneWidget);
@@ -72,7 +76,10 @@ void main() {
   ) async {
     await pumpJaap(tester);
 
-    expect(container.read(jaapControllerProvider).value!.undoAvailable, isFalse);
+    expect(
+      container.read(jaapControllerProvider).value!.undoAvailable,
+      isFalse,
+    );
 
     await tester.tap(find.byType(MalaRing));
     await tester.pump(const Duration(seconds: 1));
@@ -92,9 +99,7 @@ void main() {
   ) async {
     await container.read(jaapControllerProvider.future);
     await container.read(settingsProvider.notifier).setHaptics(false);
-    await container
-        .read(jaapControllerProvider.notifier)
-        .addManualCount(107);
+    await container.read(jaapControllerProvider.notifier).addManualCount(107);
     await pumpJaap(tester);
 
     await tester.tap(find.byType(MalaRing));
@@ -153,5 +158,42 @@ void main() {
 
     expect(find.text('आज का जाप'), findsOneWidget);
     expect(find.text('गिनने के लिए कहीं भी स्पर्श करें'), findsOneWidget);
+  });
+
+  testWidgets('the mala follows the chosen style', (tester) async {
+    await pumpJaap(tester);
+    expect(
+      tester.widget<MalaRing>(find.byType(MalaRing)).style,
+      MalaStyle.beads,
+    );
+
+    await container
+        .read(settingsProvider.notifier)
+        .setMalaStyle(MalaStyle.ring);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<MalaRing>(find.byType(MalaRing)).style,
+      MalaStyle.ring,
+    );
+  });
+
+  testWidgets('showing the mantra and making it fall are separate choices', (
+    tester,
+  ) async {
+    await pumpJaap(tester);
+    expect(find.byType(FallingMantra), findsOneWidget);
+
+    // Hidden text, still falling.
+    container.read(hideMantraProvider.notifier).set(true);
+    await tester.pumpAndSettle();
+    expect(find.byType(FallingMantra), findsOneWidget);
+    expect(find.text('राम'), findsOneWidget, reason: 'only the switcher');
+
+    // Shown text, not falling.
+    container.read(hideMantraProvider.notifier).set(false);
+    await container.read(settingsProvider.notifier).setFallingMantra(false);
+    await tester.pumpAndSettle();
+    expect(find.byType(FallingMantra), findsNothing);
+    expect(find.text('राम'), findsNWidgets(2));
   });
 }

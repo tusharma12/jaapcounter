@@ -65,7 +65,10 @@ class AppErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.somethingWentWrong, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              l10n.somethingWentWrong,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             if (onRetry != null) ...[
               const SizedBox(height: Insets.md),
               TextButton(onPressed: onRetry, child: Text(l10n.retry)),

@@ -10,16 +10,20 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/mantra_text.dart';
+import '../../../core/widgets/stat_tile.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../mantras/presentation/mantra_editor_sheet.dart';
 import '../../mantras/presentation/mantras_screen.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
+import '../../settings/domain/mala_style.dart';
+import '../../settings/presentation/appearance_sheets.dart';
 import '../../settings/presentation/settings_controller.dart';
 import 'auto_jaap_controller.dart';
 import 'counter_prefs.dart';
 import 'jaap_controller.dart';
 import 'jaap_state.dart';
 import 'widgets/auto_jaap_sheet.dart';
+import 'widgets/falling_mantra.dart';
 import 'widgets/mala_complete_overlay.dart';
 import 'widgets/mala_ring.dart';
 import 'widgets/session_pill.dart';
@@ -126,23 +130,6 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
     ref.read(counterHintSeenProvider.notifier).markSeen();
   }
 
-  Future<void> _cycleTheme() async {
-    final l10n = AppL10n.of(context);
-    final next = switch (ref.read(settingsProvider).themeMode) {
-      ThemeMode.system => ThemeMode.light,
-      ThemeMode.light => ThemeMode.dark,
-      ThemeMode.dark => ThemeMode.system,
-    };
-    await ref.read(settingsProvider.notifier).setThemeMode(next);
-    if (!mounted) return;
-    final name = switch (next) {
-      ThemeMode.system => l10n.themeSystem,
-      ThemeMode.light => l10n.themeLight,
-      ThemeMode.dark => l10n.themeDark,
-    };
-    showAppSnack(context, l10n.themeChanged(name));
-  }
-
   Future<void> _onMenu(_MenuAction action, JaapState state) async {
     switch (action) {
       case _MenuAction.undo:
@@ -156,7 +143,9 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
       case _MenuAction.hideMantra:
         ref.read(hideMantraProvider.notifier).toggle();
       case _MenuAction.theme:
-        await _cycleTheme();
+        await showThemePicker(context);
+      case _MenuAction.background:
+        await showBackgroundPicker(context);
       case _MenuAction.addCount:
         await _addManualCount(state);
       case _MenuAction.resetMala:
@@ -185,20 +174,31 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: AsyncView<JaapState>(
-          value: async,
-          onRetry: () => ref.invalidate(jaapControllerProvider),
-          builder: (context, state) => _CounterBody(
-            state: state,
-            celebrating: _celebrating,
-            autoRunning: autoRunning,
-            hideMantra: ref.watch(hideMantraProvider),
-            showHint: !ref.watch(counterHintSeenProvider),
-            onTap: () => _onTapArea(autoRunning),
-            onMenu: (action) => _onMenu(action, state),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: CounterBackdrop()),
+          SafeArea(
+            child: AsyncView<JaapState>(
+              value: async,
+              onRetry: () => ref.invalidate(jaapControllerProvider),
+              builder: (context, state) => _CounterBody(
+                state: state,
+                celebrating: _celebrating,
+                autoRunning: autoRunning,
+                hideMantra: ref.watch(hideMantraProvider),
+                fallingMantra: ref.watch(
+                  settingsProvider.select((s) => s.fallingMantra),
+                ),
+                malaStyle: ref.watch(
+                  settingsProvider.select((s) => s.malaStyle),
+                ),
+                showHint: !ref.watch(counterHintSeenProvider),
+                onTap: () => _onTapArea(autoRunning),
+                onMenu: (action) => _onMenu(action, state),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -211,6 +211,7 @@ enum _MenuAction {
   meditation,
   hideMantra,
   theme,
+  background,
   addCount,
   resetMala,
   mantras,
@@ -223,6 +224,8 @@ class _CounterBody extends StatelessWidget {
     required this.celebrating,
     required this.autoRunning,
     required this.hideMantra,
+    required this.fallingMantra,
+    required this.malaStyle,
     required this.showHint,
     required this.onTap,
     required this.onMenu,
@@ -232,6 +235,8 @@ class _CounterBody extends StatelessWidget {
   final bool celebrating;
   final bool autoRunning;
   final bool hideMantra;
+  final bool fallingMantra;
+  final MalaStyle malaStyle;
   final bool showHint;
   final VoidCallback onTap;
   final ValueChanged<_MenuAction> onMenu;
@@ -250,6 +255,12 @@ class _CounterBody extends StatelessWidget {
 
     return Stack(
       children: [
+        // Behind everything. Its own switch alone decides, so the mantra can
+        // fall even while the large text is hidden.
+        if (fallingMantra)
+          Positioned.fill(
+            child: FallingMantra(mantra: state.mantra, count: state.lifetime),
+          ),
         Column(
           children: [
             _TopBar(
@@ -302,6 +313,7 @@ class _CounterBody extends StatelessWidget {
                                 beads: position.beadsInCurrentMala,
                                 malaSize: position.malaSize,
                                 diameter: _ringDiameter(constraints),
+                                style: malaStyle,
                                 child: MalaRingLabel(
                                   beads: position.beadsInCurrentMala,
                                   malaSize: position.malaSize,
@@ -382,7 +394,7 @@ class _CounterBody extends StatelessWidget {
 
   /// A single name is set large; a verse steps down so it still fits.
   static double _mantraSize(JaapState state) {
-    final text = state.mantra.display;
+    final text = state.mantra.name;
     if (text.contains('\n') || text.length > 24) return 24;
     if (text.length > 10) return 36;
     return 64;
@@ -476,8 +488,13 @@ class _TopBar extends ConsumerWidget {
               ),
               _item(
                 _MenuAction.theme,
-                Icons.contrast_rounded,
+                Icons.palette_outlined,
                 l10n.changeTheme,
+              ),
+              _item(
+                _MenuAction.background,
+                Icons.wallpaper_rounded,
+                l10n.counterBackground,
               ),
               _item(
                 _MenuAction.addCount,
@@ -525,45 +542,18 @@ class _TopBar extends ConsumerWidget {
   }
 }
 
-class _StreakChip extends StatelessWidget {
+class _StreakChip extends ConsumerWidget {
   const _StreakChip({required this.days});
 
   final int days;
 
   @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final countedToday = ref.watch(streakProvider).value?.countedToday ?? false;
     return Semantics(
       label: AppL10n.of(context).streakDays(days),
       excludeSemantics: true,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Insets.md,
-          vertical: Insets.xs + 2,
-        ),
-        decoration: BoxDecoration(
-          color: palette.saffron.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(Radii.pill),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.local_fire_department_rounded,
-              size: 18,
-              color: palette.saffron,
-            ),
-            const SizedBox(width: Insets.xs),
-            Text(
-              '$days',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: palette.primaryText,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: StreakBadge(label: '$days', dimmed: !countedToday),
     );
   }
 }
@@ -585,8 +575,8 @@ class _MantraChip extends ConsumerWidget {
       );
     }
 
-    // The top bar names the mantra in Latin script; the hero text below
-    // carries the Devanagari.
+    // The top bar names the mantra on one line and opens the picker; the
+    // hero text below carries it in full, and stands in when it is hidden.
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(Radii.pill),

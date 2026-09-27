@@ -17,16 +17,12 @@ class MantraListController extends AsyncNotifier<List<Mantra>> {
 
   Future<Mantra> add({
     required String name,
-    String? devanagari,
-    String? transliteration,
+    String? description,
     int malaSize = AppConstants.defaultMalaSize,
   }) async {
-    final mantra = await ref.read(mantraRepositoryProvider).create(
-      name: name,
-      devanagari: devanagari,
-      transliteration: transliteration,
-      malaSize: malaSize,
-    );
+    final mantra = await ref
+        .read(mantraRepositoryProvider)
+        .create(name: name, description: description, malaSize: malaSize);
     ref.invalidateSelf();
     return mantra;
   }
@@ -43,7 +39,9 @@ class MantraListController extends AsyncNotifier<List<Mantra>> {
     final settings = ref.read(settingsProvider);
     if (settings.activeMantraId == id) {
       final remaining = await ref.read(mantraRepositoryProvider).all();
-      final next = remaining.isEmpty ? BuiltInMantras.fallback : remaining.first;
+      final next = remaining.isEmpty
+          ? BuiltInMantras.fallback
+          : remaining.first;
       await ref.read(settingsProvider.notifier).setActiveMantra(next.id);
     }
     ref.invalidateSelf();

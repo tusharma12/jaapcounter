@@ -32,16 +32,18 @@ class MantrasScreen extends ConsumerWidget {
             Insets.page,
             Insets.xxxl * 2,
           ),
-          itemCount: list.length,
+          itemCount: list.length + 1,
           separatorBuilder: (_, _) => const SizedBox(height: Insets.md),
           itemBuilder: (context, index) {
+            if (index == list.length) {
+              return AddOwnMantraTile(onTap: () => _addOwn(context, ref));
+            }
             final mantra = list[index];
             return MantraTile(
               mantra: mantra,
               isActive: mantra.id == active?.id,
-              onTap: () => ref
-                  .read(mantraListProvider.notifier)
-                  .setActive(mantra.id),
+              onTap: () =>
+                  ref.read(mantraListProvider.notifier).setActive(mantra.id),
               onEdit: () => showMantraEditor(context, existing: mantra),
               onDelete: mantra.isBuiltIn
                   ? null
@@ -51,7 +53,7 @@ class MantrasScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showMantraEditor(context),
+        onPressed: () => _addOwn(context, ref),
         icon: const Icon(Icons.add_rounded),
         label: Text(l10n.addMantra),
       ),
@@ -109,14 +111,7 @@ class MantraPickerSheet extends ConsumerWidget {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () async {
-                    final created = await showMantraEditor(context);
-                    if (created != null) {
-                      await ref
-                          .read(mantraListProvider.notifier)
-                          .setActive(created.id);
-                    }
-                  },
+                  onPressed: () => _addOwn(context, ref),
                   icon: const Icon(Icons.add_rounded, size: 18),
                   label: Text(l10n.addMantra),
                 ),
@@ -132,9 +127,12 @@ class MantraPickerSheet extends ConsumerWidget {
                 Insets.page,
                 Insets.xl,
               ),
-              itemCount: list.length,
+              itemCount: list.length + 1,
               separatorBuilder: (_, _) => const SizedBox(height: Insets.md),
               itemBuilder: (context, index) {
+                if (index == list.length) {
+                  return AddOwnMantraTile(onTap: () => _addOwn(context, ref));
+                }
                 final mantra = list[index];
                 return MantraTile(
                   mantra: mantra,
@@ -152,6 +150,15 @@ class MantraPickerSheet extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// Opens the editor for a new mantra and, once saved, switches the counter
+/// to it: someone adding their own mantra wants to chant it.
+Future<void> _addOwn(BuildContext context, WidgetRef ref) async {
+  final created = await showMantraEditor(context);
+  if (created != null) {
+    await ref.read(mantraListProvider.notifier).setActive(created.id);
   }
 }
 

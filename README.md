@@ -110,9 +110,12 @@ never in widgets. State is Riverpod.
 
 The palette is a warm off-white ground with near-black text and **saffron as an
 accent only** — progress, the streak, calls to action, selected state, a
-completed mala. Both themes are defined as tokens in
-`lib/app/theme/app_colors.dart` and reached through `context.palette`; the
-widget is the only place colours are repeated, in `colors.xml`.
+completed mala. The classic light and dark palettes are defined as tokens in
+`lib/app/theme/app_colors.dart`; the other colour themes in the theme picker
+(Saffron, Lavender, Ocean…) are derived from a background and an accent in
+`lib/app/theme/app_themes.dart`. Everything is reached through
+`context.palette`; the widget is the only place colours are repeated, in
+`colors.xml`.
 
 UI text is Inter, Devanagari is Noto Sans Devanagari (both bundled as static
 instances, SIL Open Font License), and mantras are rendered in Devanagari

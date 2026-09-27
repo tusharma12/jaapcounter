@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:japmala/core/constants/built_in_mantras.dart';
 import 'package:japmala/core/database/app_database.dart';
 import 'package:japmala/features/mantras/data/mantra_repository.dart';
+import 'package:japmala/features/mantras/domain/mantra.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../support/test_harness.dart';
@@ -21,22 +22,23 @@ void main() {
 
     expect(all.length, BuiltInMantras.all.length);
     expect(all.every((m) => m.isBuiltIn), isTrue);
-    expect(all.first.name, 'Ram');
-    expect(all.first.devanagari, 'राम');
+    expect(all.first.name, 'राम');
+    expect(all.first.description, isNull);
     expect(all.every((m) => m.malaSize == 108), isTrue);
   });
 
   test('a custom mantra is created with its own mala size', () async {
     final created = await repository.create(
-      name: 'Sita Ram',
-      devanagari: 'सीता राम',
-      transliteration: 'Sītā Rām',
+      name: 'सीता राम',
+      description: 'Sita and Ram together',
       malaSize: 27,
     );
 
     expect(created.isBuiltIn, isFalse);
     expect(created.malaSize, 27);
-    expect((await repository.byId(created.id))!.devanagari, 'सीता राम');
+    final stored = (await repository.byId(created.id))!;
+    expect(stored.name, 'सीता राम');
+    expect(stored.description, 'Sita and Ram together');
   });
 
   test('an out-of-range mala size is clamped rather than stored', () async {
@@ -45,16 +47,30 @@ void main() {
     expect(created.malaSize, 10000);
   });
 
-  test('blank optional fields are stored as absent, not empty', () async {
-    final created = await repository.create(
-      name: 'Ram',
-      devanagari: '   ',
-      transliteration: '',
-    );
+  test('a blank description is stored as absent, not empty', () async {
+    final created = await repository.create(name: 'Ram', description: '   ');
 
-    expect(created.devanagari, isNull);
-    expect(created.transliteration, isNull);
-    expect(created.display, 'Ram', reason: 'falls back to the Latin name');
+    expect(created.description, isNull);
+    expect(created.hasDescription, isFalse);
+  });
+
+  test('a mantra in the old shape reads as mantra plus description', () {
+    Mantra legacy(String? devanagari, String? transliteration) =>
+        Mantra.fromMap({
+          'id': 'x',
+          'name': 'Sita Ram',
+          'devanagari': devanagari,
+          'transliteration': transliteration,
+          'mala_size': 108,
+        });
+
+    // The Devanagari was what the counter showed; the Latin name is kept.
+    expect(legacy('सीता राम', null).name, 'सीता राम');
+    expect(legacy('सीता राम', null).description, 'Sita Ram');
+    expect(legacy('सीता राम', 'Sītā Rām').description, 'Sītā Rām');
+    // Without Devanagari the Latin name is the mantra.
+    expect(legacy(null, null).name, 'Sita Ram');
+    expect(legacy(' ', null).description, isNull);
   });
 
   test('a custom mantra can be edited', () async {

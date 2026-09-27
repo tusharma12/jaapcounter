@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_dimens.dart';
+import '../../../app/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/pill_tabs.dart';
@@ -12,10 +13,7 @@ import 'mantra_controllers.dart';
 
 /// Add or edit a mantra. Returns the saved mantra, so the caller can make it
 /// active straight away.
-Future<Mantra?> showMantraEditor(
-  BuildContext context, {
-  Mantra? existing,
-}) {
+Future<Mantra?> showMantraEditor(BuildContext context, {Mantra? existing}) {
   return showAppSheet<Mantra>(
     context,
     builder: (context) => MantraEditorSheet(existing: existing),
@@ -34,8 +32,7 @@ class MantraEditorSheet extends ConsumerStatefulWidget {
 class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _name;
-  late final TextEditingController _devanagari;
-  late final TextEditingController _transliteration;
+  late final TextEditingController _description;
   late int _malaSize;
   bool _saving = false;
 
@@ -44,18 +41,14 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
     super.initState();
     final existing = widget.existing;
     _name = TextEditingController(text: existing?.name ?? '');
-    _devanagari = TextEditingController(text: existing?.devanagari ?? '');
-    _transliteration = TextEditingController(
-      text: existing?.transliteration ?? '',
-    );
+    _description = TextEditingController(text: existing?.description ?? '');
     _malaSize = existing?.malaSize ?? AppConstants.defaultMalaSize;
   }
 
   @override
   void dispose() {
     _name.dispose();
-    _devanagari.dispose();
-    _transliteration.dispose();
+    _description.dispose();
     super.dispose();
   }
 
@@ -71,19 +64,15 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
       if (existing == null) {
         saved = await controller.add(
           name: _name.text,
-          devanagari: _devanagari.text,
-          transliteration: _transliteration.text,
+          description: _description.text,
           malaSize: _malaSize,
         );
       } else {
         saved = existing.copyWith(
           name: _name.text.trim(),
-          devanagari: _devanagari.text.trim().isEmpty
+          description: _description.text.trim().isEmpty
               ? null
-              : _devanagari.text.trim(),
-          transliteration: _transliteration.text.trim().isEmpty
-              ? null
-              : _transliteration.text.trim(),
+              : _description.text.trim(),
           malaSize: _malaSize,
         );
         await controller.save(saved);
@@ -135,29 +124,32 @@ class _MantraEditorSheetState extends ConsumerState<MantraEditorSheet> {
                 style: theme.textTheme.headlineSmall,
               ),
               const SizedBox(height: Insets.xl),
-              _Label(l10n.mantraName),
+              _Label(l10n.mantraText),
+              // Any script: the keyboard decides, and the counter shows it
+              // exactly as typed. A verse may run to several lines.
               TextFormField(
                 controller: _name,
-                textCapitalization: TextCapitalization.words,
-                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.sentences,
                 autofocus: widget.existing == null,
+                minLines: 1,
+                maxLines: 4,
+                decoration: InputDecoration(hintText: l10n.mantraTextHint),
+                style: AppTypography.mantra(size: 18),
                 validator: (value) => (value == null || value.trim().isEmpty)
-                    ? l10n.nameRequired
+                    ? l10n.mantraRequired
                     : null,
               ),
               const SizedBox(height: Insets.lg),
-              _Label('${l10n.mantraDevanagari} · ${l10n.optional}'),
+              _Label('${l10n.mantraDescription} · ${l10n.optional}'),
               TextFormField(
-                controller: _devanagari,
-                textInputAction: TextInputAction.next,
-                maxLines: 2,
-                minLines: 1,
-              ),
-              const SizedBox(height: Insets.lg),
-              _Label('${l10n.mantraTransliteration} · ${l10n.optional}'),
-              TextFormField(
-                controller: _transliteration,
+                controller: _description,
+                textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
+                minLines: 1,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: l10n.mantraDescriptionHint,
+                ),
               ),
               const SizedBox(height: Insets.xl),
               _Label(l10n.malaSize),

@@ -91,7 +91,11 @@ class RemindersScreen extends ConsumerWidget {
     await controller.reschedule(copyFrom(l10n));
 
     if (!granted && context.mounted) {
-      showAppSnack(context, l10n.notificationsBlocked, duration: const Duration(seconds: 4));
+      showAppSnack(
+        context,
+        l10n.notificationsBlocked,
+        duration: const Duration(seconds: 4),
+      );
     }
   }
 }

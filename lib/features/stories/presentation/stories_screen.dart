@@ -65,12 +65,12 @@ class StoriesScreen extends ConsumerWidget {
                 scrollable: true,
                 items: [null, ...data.categories.map((c) => c.id)],
                 selected: filter,
-                onSelected: ref.read(storyCategoryFilterProvider.notifier).select,
+                onSelected: ref
+                    .read(storyCategoryFilterProvider.notifier)
+                    .select,
                 labelOf: (id) => id == null
                     ? l10n.all
-                    : data.categories
-                          .firstWhere((c) => c.id == id)
-                          .label,
+                    : data.categories.firstWhere((c) => c.id == id).label,
               ),
               const SizedBox(height: Insets.xl),
               if (stories.isEmpty)
@@ -141,11 +141,7 @@ class StoryCard extends ConsumerWidget {
               Text(story.emoji, style: const TextStyle(fontSize: 24)),
               const Spacer(),
               if (isFavourite)
-                Icon(
-                  Icons.favorite_rounded,
-                  size: 16,
-                  color: palette.saffron,
-                ),
+                Icon(Icons.favorite_rounded, size: 16, color: palette.saffron),
             ],
           ),
           const SizedBox(height: Insets.lg),

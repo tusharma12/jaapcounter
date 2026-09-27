@@ -74,36 +74,41 @@ class StreakBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final palette = context.palette;
 
+    // A themed icon, not the 🔥 emoji: the emoji's fixed orange clashed with
+    // every theme that is not saffron.
+    final ink = palette.secondary;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: large ? Insets.xl : Insets.lg,
         vertical: large ? Insets.md : Insets.sm,
       ),
       decoration: BoxDecoration(
-        color: palette.softSaffron,
+        color: palette.softSecondary,
         borderRadius: BorderRadius.circular(Radii.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Opacity(
-            opacity: dimmed ? 0.5 : 1,
-            child: Text('🔥', style: TextStyle(fontSize: large ? 20 : 15)),
+          Icon(
+            Icons.local_fire_department_rounded,
+            size: large ? 22 : 17,
+            // At risk until today is counted, so the flame burns low.
+            color: dimmed ? ink.withValues(alpha: 0.45) : ink,
           ),
-          SizedBox(width: large ? Insets.md : Insets.sm),
+          SizedBox(width: large ? Insets.sm : Insets.xs),
           Text(
             label,
-            style: (large ? theme.textTheme.titleLarge : theme.textTheme.titleSmall)
-                ?.copyWith(color: palette.saffronDeepText),
+            style:
+                (large
+                        ? theme.textTheme.titleLarge
+                        : theme.textTheme.titleSmall)
+                    ?.copyWith(
+                      color: ink,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
           ),
         ],
       ),
     );
   }
-}
-
-extension on AppPalette {
-  /// Saffron is too light for text on the soft background; this is the
-  /// readable version of the accent.
-  Color get saffronDeepText => Color.lerp(saffron, primaryText, 0.45)!;
 }

@@ -41,7 +41,10 @@ class RemindersController extends AsyncNotifier<List<Reminder>> {
   @override
   Future<List<Reminder>> build() => ref.watch(reminderRepositoryProvider).all();
 
-  Future<Reminder> add(int minutes, {ReminderKind kind = ReminderKind.jaap}) async {
+  Future<Reminder> add(
+    int minutes, {
+    ReminderKind kind = ReminderKind.jaap,
+  }) async {
     final reminder = await ref
         .read(reminderRepositoryProvider)
         .create(minutes: minutes, kind: kind);
@@ -75,11 +78,9 @@ class RemindersController extends AsyncNotifier<List<Reminder>> {
     required int minutes,
     required bool enabled,
   }) async {
-    await ref.read(reminderRepositoryProvider).upsertSingleton(
-      kind: kind,
-      minutes: minutes,
-      enabled: enabled,
-    );
+    await ref
+        .read(reminderRepositoryProvider)
+        .upsertSingleton(kind: kind, minutes: minutes, enabled: enabled);
     ref.invalidateSelf();
   }
 

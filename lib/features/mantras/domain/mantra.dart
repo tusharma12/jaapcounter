@@ -2,15 +2,14 @@ import 'package:meta/meta.dart';
 
 import '../../../core/constants/app_constants.dart';
 
-/// A name to chant, together with the size of the mala used for it.
+/// A mantra to chant, together with the size of the mala used for it.
 @immutable
 class Mantra {
   const Mantra({
     required this.id,
     required this.name,
     required this.malaSize,
-    this.devanagari,
-    this.transliteration,
+    this.description,
     this.isBuiltIn = false,
     this.sortOrder = 0,
     this.malaBase = 0,
@@ -18,12 +17,12 @@ class Mantra {
 
   final String id;
 
-  /// Latin name, always present — used for accessibility and sorting.
+  /// The mantra itself, exactly as it is chanted, in whatever script the
+  /// user wrote it: राम, ॐ नमः शिवाय, Waheguru.
   final String name;
 
-  /// The mantra in Devanagari, shown as the hero text when available.
-  final String? devanagari;
-  final String? transliteration;
+  /// An optional note: a meaning, a source, a reminder of why.
+  final String? description;
 
   /// Beads in one mala for this mantra.
   final int malaSize;
@@ -36,24 +35,17 @@ class Mantra {
   /// delete history: totals stay intact while the bead position moves.
   final int malaBase;
 
-  /// What to render large on the counter.
-  String get display => (devanagari != null && devanagari!.isNotEmpty)
-      ? devanagari!
-      : name;
+  static final _devanagari = RegExp('[ऀ-ॿ]');
 
-  bool get hasDevanagari => devanagari != null && devanagari!.isNotEmpty;
+  /// Whether the mantra needs the Devanagari typeface to render well.
+  bool get isDevanagari => _devanagari.hasMatch(name);
 
-  /// A one-line subtitle: transliteration if we have one, else the Latin name.
-  String get subtitle =>
-      (transliteration != null && transliteration!.isNotEmpty)
-      ? transliteration!
-      : name;
+  bool get hasDescription => description != null && description!.isNotEmpty;
 
   Mantra copyWith({
     String? id,
     String? name,
-    Object? devanagari = _sentinel,
-    Object? transliteration = _sentinel,
+    Object? description = _sentinel,
     int? malaSize,
     bool? isBuiltIn,
     int? sortOrder,
@@ -62,12 +54,9 @@ class Mantra {
     return Mantra(
       id: id ?? this.id,
       name: name ?? this.name,
-      devanagari: devanagari == _sentinel
-          ? this.devanagari
-          : devanagari as String?,
-      transliteration: transliteration == _sentinel
-          ? this.transliteration
-          : transliteration as String?,
+      description: description == _sentinel
+          ? this.description
+          : description as String?,
       malaSize: malaSize ?? this.malaSize,
       isBuiltIn: isBuiltIn ?? this.isBuiltIn,
       sortOrder: sortOrder ?? this.sortOrder,
@@ -78,32 +67,56 @@ class Mantra {
   Map<String, Object?> toMap() => {
     'id': id,
     'name': name,
-    'devanagari': devanagari,
-    'transliteration': transliteration,
+    'description': description,
     'mala_size': malaSize,
     'is_built_in': isBuiltIn ? 1 : 0,
     'sort_order': sortOrder,
     'mala_base': malaBase,
   };
 
-  factory Mantra.fromMap(Map<String, Object?> map) => Mantra(
-    id: map['id'] as String,
-    name: map['name'] as String,
-    devanagari: map['devanagari'] as String?,
-    transliteration: map['transliteration'] as String?,
-    malaSize: (map['mala_size'] as int?) ?? AppConstants.defaultMalaSize,
-    isBuiltIn: (map['is_built_in'] as int? ?? 0) == 1,
-    sortOrder: (map['sort_order'] as int?) ?? 0,
-    malaBase: (map['mala_base'] as int?) ?? 0,
-  );
+  /// Also reads rows and backups from before mantras had a description,
+  /// when a mantra carried a Latin name plus optional Devanagari and
+  /// transliteration. See [fromLegacy].
+  factory Mantra.fromMap(Map<String, Object?> map) {
+    final (name, description) = map.containsKey('description')
+        ? (map['name'] as String, map['description'] as String?)
+        : fromLegacy(
+            name: map['name'] as String,
+            devanagari: map['devanagari'] as String?,
+            transliteration: map['transliteration'] as String?,
+          );
+    return Mantra(
+      id: map['id'] as String,
+      name: name,
+      description: description,
+      malaSize: (map['mala_size'] as int?) ?? AppConstants.defaultMalaSize,
+      isBuiltIn: (map['is_built_in'] as int? ?? 0) == 1,
+      sortOrder: (map['sort_order'] as int?) ?? 0,
+      malaBase: (map['mala_base'] as int?) ?? 0,
+    );
+  }
+
+  /// The old three fields as the new two. The Devanagari, when there was
+  /// any, is what was shown on the counter, so it becomes the mantra; the
+  /// Latin name the user typed is kept as its description rather than lost.
+  static (String, String?) fromLegacy({
+    required String name,
+    String? devanagari,
+    String? transliteration,
+  }) {
+    String? clean(String? s) =>
+        (s == null || s.trim().isEmpty) ? null : s.trim();
+    final script = clean(devanagari);
+    if (script == null) return (name, clean(transliteration));
+    return (script, clean(transliteration) ?? clean(name));
+  }
 
   @override
   bool operator ==(Object other) =>
       other is Mantra &&
       other.id == id &&
       other.name == name &&
-      other.devanagari == devanagari &&
-      other.transliteration == transliteration &&
+      other.description == description &&
       other.malaSize == malaSize &&
       other.isBuiltIn == isBuiltIn &&
       other.sortOrder == sortOrder &&
@@ -113,8 +126,7 @@ class Mantra {
   int get hashCode => Object.hash(
     id,
     name,
-    devanagari,
-    transliteration,
+    description,
     malaSize,
     isBuiltIn,
     sortOrder,

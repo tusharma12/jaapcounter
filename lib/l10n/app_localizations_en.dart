@@ -171,15 +171,6 @@ class AppL10nEn extends AppL10n {
   String get editMantra => 'Edit Mantra';
 
   @override
-  String get mantraName => 'Name';
-
-  @override
-  String get mantraDevanagari => 'Devanagari';
-
-  @override
-  String get mantraTransliteration => 'Transliteration';
-
-  @override
   String get malaSize => 'Mala Size';
 
   @override
@@ -352,9 +343,6 @@ class AppL10nEn extends AppL10n {
   String get yearlyJaap => 'Yearly Jaap';
 
   @override
-  String get activity => 'Activity';
-
-  @override
   String ofGoal(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -473,15 +461,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get theme => 'Theme';
-
-  @override
-  String get themeSystem => 'System';
-
-  @override
-  String get themeLight => 'Light';
-
-  @override
-  String get themeDark => 'Dark';
 
   @override
   String get haptics => 'Haptics';
@@ -708,13 +687,6 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get autoJaapSpeak => 'Chant aloud';
-
-  @override
-  String get autoJaapSpeakHint =>
-      'The phone speaks the mantra before each bead';
-
-  @override
   String get autoJaapStopAfter => 'Stop after';
 
   @override
@@ -760,11 +732,6 @@ class AppL10nEn extends AppL10n {
   String get changeTheme => 'Change theme';
 
   @override
-  String themeChanged(String name) {
-    return 'Theme: $name';
-  }
-
-  @override
   String streakDays(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -779,61 +746,160 @@ class AppL10nEn extends AppL10n {
   String get menu => 'Menu';
 
   @override
-  String get autoJaapVoice => 'Voice';
+  String get chooseTheme => 'Choose Theme';
 
   @override
-  String get autoJaapVoiceDefault => 'Default Hindi voice';
+  String get themeAuto => 'Auto';
 
   @override
-  String get autoJaapChooseVoice => 'Choose a voice';
+  String get themeWhite => 'White';
 
   @override
-  String get autoJaapVoiceHintIos =>
-      'For the most natural, soothing sound, download an Enhanced or Premium Hindi voice in Settings → Accessibility → Spoken Content → Voices → Hindi, then come back here.';
+  String get themeBlack => 'Black';
 
   @override
-  String get autoJaapVoiceHintAndroid =>
-      'For a more natural sound, install a Hindi voice in Settings → Accessibility → Text-to-speech output.';
+  String get themePastelPink => 'Pastel Pink';
 
   @override
-  String get autoJaapShowAllVoices => 'Show every language';
+  String get themeSpiritual => 'Spiritual';
 
   @override
-  String get autoJaapNoVoices => 'No voices found on this device.';
+  String get themeSaffron => 'Saffron';
 
   @override
-  String get autoJaapSpeed => 'Speed';
+  String get themePeaceful => 'Peaceful';
 
   @override
-  String get autoJaapPitch => 'Pitch';
+  String get themeTerracotta => 'Terracotta';
 
   @override
-  String get autoJaapSlow => 'Slow';
+  String get themeMeditative => 'Meditative';
 
   @override
-  String get autoJaapFast => 'Fast';
+  String get themeNature => 'Nature';
 
   @override
-  String get autoJaapDeep => 'Deep';
+  String get themeRoseGold => 'Rose Gold';
 
   @override
-  String get autoJaapHigh => 'High';
+  String get themeOcean => 'Ocean';
 
   @override
-  String get autoJaapPreview => 'Preview';
+  String get themeLavender => 'Lavender';
 
   @override
-  String get autoJaapResetVoice => 'Reset to soothing defaults';
+  String get themeCharcoal => 'Charcoal';
 
   @override
-  String get voiceQualityEnhanced => 'Enhanced';
+  String get counterBackground => 'Counter background';
 
   @override
-  String get voiceQualityPremium => 'Premium';
+  String get counterBackgroundBody =>
+      'Shown behind the mantra and beads on the counter.';
 
   @override
-  String get languagePunjabi => 'Punjabi';
+  String get backgroundNone => 'None';
 
   @override
-  String get languageEnglishIndia => 'English (India)';
+  String get backgroundDawn => 'Dawn';
+
+  @override
+  String get backgroundDusk => 'Dusk';
+
+  @override
+  String get backgroundLotus => 'Lotus';
+
+  @override
+  String get backgroundForest => 'Forest';
+
+  @override
+  String get backgroundOcean => 'Ocean';
+
+  @override
+  String get backgroundCosmos => 'Cosmos';
+
+  @override
+  String get backgroundPhoto => 'My photo';
+
+  @override
+  String get backgroundChoosePhoto => 'Choose a photo';
+
+  @override
+  String get backgroundChangePhoto => 'Change photo';
+
+  @override
+  String get backgroundRemovePhoto => 'Remove photo';
+
+  @override
+  String get backgroundDim => 'Dim background';
+
+  @override
+  String get backgroundDimHint => 'More dimming keeps the mantra easy to read.';
+
+  @override
+  String get addOwnMantra => 'Add your own mantra';
+
+  @override
+  String get addOwnMantraHint =>
+      'Any name or mantra, in any script, with your own mala size';
+
+  @override
+  String get legendLess => 'Less';
+
+  @override
+  String get legendMore => 'More';
+
+  @override
+  String get allMantras => 'All mantras';
+
+  @override
+  String get previousPeriod => 'Previous';
+
+  @override
+  String get nextPeriod => 'Next';
+
+  @override
+  String get showStatsFor => 'Show statistics for';
+
+  @override
+  String selectionSummary(String label, String count, String malas) {
+    return '$label · $count Jaap · $malas malas';
+  }
+
+  @override
+  String get dailyJaap => 'Daily Jaap';
+
+  @override
+  String get mantraText => 'Mantra';
+
+  @override
+  String get mantraTextHint => 'e.g. राम or Om Namah Shivaya';
+
+  @override
+  String get mantraRequired => 'Please enter the mantra';
+
+  @override
+  String get mantraDescription => 'Description';
+
+  @override
+  String get mantraDescriptionHint =>
+      'A meaning, a source, or a note to yourself';
+
+  @override
+  String get fallingMantra => 'Falling mantra';
+
+  @override
+  String get malaStyle => 'Mala style';
+
+  @override
+  String get malaStyleBeads => 'Beads';
+
+  @override
+  String get malaStyleRing => 'Progress ring';
+
+  @override
+  String get sectionCounter => 'COUNTER';
+
+  @override
+  String get showMantraOnCounter => 'Show mantra on counter';
 }

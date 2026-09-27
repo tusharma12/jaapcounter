@@ -4,27 +4,46 @@ import 'package:flutter/services.dart';
 
 import 'app_colors.dart';
 import 'app_dimens.dart';
+import 'app_themes.dart';
 import 'app_typography.dart';
 
 abstract final class AppTheme {
-  static ThemeData light() => _build(AppPalette.light(), Brightness.light);
-  static ThemeData dark() => _build(AppPalette.dark(), Brightness.dark);
+  static final ThemeData _light = _build(AppPalette.light(), Brightness.light);
+  static final ThemeData _dark = _build(AppPalette.dark(), Brightness.dark);
+  static final Map<AppThemeId, ThemeData> _fixed = {};
+
+  static ThemeData light() => _light;
+  static ThemeData dark() => _dark;
+
+  /// The theme for a fixed colour theme; [AppThemeId.system] has none and
+  /// uses [light] and [dark] instead.
+  static ThemeData forId(AppThemeId id) {
+    final spec = AppThemeSpec.of(id);
+    if (spec == null) return _light;
+    return _fixed[id] ??= _build(spec.palette, spec.brightness);
+  }
 
   static ThemeData _build(AppPalette p, Brightness brightness) {
     final text = AppTypography.textTheme(p.primaryText, p.secondaryText);
-    final scheme = ColorScheme.fromSeed(
-      seedColor: p.saffron,
-      brightness: brightness,
-    ).copyWith(
-      primary: p.saffron,
-      onPrimary: brightness == Brightness.light
-          ? const Color(0xFF3A2500)
-          : const Color(0xFF241700),
-      surface: p.background,
-      onSurface: p.primaryText,
-      surfaceContainerHighest: p.card,
-      error: p.danger,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: p.saffron,
+          brightness: brightness,
+        ).copyWith(
+          primary: p.saffron,
+          // Most themes accent in saffron and want dark ink on it; a deep accent
+          // (maroon, rose) needs light ink instead.
+          onPrimary:
+              ThemeData.estimateBrightnessForColor(p.saffron) == Brightness.dark
+              ? Colors.white
+              : brightness == Brightness.light
+              ? const Color(0xFF3A2500)
+              : const Color(0xFF241700),
+          surface: p.background,
+          onSurface: p.primaryText,
+          surfaceContainerHighest: p.card,
+          error: p.danger,
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -37,11 +56,7 @@ abstract final class AppTheme {
       textTheme: text,
       extensions: [p],
       splashFactory: InkSparkle.splashFactory,
-      dividerTheme: DividerThemeData(
-        color: p.divider,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: p.divider, thickness: 1, space: 1),
       appBarTheme: AppBarTheme(
         backgroundColor: p.background,
         surfaceTintColor: Colors.transparent,

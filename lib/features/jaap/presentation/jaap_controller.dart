@@ -14,8 +14,9 @@ import '../domain/jaap_session.dart';
 import '../domain/mala_math.dart';
 import 'jaap_state.dart';
 
-final jaapControllerProvider =
-    AsyncNotifierProvider<JaapController, JaapState>(JaapController.new);
+final jaapControllerProvider = AsyncNotifierProvider<JaapController, JaapState>(
+  JaapController.new,
+);
 
 /// Drives the counter.
 ///
@@ -107,13 +108,15 @@ class JaapController extends AsyncNotifier<JaapState> {
     final mantraId = current.mantra.id;
     final sessionId = _sessionId;
     _enqueue(
-      () => ref.read(jaapRepositoryProvider).addBeads(
-        mantraId: mantraId,
-        delta: delta,
-        source: source,
-        sessionId: sessionId,
-        at: now,
-      ),
+      () => ref
+          .read(jaapRepositoryProvider)
+          .addBeads(
+            mantraId: mantraId,
+            delta: delta,
+            source: source,
+            sessionId: sessionId,
+            at: now,
+          ),
     );
   }
 
@@ -149,18 +152,17 @@ class JaapController extends AsyncNotifier<JaapState> {
   }
 
   /// Adds beads counted somewhere else — a physical mala, a hand counter.
-  Future<void> addManualCount(int amount, {
+  Future<void> addManualCount(
+    int amount, {
     JaapSource source = JaapSource.manual,
   }) async {
     final current = state.value;
     if (current == null || amount <= 0) return;
 
     await flushPendingWrites();
-    await ref.read(jaapRepositoryProvider).addBeads(
-      mantraId: current.mantra.id,
-      delta: amount,
-      source: source,
-    );
+    await ref
+        .read(jaapRepositoryProvider)
+        .addBeads(mantraId: current.mantra.id, delta: amount, source: source);
     await _reloadFromLedger();
   }
 
@@ -280,14 +282,16 @@ class JaapController extends AsyncNotifier<JaapState> {
     if (current == null) return;
     try {
       final streak = await ref.read(streakProvider.future);
-      await ref.read(widgetServiceProvider).publish(
-        mantraDisplay: current.mantra.display,
-        beadsInCurrentMala: current.position.beadsInCurrentMala,
-        malaSize: current.mantra.malaSize,
-        todayTotal: current.todayTotal,
-        todayMalas: current.todayMalas,
-        streak: streak.current,
-      );
+      await ref
+          .read(widgetServiceProvider)
+          .publish(
+            mantraDisplay: current.mantra.name,
+            beadsInCurrentMala: current.position.beadsInCurrentMala,
+            malaSize: current.mantra.malaSize,
+            todayTotal: current.todayTotal,
+            todayMalas: current.todayMalas,
+            streak: streak.current,
+          );
     } on Object catch (error, stack) {
       AppLogger.e('Could not publish widget data', error, stack);
     }

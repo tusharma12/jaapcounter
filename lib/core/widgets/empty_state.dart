@@ -57,10 +57,7 @@ class EmptyState extends StatelessWidget {
                 style: theme.textTheme.bodyMedium,
               ),
             ],
-            if (action != null) ...[
-              const SizedBox(height: Insets.xl),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: Insets.xl), action!],
           ],
         ),
       ),

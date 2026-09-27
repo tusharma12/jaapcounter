@@ -59,11 +59,9 @@ void main() {
   ) async {
     // A 40 day vow begun 17 days ago, kept on 3 of those days.
     clock.set(DateTime(2026, 8, 17, 8));
-    await container.read(activeSadhanaProvider.notifier).begin(
-      mantraId: 'builtin.ram',
-      dailyGoal: 108,
-      durationDays: 40,
-    );
+    await container
+        .read(activeSadhanaProvider.notifier)
+        .begin(mantraId: 'builtin.ram', dailyGoal: 108, durationDays: 40);
     final repo = container.read(jaapRepositoryProvider);
     for (final day in [17, 18, 19]) {
       clock.set(DateTime(2026, 8, day, 8));
@@ -86,11 +84,9 @@ void main() {
     tester,
   ) async {
     clock.set(DateTime(2026, 8, 17, 8));
-    await container.read(activeSadhanaProvider.notifier).begin(
-      mantraId: 'builtin.ram',
-      dailyGoal: 108,
-      durationDays: 5,
-    );
+    await container
+        .read(activeSadhanaProvider.notifier)
+        .begin(mantraId: 'builtin.ram', dailyGoal: 108, durationDays: 5);
 
     // Well past the fifth day.
     clock.set(DateTime(2026, 9, 3, 9));

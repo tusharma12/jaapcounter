@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
+import '../../features/mantras/domain/mantra.dart';
 import '../constants/built_in_mantras.dart';
 import '../services/app_logger.dart';
 
@@ -9,7 +10,7 @@ import '../services/app_logger.dart';
 /// anywhere. [openTestDatabase] lets the same schema run in unit tests.
 abstract final class AppDatabase {
   static const String fileName = 'japmala.db';
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 5;
 
   static Future<Database> open({DatabaseFactory? factory}) async {
     final f = factory ?? databaseFactory;
@@ -52,9 +53,102 @@ abstract final class AppDatabase {
     AppLogger.i('Migrating database from v$from to v$to');
     // Future migrations append here, one `if (from < n)` block each, so an
     // install can hop several versions in a single upgrade.
+    if (from < 5) {
+      // First, because every seeding step below writes a description. Checked,
+      // so an upgrade interrupted after this line can safely run again.
+      final columns = await db.rawQuery('PRAGMA table_info(mantras)');
+      if (!columns.any((c) => c['name'] == 'description')) {
+        await db.execute('ALTER TABLE mantras ADD COLUMN description TEXT');
+      }
+    }
     if (from < 2) {
       // v2 ships Sikh and Jain mantras; seeding ignores rows already present.
       await _seedBuiltInMantras(db);
+    }
+    if (from < 3) {
+      // v3 corrects the Sikh transliterations and adds the full Hare Krishna
+      // Mahamantra. Only text still as it shipped is touched, so a user's own
+      // edits to a built-in survive.
+      const corrections = {
+        'builtin.waheguru': ('Vāhegurū', 'Vāheguru'),
+        'builtin.satnam-waheguru': ('Satnām Vāhegurū', 'Satnām Vāheguru'),
+      };
+      for (final MapEntry(key: id, value: (before, after))
+          in corrections.entries) {
+        await db.update(
+          'mantras',
+          {'transliteration': after},
+          where: 'id = ? AND transliteration = ?',
+          whereArgs: [id, before],
+        );
+      }
+      // Built-ins are listed by sort order, so renumber them to make room.
+      final batch = db.batch();
+      for (final mantra in BuiltInMantras.all) {
+        batch.update(
+          'mantras',
+          {'sort_order': mantra.sortOrder},
+          where: 'id = ? AND is_built_in = 1',
+          whereArgs: [mantra.id],
+        );
+      }
+      await batch.commit(noResult: true);
+      await _seedBuiltInMantras(db);
+    }
+    if (from < 4) {
+      // v4 no longer ships the Mool Mantar, Navkar and Om Hreem Arham Namah.
+      await _retireBuiltInMantras(db);
+    }
+    if (from < 5) {
+      // v5: a mantra is its text plus an optional description, in place of
+      // a Latin name with optional Devanagari and transliteration. Rows the
+      // steps above seeded are already in the new shape and pass unchanged.
+      final rows = await db.query('mantras');
+      final batch = db.batch();
+      for (final row in rows) {
+        final (name, description) = Mantra.fromLegacy(
+          name: row['name'] as String,
+          devanagari: row['devanagari'] as String?,
+          transliteration: row['transliteration'] as String?,
+        );
+        batch.update(
+          'mantras',
+          {
+            'name': name,
+            // A built-in's old fields were only its romanised name.
+            'description': row['is_built_in'] == 1 ? null : description,
+            'devanagari': null,
+            'transliteration': null,
+          },
+          where: 'id = ?',
+          whereArgs: [row['id']],
+        );
+      }
+      await batch.commit(noResult: true);
+    }
+  }
+
+  /// Removes built-ins that are no longer shipped. One that was never used
+  /// simply goes; one with Jaap or a Sankalp recorded against it becomes the
+  /// user's own mantra instead, so no history is left pointing at nothing,
+  /// and the user can still delete it themselves.
+  static Future<void> _retireBuiltInMantras(Database db) async {
+    for (final id in BuiltInMantras.retiredIds) {
+      final used = await db.rawQuery(
+        'SELECT 1 FROM jaap_entries WHERE mantra_id = ? '
+        'UNION ALL SELECT 1 FROM sadhanas WHERE mantra_id = ? LIMIT 1',
+        [id, id],
+      );
+      if (used.isEmpty) {
+        await db.delete('mantras', where: 'id = ?', whereArgs: [id]);
+      } else {
+        await db.update(
+          'mantras',
+          {'is_built_in': 0},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+      }
     }
   }
 
@@ -65,8 +159,7 @@ abstract final class AppDatabase {
       CREATE TABLE mantras (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        devanagari TEXT,
-        transliteration TEXT,
+        description TEXT,
         mala_size INTEGER NOT NULL DEFAULT 108,
         is_built_in INTEGER NOT NULL DEFAULT 0,
         sort_order INTEGER NOT NULL DEFAULT 0,
@@ -154,10 +247,13 @@ abstract final class AppDatabase {
     await batch.commit(noResult: true);
   }
 
-  /// Re-seeds the built-in mantras. Used after a restore so a backup made on
-  /// an older version never leaves the library empty.
-  static Future<void> ensureBuiltInMantras(Database db) =>
-      _seedBuiltInMantras(db);
+  /// Re-seeds the built-in mantras and retires old ones. Used after a restore,
+  /// so a backup made on an older version never leaves the library empty.
+  static Future<void> ensureBuiltInMantras(Database db) async {
+    await _seedBuiltInMantras(db);
+    // A backup from an older version may bring retired built-ins back.
+    await _retireBuiltInMantras(db);
+  }
 
   /// Wipes every table and re-seeds. Behind explicit confirmation only.
   static Future<void> clearAll(Database db) async {

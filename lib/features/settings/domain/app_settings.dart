@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/theme/app_themes.dart';
 import '../../../core/constants/app_constants.dart';
+import 'counter_background.dart';
+import 'mala_style.dart';
 
 @immutable
 class AppSettings {
   const AppSettings({
-    this.themeMode = ThemeMode.system,
+    this.themeId = AppThemeId.system,
     this.localeCode,
     this.hapticsEnabled = true,
     this.soundEnabled = false,
@@ -14,9 +17,18 @@ class AppSettings {
     this.fallbackDailyGoal = AppConstants.defaultDailyGoal,
     this.storyTextScale = 1.0,
     this.keepScreenOnInMeditation = true,
+    this.background = CounterBackground.none,
+    this.backgroundPhotoPath,
+    this.backgroundDim = defaultBackgroundDim,
+    this.fallingMantra = true,
+    this.malaStyle = MalaStyle.beads,
   });
 
-  final ThemeMode themeMode;
+  static const double defaultBackgroundDim = 0.45;
+  static const double minBackgroundDim = 0.0;
+  static const double maxBackgroundDim = 0.85;
+
+  final AppThemeId themeId;
 
   /// `null` follows the device language.
   final String? localeCode;
@@ -34,10 +46,34 @@ class AppSettings {
   final double storyTextScale;
   final bool keepScreenOnInMeditation;
 
+  /// What is drawn behind the counter.
+  final CounterBackground background;
+
+  /// The copied photo, inside the app's own documents directory. Only
+  /// meaningful when [background] is [CounterBackground.photo].
+  final String? backgroundPhotoPath;
+
+  /// How much of the theme's background colour is laid over the picture, so
+  /// the mantra and count stay readable on a busy photo.
+  final double backgroundDim;
+
+  /// Each bead sends the mantra drifting down behind the counter.
+  final bool fallingMantra;
+
+  /// Beads or a plain ring, on the counter and in meditation.
+  final MalaStyle malaStyle;
+
   Locale? get locale => localeCode == null ? null : Locale(localeCode!);
 
+  /// Light or dark as far as the platform is concerned.
+  ThemeMode get themeMode => switch (AppThemeSpec.of(themeId)?.brightness) {
+    null => ThemeMode.system,
+    Brightness.light => ThemeMode.light,
+    Brightness.dark => ThemeMode.dark,
+  };
+
   AppSettings copyWith({
-    ThemeMode? themeMode,
+    AppThemeId? themeId,
     Object? localeCode = _sentinel,
     bool? hapticsEnabled,
     bool? soundEnabled,
@@ -46,9 +82,14 @@ class AppSettings {
     int? fallbackDailyGoal,
     double? storyTextScale,
     bool? keepScreenOnInMeditation,
+    CounterBackground? background,
+    Object? backgroundPhotoPath = _sentinel,
+    double? backgroundDim,
+    bool? fallingMantra,
+    MalaStyle? malaStyle,
   }) {
     return AppSettings(
-      themeMode: themeMode ?? this.themeMode,
+      themeId: themeId ?? this.themeId,
       localeCode: localeCode == _sentinel
           ? this.localeCode
           : localeCode as String?,
@@ -62,11 +103,29 @@ class AppSettings {
       storyTextScale: storyTextScale ?? this.storyTextScale,
       keepScreenOnInMeditation:
           keepScreenOnInMeditation ?? this.keepScreenOnInMeditation,
+      background: background ?? this.background,
+      backgroundPhotoPath: backgroundPhotoPath == _sentinel
+          ? this.backgroundPhotoPath
+          : backgroundPhotoPath as String?,
+      backgroundDim: backgroundDim ?? this.backgroundDim,
+      fallingMantra: fallingMantra ?? this.fallingMantra,
+      malaStyle: malaStyle ?? this.malaStyle,
     );
   }
 
+  /// Maps the light/dark/system choice older versions stored onto a theme.
+  static AppThemeId? themeIdFromLegacyMode(String? mode) => switch (mode) {
+    'light' => AppThemeId.white,
+    'dark' => AppThemeId.black,
+    'system' => AppThemeId.system,
+    _ => null,
+  };
+
   /// Parses the `settings` section of a backup. Anything missing or of the
   /// wrong type falls back to [fallback], so an older backup still restores.
+  ///
+  /// The counter background is deliberately not part of a backup: a photo
+  /// lives on this device only.
   factory AppSettings.fromJson(
     Map<String, Object?> json, {
     required AppSettings fallback,
@@ -77,12 +136,9 @@ class AppSettings {
     }
 
     return fallback.copyWith(
-      themeMode: switch (read<String>('themeMode')) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        'system' => ThemeMode.system,
-        _ => null,
-      },
+      themeId:
+          AppThemeId.tryParse(read<String>('themeId')) ??
+          themeIdFromLegacyMode(read<String>('themeMode')),
       localeCode: json.containsKey('localeCode')
           ? read<String>('localeCode')
           : fallback.localeCode,
@@ -94,10 +150,15 @@ class AppSettings {
       fallbackDailyGoal: read<int>('fallbackDailyGoal'),
       storyTextScale: read<num>('storyTextScale')?.toDouble(),
       keepScreenOnInMeditation: read<bool>('keepScreenOnInMeditation'),
+      fallingMantra: read<bool>('fallingMantra'),
+      malaStyle: MalaStyle.tryParse(read<String>('malaStyle')),
     );
   }
 
   Map<String, Object?> toJson() => {
+    'themeId': themeId.name,
+    // Still written so an older version restoring this backup keeps the
+    // closest light/dark choice.
     'themeMode': themeMode.name,
     'localeCode': localeCode,
     'hapticsEnabled': hapticsEnabled,
@@ -106,12 +167,14 @@ class AppSettings {
     'fallbackDailyGoal': fallbackDailyGoal,
     'storyTextScale': storyTextScale,
     'keepScreenOnInMeditation': keepScreenOnInMeditation,
+    'fallingMantra': fallingMantra,
+    'malaStyle': malaStyle.name,
   };
 
   @override
   bool operator ==(Object other) =>
       other is AppSettings &&
-      other.themeMode == themeMode &&
+      other.themeId == themeId &&
       other.localeCode == localeCode &&
       other.hapticsEnabled == hapticsEnabled &&
       other.soundEnabled == soundEnabled &&
@@ -119,11 +182,16 @@ class AppSettings {
       other.activeMantraId == activeMantraId &&
       other.fallbackDailyGoal == fallbackDailyGoal &&
       other.storyTextScale == storyTextScale &&
-      other.keepScreenOnInMeditation == keepScreenOnInMeditation;
+      other.keepScreenOnInMeditation == keepScreenOnInMeditation &&
+      other.background == background &&
+      other.backgroundPhotoPath == backgroundPhotoPath &&
+      other.backgroundDim == backgroundDim &&
+      other.fallingMantra == fallingMantra &&
+      other.malaStyle == malaStyle;
 
   @override
   int get hashCode => Object.hash(
-    themeMode,
+    themeId,
     localeCode,
     hapticsEnabled,
     soundEnabled,
@@ -132,6 +200,11 @@ class AppSettings {
     fallbackDailyGoal,
     storyTextScale,
     keepScreenOnInMeditation,
+    background,
+    backgroundPhotoPath,
+    backgroundDim,
+    fallingMantra,
+    malaStyle,
   );
 }
 

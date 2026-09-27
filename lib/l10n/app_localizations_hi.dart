@@ -171,15 +171,6 @@ class AppL10nHi extends AppL10n {
   String get editMantra => 'मंत्र बदलें';
 
   @override
-  String get mantraName => 'नाम';
-
-  @override
-  String get mantraDevanagari => 'देवनागरी';
-
-  @override
-  String get mantraTransliteration => 'उच्चारण';
-
-  @override
   String get malaSize => 'माला का आकार';
 
   @override
@@ -352,9 +343,6 @@ class AppL10nHi extends AppL10n {
   String get yearlyJaap => 'वार्षिक जाप';
 
   @override
-  String get activity => 'सक्रियता';
-
-  @override
   String ofGoal(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -472,15 +460,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get theme => 'थीम';
-
-  @override
-  String get themeSystem => 'सिस्टम';
-
-  @override
-  String get themeLight => 'उजला';
-
-  @override
-  String get themeDark => 'गहरा';
 
   @override
   String get haptics => 'कंपन';
@@ -706,12 +685,6 @@ class AppL10nHi extends AppL10n {
   }
 
   @override
-  String get autoJaapSpeak => 'स्वर में जाप';
-
-  @override
-  String get autoJaapSpeakHint => 'हर मनके से पहले फ़ोन मंत्र बोलेगा';
-
-  @override
   String get autoJaapStopAfter => 'कब रुकें';
 
   @override
@@ -758,11 +731,6 @@ class AppL10nHi extends AppL10n {
   String get changeTheme => 'थीम बदलें';
 
   @override
-  String themeChanged(String name) {
-    return 'थीम: $name';
-  }
-
-  @override
   String streakDays(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -777,61 +745,159 @@ class AppL10nHi extends AppL10n {
   String get menu => 'मेनू';
 
   @override
-  String get autoJaapVoice => 'आवाज़';
+  String get chooseTheme => 'थीम चुनें';
 
   @override
-  String get autoJaapVoiceDefault => 'डिफ़ॉल्ट हिंदी आवाज़';
+  String get themeAuto => 'स्वचालित';
 
   @override
-  String get autoJaapChooseVoice => 'आवाज़ चुनें';
+  String get themeWhite => 'सफ़ेद';
 
   @override
-  String get autoJaapVoiceHintIos =>
-      'सबसे स्वाभाविक, शांत ध्वनि के लिए सेटिंग्स → एक्सेसिबिलिटी → स्पोकन कंटेंट → वॉइसेस → हिंदी में Enhanced या Premium हिंदी आवाज़ डाउनलोड करें, फिर यहाँ लौटें।';
+  String get themeBlack => 'काला';
 
   @override
-  String get autoJaapVoiceHintAndroid =>
-      'अधिक स्वाभाविक ध्वनि के लिए सेटिंग्स → एक्सेसिबिलिटी → टेक्स्ट-टू-स्पीच में हिंदी आवाज़ इंस्टॉल करें।';
+  String get themePastelPink => 'हल्का गुलाबी';
 
   @override
-  String get autoJaapShowAllVoices => 'सभी भाषाएँ दिखाएँ';
+  String get themeSpiritual => 'आध्यात्मिक';
 
   @override
-  String get autoJaapNoVoices => 'इस डिवाइस पर कोई आवाज़ नहीं मिली।';
+  String get themeSaffron => 'केसरिया';
 
   @override
-  String get autoJaapSpeed => 'गति';
+  String get themePeaceful => 'शांत';
 
   @override
-  String get autoJaapPitch => 'स्वर';
+  String get themeTerracotta => 'टेराकोटा';
 
   @override
-  String get autoJaapSlow => 'धीमा';
+  String get themeMeditative => 'ध्यान';
 
   @override
-  String get autoJaapFast => 'तेज़';
+  String get themeNature => 'प्रकृति';
 
   @override
-  String get autoJaapDeep => 'गहरा';
+  String get themeRoseGold => 'रोज़ गोल्ड';
 
   @override
-  String get autoJaapHigh => 'ऊँचा';
+  String get themeOcean => 'सागर';
 
   @override
-  String get autoJaapPreview => 'सुनें';
+  String get themeLavender => 'लैवेंडर';
 
   @override
-  String get autoJaapResetVoice => 'शांत डिफ़ॉल्ट पर लौटें';
+  String get themeCharcoal => 'चारकोल';
 
   @override
-  String get voiceQualityEnhanced => 'Enhanced';
+  String get counterBackground => 'काउंटर पृष्ठभूमि';
 
   @override
-  String get voiceQualityPremium => 'Premium';
+  String get counterBackgroundBody =>
+      'काउंटर पर मंत्र और मनकों के पीछे दिखती है।';
 
   @override
-  String get languagePunjabi => 'पंजाबी';
+  String get backgroundNone => 'कोई नहीं';
 
   @override
-  String get languageEnglishIndia => 'अंग्रेज़ी (भारत)';
+  String get backgroundDawn => 'भोर';
+
+  @override
+  String get backgroundDusk => 'संध्या';
+
+  @override
+  String get backgroundLotus => 'कमल';
+
+  @override
+  String get backgroundForest => 'वन';
+
+  @override
+  String get backgroundOcean => 'सागर';
+
+  @override
+  String get backgroundCosmos => 'ब्रह्मांड';
+
+  @override
+  String get backgroundPhoto => 'मेरी फ़ोटो';
+
+  @override
+  String get backgroundChoosePhoto => 'फ़ोटो चुनें';
+
+  @override
+  String get backgroundChangePhoto => 'फ़ोटो बदलें';
+
+  @override
+  String get backgroundRemovePhoto => 'फ़ोटो हटाएँ';
+
+  @override
+  String get backgroundDim => 'पृष्ठभूमि मंद करें';
+
+  @override
+  String get backgroundDimHint => 'अधिक मंद करने से मंत्र पढ़ना आसान रहता है।';
+
+  @override
+  String get addOwnMantra => 'अपना मंत्र जोड़ें';
+
+  @override
+  String get addOwnMantraHint =>
+      'कोई भी नाम या मंत्र, किसी भी लिपि में, अपनी माला के आकार के साथ';
+
+  @override
+  String get legendLess => 'कम';
+
+  @override
+  String get legendMore => 'अधिक';
+
+  @override
+  String get allMantras => 'सभी मंत्र';
+
+  @override
+  String get previousPeriod => 'पिछला';
+
+  @override
+  String get nextPeriod => 'अगला';
+
+  @override
+  String get showStatsFor => 'इसके आँकड़े दिखाएँ';
+
+  @override
+  String selectionSummary(String label, String count, String malas) {
+    return '$label · $count जाप · $malas माला';
+  }
+
+  @override
+  String get dailyJaap => 'दैनिक जाप';
+
+  @override
+  String get mantraText => 'मंत्र';
+
+  @override
+  String get mantraTextHint => 'जैसे राम या ॐ नमः शिवाय';
+
+  @override
+  String get mantraRequired => 'कृपया मंत्र लिखें';
+
+  @override
+  String get mantraDescription => 'विवरण';
+
+  @override
+  String get mantraDescriptionHint => 'अर्थ, स्रोत, या अपने लिए कोई नोट';
+
+  @override
+  String get fallingMantra => 'गिरता मंत्र';
+
+  @override
+  String get malaStyle => 'माला की शैली';
+
+  @override
+  String get malaStyleBeads => 'मनके';
+
+  @override
+  String get malaStyleRing => 'प्रगति वलय';
+
+  @override
+  String get sectionCounter => 'काउंटर';
+
+  @override
+  String get showMantraOnCounter => 'काउंटर पर मंत्र दिखाएँ';
 }
