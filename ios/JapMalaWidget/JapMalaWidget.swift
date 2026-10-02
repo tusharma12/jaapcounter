@@ -171,5 +171,8 @@ struct JapMalaWidget: Widget {
 
 @main
 struct JapMalaWidgetBundle: WidgetBundle {
-    var body: some Widget { JapMalaWidget() }
+    var body: some Widget {
+        JapMalaWidget()
+        JapMalaLiveActivity()
+    }
 }

@@ -13,6 +13,8 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/mantra_text.dart';
 import '../../../core/widgets/stat_tile.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/widgets/section_header.dart';
+import '../../festivals/presentation/observances_card.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../mantras/domain/mantra.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
@@ -80,6 +82,9 @@ class SadhanaScreen extends ConsumerWidget {
               completedDays: completedDays,
               onEnd: () => _endSankalp(context, ref, sadhana),
             ),
+          const SizedBox(height: Insets.xl),
+          ScreenSectionTitle(l10n.upcomingObservances),
+          const ObservancesCard(),
           const SizedBox(height: Insets.xl),
           const _GoalRow(),
           const SizedBox(height: Insets.md),
@@ -240,6 +245,11 @@ class _SankalpCard extends ConsumerWidget {
           Text(
             total == null
                 ? goalLabel(l10n, sadhana.dailyGoal, malaSize, locale)
+                // A vow taken ahead of its observance has not begun yet.
+                : dayNumber == 0
+                ? l10n.sankalpBegins(
+                    Fmt.dayLabel(DayKeys.parse(sadhana.startDay), locale),
+                  )
                 : l10n.dayXofY(dayNumber, total),
             style: theme.textTheme.headlineSmall,
           ),

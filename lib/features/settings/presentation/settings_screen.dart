@@ -17,6 +17,7 @@ import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../backup/presentation/backup_controllers.dart';
+import '../../diagnostics/presentation/diagnostics_sheet.dart';
 import '../../jaap/presentation/counter_prefs.dart';
 import '../../jaap/presentation/jaap_controller.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
@@ -24,9 +25,12 @@ import '../../reminders/domain/reminder.dart';
 import '../../reminders/presentation/reminder_controllers.dart';
 import '../../reminders/presentation/reminders_screen.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
+import '../../jaap/presentation/widgets/hardware_count_keys.dart';
+import '../domain/app_settings.dart';
 import '../domain/mala_style.dart';
 import 'appearance_sheets.dart';
 import 'settings_controller.dart';
+import '../../../core/constants/app_languages.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -61,6 +65,13 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.auto_awesome_outlined,
                 onTap: () => context.push('/sadhana'),
               ),
+              _SwitchRow(
+                label: l10n.graceDays,
+                subtitle: l10n.graceDaysHint,
+                icon: Icons.healing_outlined,
+                value: settings.graceDaysEnabled,
+                onChanged: controller.setGraceDays,
+              ),
               _NavRow(
                 label: l10n.resetCounts,
                 icon: Icons.restart_alt_rounded,
@@ -87,6 +98,22 @@ class SettingsScreen extends ConsumerWidget {
                 kind: ReminderKind.goal,
                 label: l10n.goalReminder,
                 defaultMinutes: 19 * 60,
+              ),
+              _SwitchRow(
+                label: l10n.festivalReminders,
+                subtitle: l10n.festivalRemindersHint,
+                icon: Icons.nightlight_outlined,
+                value: settings.festivalReminders,
+                onChanged: (on) async {
+                  final reminders = ref.read(remindersProvider.notifier);
+                  if (on) await reminders.requestPermission();
+                  await controller.setFestivalReminders(on);
+                  if (context.mounted) {
+                    await reminders.reschedule(
+                      RemindersScreen.copyFrom(AppL10n.of(context)),
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -116,6 +143,31 @@ class SettingsScreen extends ConsumerWidget {
                   MalaStyle.ring => l10n.malaStyleRing,
                 },
                 onTap: () => _pickMalaStyle(context, ref),
+              ),
+              _SwitchRow(
+                label: l10n.countWithButtons,
+                subtitle: HardwareCountKeys.volumeButtonsSupported
+                    ? l10n.countWithButtonsHintAndroid
+                    : l10n.countWithButtonsHintIOS,
+                icon: Icons.touch_app_outlined,
+                value: settings.hardwareKeyCounting,
+                onChanged: controller.setHardwareKeyCounting,
+              ),
+              if (ref.watch(lockScreenSupportedProvider).value ?? false)
+                _SwitchRow(
+                  label: l10n.lockScreenCounter,
+                  subtitle: l10n.lockScreenCounterHint,
+                  icon: Icons.lock_clock_outlined,
+                  value: settings.lockScreenCounter,
+                  onChanged: controller.setLockScreenCounter,
+                ),
+              _NavRow(
+                label: l10n.markerBead,
+                icon: Icons.adjust_rounded,
+                value: settings.beadMarkerInterval == 0
+                    ? l10n.markerBeadOff
+                    : l10n.markerBeadEvery(settings.beadMarkerInterval),
+                onTap: () => _pickMarkerBead(context, ref),
               ),
               _SwitchRow(
                 label: l10n.fallingMantra,
@@ -161,11 +213,9 @@ class SettingsScreen extends ConsumerWidget {
               _NavRow(
                 label: l10n.language,
                 icon: Icons.translate_rounded,
-                value: switch (settings.localeCode) {
-                  'en' => l10n.languageEnglish,
-                  'hi' => l10n.languageHindi,
-                  _ => l10n.languageSystem,
-                },
+                value:
+                    AppLanguages.names[settings.localeCode] ??
+                    l10n.languageSystem,
                 onTap: () => _pickLanguage(context, ref),
               ),
             ],
@@ -192,7 +242,7 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.star_border_rounded,
                 onTap: () => _open(
                   Theme.of(context).platform == TargetPlatform.iOS
-                      ? AppConstants.iosStoreUrl
+                      ? AppConstants.iosReviewUrl
                       : AppConstants.androidStoreUrl,
                 ),
               ),
@@ -200,7 +250,11 @@ class SettingsScreen extends ConsumerWidget {
                 label: l10n.shareApp,
                 icon: Icons.ios_share_rounded,
                 onTap: () => SharePlus.instance.share(
-                  ShareParams(text: '${l10n.appName} - ${l10n.tagline}'),
+                  ShareParams(
+                    text:
+                        '${l10n.appName} - ${l10n.tagline}\n'
+                        '${Theme.of(context).platform == TargetPlatform.iOS ? AppConstants.iosStoreUrl : AppConstants.androidStoreUrl}',
+                  ),
                 ),
               ),
               _NavRow(
@@ -210,6 +264,11 @@ class SettingsScreen extends ConsumerWidget {
                   'mailto:${AppConstants.supportEmail}'
                   '?subject=${Uri.encodeComponent(l10n.feedbackEmailSubject)}',
                 ),
+              ),
+              _NavRow(
+                label: l10n.sendDiagnostics,
+                icon: Icons.bug_report_outlined,
+                onTap: () => showDiagnosticsSheet(context),
               ),
             ],
           ),
@@ -290,6 +349,54 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _pickMarkerBead(BuildContext context, WidgetRef ref) async {
+    final l10n = AppL10n.of(context);
+    final current = ref.read(settingsProvider).beadMarkerInterval;
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Insets.page,
+                0,
+                Insets.page,
+                Insets.md,
+              ),
+              child: Text(
+                l10n.markerBeadHint,
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                  color: sheetContext.palette.secondaryText,
+                ),
+              ),
+            ),
+            for (final interval in AppSettings.beadMarkerIntervals)
+              ListTile(
+                title: Text(
+                  interval == 0
+                      ? l10n.markerBeadOff
+                      : l10n.markerBeadEvery(interval),
+                ),
+                trailing: interval == current
+                    ? const Icon(Icons.check_rounded)
+                    : null,
+                onTap: () {
+                  ref
+                      .read(settingsProvider.notifier)
+                      .setBeadMarkerInterval(interval);
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+            const SizedBox(height: Insets.lg),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
     final l10n = AppL10n.of(context);
     final current = ref.read(settingsProvider).localeCode;
@@ -302,8 +409,7 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             for (final entry in <String?, String>{
               null: l10n.languageSystem,
-              'en': l10n.languageEnglish,
-              'hi': l10n.languageHindi,
+              ...AppLanguages.names,
             }.entries)
               ListTile(
                 title: Text(entry.value),
@@ -531,20 +637,27 @@ class _SwitchRow extends StatelessWidget {
     required this.icon,
     required this.value,
     required this.onChanged,
+    this.subtitle,
   });
 
   final String label;
   final IconData icon;
   final bool value;
   final ValueChanged<bool> onChanged;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, size: 20),
-      title: Text(label),
-      onTap: () => onChanged(!value),
-      trailing: Switch(value: value, onChanged: onChanged),
+    // One node for the row and its switch, so a screen reader announces the
+    // label with the toggle instead of a bare, unnamed switch.
+    return MergeSemantics(
+      child: ListTile(
+        leading: Icon(icon, size: 20),
+        title: Text(label),
+        subtitle: subtitle == null ? null : Text(subtitle!),
+        onTap: () => onChanged(!value),
+        trailing: Switch(value: value, onChanged: onChanged),
+      ),
     );
   }
 }
@@ -582,43 +695,45 @@ class _SingletonReminderRow extends ConsumerWidget {
       await controller.reschedule(RemindersScreen.copyFrom(l10n));
     }
 
-    return ListTile(
-      leading: Icon(
-        kind == ReminderKind.streak
-            ? Icons.local_fire_department_outlined
-            : Icons.flag_outlined,
-        size: 20,
-      ),
-      title: Text(label),
-      subtitle: enabled ? Text(time.format(context)) : null,
-      onTap: !enabled
-          ? null
-          : () async {
-              final picked = await showTimePicker(
-                context: context,
-                initialTime: time,
-                helpText: l10n.reminderTime,
-              );
-              if (picked == null) return;
-              await apply(
-                on: true,
-                newMinutes: picked.hour * 60 + picked.minute,
-              );
-            },
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Switch(
-            value: enabled,
-            onChanged: (on) => apply(on: on),
-          ),
-          if (enabled)
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 20,
-              color: palette.tertiaryText,
+    return MergeSemantics(
+      child: ListTile(
+        leading: Icon(
+          kind == ReminderKind.streak
+              ? Icons.local_fire_department_outlined
+              : Icons.flag_outlined,
+          size: 20,
+        ),
+        title: Text(label),
+        subtitle: enabled ? Text(time.format(context)) : null,
+        onTap: !enabled
+            ? null
+            : () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: time,
+                  helpText: l10n.reminderTime,
+                );
+                if (picked == null) return;
+                await apply(
+                  on: true,
+                  newMinutes: picked.hour * 60 + picked.minute,
+                );
+              },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Switch(
+              value: enabled,
+              onChanged: (on) => apply(on: on),
             ),
-        ],
+            if (enabled)
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: palette.tertiaryText,
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -35,6 +35,7 @@ class ActiveSadhanaController extends AsyncNotifier<Sadhana?> {
     int? durationDays,
     bool reminderEnabled = false,
     int? reminderMinutes,
+    DateTime? startAt,
   }) async {
     final sadhana = await ref
         .read(sadhanaRepositoryProvider)
@@ -44,6 +45,7 @@ class ActiveSadhanaController extends AsyncNotifier<Sadhana?> {
           durationDays: durationDays,
           reminderEnabled: reminderEnabled,
           reminderMinutes: reminderMinutes,
+          startAt: startAt,
         );
     // The goal a Sankalp sets becomes the app's daily goal from now on.
     await ref.read(settingsProvider.notifier).setFallbackDailyGoal(dailyGoal);
@@ -96,6 +98,7 @@ final streakProvider = FutureProvider<StreakInfo>((ref) async {
     totalsByDay: totals,
     today: ref.watch(clockProvider)(),
     goalFor: ref.watch(goalForDayProvider),
+    graceDays: ref.watch(settingsProvider.select((s) => s.graceDaysEnabled)),
   );
 });
 

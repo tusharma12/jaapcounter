@@ -122,6 +122,26 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setKeepScreenOn(bool enabled) =>
       _save(state.copyWith(keepScreenOnInMeditation: enabled));
 
+  Future<void> setHardwareKeyCounting(bool enabled) =>
+      _save(state.copyWith(hardwareKeyCounting: enabled));
+
+  Future<void> setBeadMarkerInterval(int interval) => _save(
+    state.copyWith(
+      beadMarkerInterval: AppSettings.beadMarkerIntervals.contains(interval)
+          ? interval
+          : 0,
+    ),
+  );
+
+  Future<void> setGraceDays(bool enabled) =>
+      _save(state.copyWith(graceDaysEnabled: enabled));
+
+  Future<void> setFestivalReminders(bool enabled) =>
+      _save(state.copyWith(festivalReminders: enabled));
+
+  Future<void> setLockScreenCounter(bool enabled) =>
+      _save(state.copyWith(lockScreenCounter: enabled));
+
   Future<void> completeOnboarding() =>
       _save(state.copyWith(onboardingComplete: true));
 }

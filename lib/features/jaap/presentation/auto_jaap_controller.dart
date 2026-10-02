@@ -133,6 +133,35 @@ class AutoJaapController extends Notifier<AutoJaapState> {
     _generation++;
     state = state.copyWith(running: false);
     _applyWakelock(false);
+    unawaited(_stopVoice());
+  }
+
+  /// Plays the active mantra's own recording, if it has one, and completes
+  /// when it ends. Auto Jaap then chants at the pace of the user's voice
+  /// when a recording is longer than the chosen interval.
+  Future<void> _playVoice() async {
+    try {
+      final mantra = ref.read(activeMantraProvider);
+      if (mantra == null || !mantra.hasAudio) return;
+      final store = ref.read(voiceNoteStoreProvider);
+      if (!await store.exists(mantra.audioPath)) return;
+      await ref
+          .read(mantraAudioServiceProvider)
+          .playToEnd(await store.pathFor(mantra.audioPath!));
+    } on Object catch (error, stack) {
+      // A recording that will not play must not stop the counting.
+      AppLogger.e('Could not play the mantra recording', error, stack);
+    }
+  }
+
+  Future<void> _stopVoice() async {
+    try {
+      if (ref.read(activeMantraProvider)?.hasAudio ?? false) {
+        await ref.read(mantraAudioServiceProvider).stopPlayback();
+      }
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not stop the mantra recording', error, stack);
+    }
   }
 
   Future<void> _run(
@@ -144,6 +173,7 @@ class AutoJaapController extends Notifier<AutoJaapState> {
       final config = state.config;
       final beadStarted = DateTime.now();
 
+      final voice = _playVoice();
       ref.read(jaapControllerProvider.notifier).count(1, JaapSource.auto);
 
       final jaap = ref.read(jaapControllerProvider).value;
@@ -154,14 +184,19 @@ class AutoJaapController extends Notifier<AutoJaapState> {
           AutoJaapStop.never => false,
         };
         if (done) {
-          stop();
+          // Let the last recording finish rather than cutting it off.
+          await voice;
+          if (generation == _generation) stop();
           return;
         }
       }
 
       final remaining =
           config.interval - DateTime.now().difference(beadStarted);
-      if (remaining > Duration.zero) await Future<void>.delayed(remaining);
+      await Future.wait([
+        voice,
+        if (remaining > Duration.zero) Future<void>.delayed(remaining),
+      ]);
     }
   }
 

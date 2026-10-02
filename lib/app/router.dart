@@ -17,6 +17,7 @@ import '../features/settings/presentation/settings_screen.dart';
 import '../features/stories/presentation/stories_screen.dart';
 import '../features/stories/presentation/story_screen.dart';
 import 'app_shell.dart';
+import '../features/progress/presentation/year_review_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -69,6 +70,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/backup',
         parentNavigatorKey: rootKey,
         builder: (context, state) => const BackupScreen(),
+      ),
+      GoRoute(
+        path: '/year-review',
+        parentNavigatorKey: rootKey,
+        builder: (context, state) => const YearReviewScreen(),
       ),
       GoRoute(
         path: '/about',

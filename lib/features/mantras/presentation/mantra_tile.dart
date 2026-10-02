@@ -65,7 +65,8 @@ class MantraTile extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: Insets.md),
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
                         l10n.beads(mantra.malaSize),

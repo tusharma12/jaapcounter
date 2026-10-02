@@ -141,4 +141,37 @@ void main() {
       expect(MalaMath.malasIn(-5, 108), 0);
     });
   });
+
+  group('marker beads', () {
+    bool marks(int before, {int delta = 1, int size = 108, int every = 27}) =>
+        MalaMath.crossesMarker(
+          beadsBefore: before,
+          delta: delta,
+          malaSize: size,
+          interval: every,
+        );
+
+    test('fall every interval within the mala', () {
+      expect(marks(26), isTrue, reason: 'bead 27');
+      expect(marks(53), isTrue, reason: 'bead 54');
+      expect(marks(80), isTrue, reason: 'bead 81');
+      expect(marks(27), isFalse, reason: 'bead 28');
+    });
+
+    test('leave the mala\'s own end to the mala signal', () {
+      expect(marks(107), isFalse);
+      expect(marks(53, every: 54), isTrue);
+      expect(marks(107, every: 54), isFalse);
+    });
+
+    test('are off at 0, or when as large as the mala', () {
+      expect(marks(26, every: 0), isFalse);
+      expect(marks(26, size: 27), isFalse);
+    });
+
+    test('are caught by a multi-bead step', () {
+      expect(marks(20, delta: 10), isTrue);
+      expect(marks(0, delta: 10), isFalse);
+    });
+  });
 }

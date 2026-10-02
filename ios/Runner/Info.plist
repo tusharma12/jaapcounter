@@ -22,6 +22,8 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -58,14 +60,27 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<!-- The lock-screen counter (a Live Activity with a +1 button). -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<!-- The app ships no encryption of its own. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Recording a mantra's voice note, and transcribing speech typed by voice. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Used to record your own voice chanting a mantra, and to fill in the mantra text by speaking it.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Used to turn your spoken words into the mantra text. Recognition happens on this iPhone; your voice is never sent anywhere.</string>
 	<!-- Hindi is a first-class language, not a fallback. -->
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
 		<string>hi</string>
+		<string>mr</string>
+		<string>gu</string>
+		<string>pa</string>
+		<string>ta</string>
+		<string>te</string>
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>

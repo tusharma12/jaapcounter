@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
@@ -219,5 +220,74 @@ void main() {
     await tester.tap(find.text('Stop falling mantra'));
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).fallingMantra, isFalse);
+  });
+
+  group('counting with buttons', () {
+    int today() => container.read(jaapControllerProvider).value!.todayTotal;
+
+    testWidgets('is off by default, leaving the keys to the system', (
+      tester,
+    ) async {
+      await pumpJaap(tester);
+
+      final handled = await tester.sendKeyEvent(
+        LogicalKeyboardKey.audioVolumeUp,
+      );
+      await tester.pump();
+
+      expect(today(), 0);
+      expect(handled, isFalse, reason: 'the volume still changes');
+    });
+
+    testWidgets('a volume button or a clicker counts a bead once enabled', (
+      tester,
+    ) async {
+      await pumpJaap(tester);
+      await container
+          .read(settingsProvider.notifier)
+          .setHardwareKeyCounting(true);
+
+      for (final key in [
+        LogicalKeyboardKey.audioVolumeUp,
+        LogicalKeyboardKey.audioVolumeDown,
+        LogicalKeyboardKey.arrowRight,
+        LogicalKeyboardKey.space,
+      ]) {
+        final handled = await tester.sendKeyEvent(key);
+        expect(handled, isTrue, reason: '$key is consumed');
+      }
+      await tester.pump();
+
+      expect(today(), 4);
+      await tester.pump(const Duration(seconds: 1));
+    });
+
+    testWidgets('a held button counts once', (tester) async {
+      await pumpJaap(tester);
+      await container
+          .read(settingsProvider.notifier)
+          .setHardwareKeyCounting(true);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.audioVolumeUp);
+      await tester.sendKeyRepeatEvent(LogicalKeyboardKey.audioVolumeUp);
+      await tester.sendKeyRepeatEvent(LogicalKeyboardKey.audioVolumeUp);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.audioVolumeUp);
+      await tester.pump();
+
+      expect(today(), 1);
+      await tester.pump(const Duration(seconds: 1));
+    });
+
+    testWidgets('other keys are left alone', (tester) async {
+      await pumpJaap(tester);
+      await container
+          .read(settingsProvider.notifier)
+          .setHardwareKeyCounting(true);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.pump();
+
+      expect(today(), 0);
+    });
   });
 }

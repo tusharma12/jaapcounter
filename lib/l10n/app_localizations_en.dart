@@ -816,6 +816,47 @@ class AppL10nEn extends AppL10n {
       'A meaning, a source, or a note to yourself';
 
   @override
+  String get dictationStart => 'Enter the mantra by speaking it';
+
+  @override
+  String get dictationListening => 'Listening… tap to stop';
+
+  @override
+  String get dictationUnavailable =>
+      'Speech input isn\'t available on this device';
+
+  @override
+  String get dictationOfflineUnavailable =>
+      'Offline speech input isn\'t available for this language on this phone. Your voice never leaves the device, so please type it instead.';
+
+  @override
+  String get micPermissionDenied => 'Microphone access is needed for this';
+
+  @override
+  String get voiceNote => 'Voice note';
+
+  @override
+  String get voiceNoteHint => 'Record yourself chanting it';
+
+  @override
+  String get voiceNoteRecord => 'Record';
+
+  @override
+  String get voiceNoteRecording => 'Recording… tap to stop';
+
+  @override
+  String get voiceNotePlay => 'Play voice note';
+
+  @override
+  String get voiceNotePause => 'Pause voice note';
+
+  @override
+  String get voiceNoteDelete => 'Delete voice note';
+
+  @override
+  String get voiceNoteMissing => 'This voice note is no longer on this phone';
+
+  @override
   String get fallingMantra => 'Falling mantra';
 
   @override
@@ -924,4 +965,291 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get addToHomeScreen => 'Add to Home Screen';
+
+  @override
+  String get countWithButtons => 'Count with buttons';
+
+  @override
+  String get countWithButtonsHintAndroid =>
+      'Volume buttons, a headset button or a Bluetooth clicker count a bead';
+
+  @override
+  String get countWithButtonsHintIOS =>
+      'A Bluetooth clicker or keyboard counts a bead. iPhone volume buttons can\'t be used by apps.';
+
+  @override
+  String get lockScreenCounter => 'Lock screen counter';
+
+  @override
+  String get lockScreenCounterHint =>
+      'A +1 button on your lock screen and Dynamic Island. Taps are added to your Jaap when you next open the app.';
+
+  @override
+  String get markerBead => 'Marker bead';
+
+  @override
+  String get markerBeadHint =>
+      'One firm knock partway through the mala, so you can feel where you are with eyes closed';
+
+  @override
+  String markerBeadEvery(int count) {
+    return 'Every $count';
+  }
+
+  @override
+  String get markerBeadOff => 'Off';
+
+  @override
+  String get graceDays => 'Grace days';
+
+  @override
+  String get graceDaysHint =>
+      'Every 7 days in a row earns a grace day (up to 2). A missed day uses one instead of breaking your streak.';
+
+  @override
+  String graceDaysHeld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count grace days held',
+      one: '1 grace day held',
+      zero: 'No grace days held',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get graceDayUsed => 'Covered by a grace day';
+
+  @override
+  String milestoneLakh(int count) {
+    return '$count lakh Jaap';
+  }
+
+  @override
+  String get milestoneSavaLakh => 'Sava lakh Jaap';
+
+  @override
+  String get milestoneCrore => '1 crore Jaap';
+
+  @override
+  String milestoneStreak(int days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String milestoneReached(String milestone) {
+    return '$milestone reached. A milestone in your practice.';
+  }
+
+  @override
+  String get milestones => 'Milestones';
+
+  @override
+  String milestoneNext(String milestone) {
+    return 'Next: $milestone';
+  }
+
+  @override
+  String milestoneToGo(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString to go';
+  }
+
+  @override
+  String get milestoneAllReached => 'Every milestone reached';
+
+  @override
+  String get yearInReview => 'Year in review';
+
+  @override
+  String yearInReviewTitle(int year) {
+    return 'Your $year in Jaap';
+  }
+
+  @override
+  String yearNoJaap(int year) {
+    return 'No Jaap recorded in $year';
+  }
+
+  @override
+  String get yearActiveDays => 'Days chanted';
+
+  @override
+  String get yearLongestRun => 'Longest run';
+
+  @override
+  String yearLongestRunValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yearBestDay => 'Best day';
+
+  @override
+  String get yearTopMantra => 'Most chanted';
+
+  @override
+  String get yearByMonth => 'By month';
+
+  @override
+  String get yearMilestones => 'Milestones this year';
+
+  @override
+  String yearShareText(int year, String count) {
+    return 'My $year in Naam Jap: $count Jaap';
+  }
+
+  @override
+  String get previousYear => 'Previous year';
+
+  @override
+  String get nextYear => 'Next year';
+
+  @override
+  String ekadashiName(String name) {
+    String _temp0 = intl.Intl.selectLogic(name, {
+      'indira': 'Indira Ekadashi',
+      'papankusha': 'Papankusha Ekadashi',
+      'rama': 'Rama Ekadashi',
+      'devutthana': 'Devutthana Ekadashi',
+      'utpanna': 'Utpanna Ekadashi',
+      'mokshada': 'Mokshada Ekadashi',
+      'saphala': 'Saphala Ekadashi',
+      'paushaPutrada': 'Pausha Putrada Ekadashi',
+      'shattila': 'Shattila Ekadashi',
+      'jaya': 'Jaya Ekadashi',
+      'vijaya': 'Vijaya Ekadashi',
+      'amalaki': 'Amalaki Ekadashi',
+      'papamochani': 'Papamochani Ekadashi',
+      'kamada': 'Kamada Ekadashi',
+      'varuthini': 'Varuthini Ekadashi',
+      'mohini': 'Mohini Ekadashi',
+      'apara': 'Apara Ekadashi',
+      'nirjala': 'Nirjala Ekadashi',
+      'yogini': 'Yogini Ekadashi',
+      'devshayani': 'Devshayani Ekadashi',
+      'kamika': 'Kamika Ekadashi',
+      'shravanaPutrada': 'Shravana Putrada Ekadashi',
+      'aja': 'Aja Ekadashi',
+      'parsva': 'Parsva Ekadashi',
+      'other': 'Ekadashi',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String festivalName(String name) {
+    String _temp0 = intl.Intl.selectLogic(name, {
+      'sharadNavratri': 'Sharad Navratri',
+      'chaitraNavratri': 'Chaitra Navratri',
+      'dussehra': 'Dussehra',
+      'diwali': 'Diwali',
+      'kartikMonth': 'Kartik month',
+      'kartikPurnima': 'Kartik Purnima',
+      'guruNanakJayanti': 'Guru Nanak Jayanti',
+      'makarSankranti': 'Makar Sankranti',
+      'vasantPanchami': 'Vasant Panchami',
+      'mahaShivaratri': 'Maha Shivaratri',
+      'holi': 'Holi',
+      'ramNavami': 'Ram Navami',
+      'mahavirJayanti': 'Mahavir Jayanti',
+      'hanumanJayanti': 'Hanuman Jayanti',
+      'guruPurnima': 'Guru Purnima',
+      'shravanMonth': 'Shravan month',
+      'rakshaBandhan': 'Raksha Bandhan',
+      'krishnaJanmashtami': 'Krishna Janmashtami',
+      'ganeshChaturthi': 'Ganesh Chaturthi',
+      'other': 'Festival',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sankalpBegins(String date) {
+    return 'Begins $date';
+  }
+
+  @override
+  String get upcomingObservances => 'Ekadashi and festivals';
+
+  @override
+  String get observanceToday => 'Today';
+
+  @override
+  String observanceInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'In $count days',
+      one: 'Tomorrow',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String observanceDateRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String observanceSankalpTitle(String name) {
+    return 'Sankalp for $name';
+  }
+
+  @override
+  String get observanceTakeSankalp => 'Take a Sankalp';
+
+  @override
+  String observanceVaishnava(String date) {
+    return 'Vaishnava (ISKCON) observance: $date';
+  }
+
+  @override
+  String get observanceSourceNote =>
+      'Dates follow Drik Panchang for New Delhi. Your local temple or tradition may observe a day apart.';
+
+  @override
+  String get observancesNone => 'Nothing in the next few weeks';
+
+  @override
+  String get festivalReminders => 'Ekadashi and festival reminders';
+
+  @override
+  String get festivalRemindersHint =>
+      'A note at 6 am on Ekadashi and festival days';
+
+  @override
+  String festivalNotificationBody(String name) {
+    return 'Today is $name. A blessed day for Naam Jap.';
+  }
+
+  @override
+  String get sendDiagnostics => 'Send diagnostics';
+
+  @override
+  String get diagnosticsExplain =>
+      'This report helps fix a problem. It has the app and phone versions, your settings and the app\'s error log. It has no mantras, counts or notes. Nothing is sent until you choose how below.';
+
+  @override
+  String get diagnosticsEmail => 'Email it';
+
+  @override
+  String get diagnosticsShare => 'Share as a file';
+
+  @override
+  String get diagnosticsEmailSubject => 'Smaran diagnostics';
+
+  @override
+  String get diagnosticsNoMail =>
+      'No mail app found. Try sharing it as a file.';
 }

@@ -10,6 +10,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/reminder.dart';
 import 'reminder_controllers.dart';
+import '../../festivals/presentation/observance_names.dart';
 
 /// Daily nudges. Deliberately plain: a list of times, each of which can be
 /// switched off without being deleted.
@@ -23,6 +24,8 @@ class RemindersScreen extends ConsumerWidget {
     streakBody: l10n.streakNotificationBody,
     goalTitle: l10n.goalNotificationTitle,
     goalBody: l10n.goalNotificationBody,
+    observanceName: (o) => observanceName(l10n, o),
+    observanceBody: l10n.festivalNotificationBody,
   );
 
   @override

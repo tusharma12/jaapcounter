@@ -29,5 +29,8 @@ abstract final class AppConstants {
   static const String androidStoreUrl =
       'https://play.google.com/store/apps/details?id=com.naamjapcounter.smaran';
   static const String iosStoreUrl =
-      'https://apps.apple.com/app/japmala/id0000000000';
+      'https://apps.apple.com/in/app/declutta-free-up-space/id6816732989';
+
+  /// Opens the App Store's review box directly.
+  static const String iosReviewUrl = '$iosStoreUrl?action=write-review';
 }

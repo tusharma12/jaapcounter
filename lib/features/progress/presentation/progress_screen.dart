@@ -20,9 +20,11 @@ import '../../mantras/presentation/mantra_controllers.dart';
 import '../../sadhana/domain/streak.dart';
 import '../../share/presentation/share_card.dart';
 import '../../sadhana/presentation/sadhana_controllers.dart';
+import '../../settings/presentation/settings_controller.dart';
 import '../domain/progress_models.dart';
 import 'progress_providers.dart';
 import 'widgets/jaap_bar_chart.dart';
+import 'widgets/milestones_card.dart';
 import 'widgets/weekly_habit_grid.dart';
 
 /// "Am I becoming more consistent?" - that is the only question this screen
@@ -74,6 +76,9 @@ class _ProgressBody extends ConsumerWidget {
     final streak = ref.watch(streakProvider).value ?? StreakInfo.empty;
     final period = ref.watch(progressPeriodProvider);
     final mantras = ref.watch(mantraListProvider).value ?? const <Mantra>[];
+    final graceDays = ref.watch(
+      settingsProvider.select((s) => s.graceDaysEnabled),
+    );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -90,6 +95,17 @@ class _ProgressBody extends ConsumerWidget {
             large: true,
           ),
         ),
+        if (graceDays && streak.current > 0) ...[
+          const SizedBox(height: Insets.sm),
+          Center(
+            child: Text(
+              l10n.graceDaysHeld(streak.graceDaysHeld),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.palette.secondaryText,
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: Insets.xl),
 
         _TodayCard(data: data),
@@ -111,7 +127,7 @@ class _ProgressBody extends ConsumerWidget {
         _PeriodBar(data: data, mantras: mantras),
         const SizedBox(height: Insets.md),
 
-        _ChartCard(data: data),
+        _ChartCard(data: data, bridgedDays: streak.bridgedDays),
         const SizedBox(height: Insets.lg),
 
         Row(
@@ -149,6 +165,10 @@ class _ProgressBody extends ConsumerWidget {
             ),
           ],
         ),
+
+        const SizedBox(height: Insets.xxl),
+        ScreenSectionTitle(l10n.milestones),
+        MilestonesCard(streak: streak),
 
         if (data.mantraId == null && data.totalsByMantra.length > 1) ...[
           const SizedBox(height: Insets.xxl),
@@ -221,7 +241,6 @@ class _PeriodBar extends ConsumerWidget {
       children: [
         IconButton(
           tooltip: l10n.previousPeriod,
-          visualDensity: VisualDensity.compact,
           onPressed: () => anchor.shift(-1),
           icon: const Icon(Icons.chevron_left_rounded),
         ),
@@ -233,7 +252,6 @@ class _PeriodBar extends ConsumerWidget {
         ),
         IconButton(
           tooltip: l10n.nextPeriod,
-          visualDensity: VisualDensity.compact,
           onPressed: data.canGoForward ? () => anchor.shift(1) : null,
           icon: const Icon(Icons.chevron_right_rounded),
         ),
@@ -326,9 +344,10 @@ class _PeriodBar extends ConsumerWidget {
 /// The period's chart - the week grid for Weekly, bars for the rest - and a
 /// line under it saying what the selected day or month holds.
 class _ChartCard extends StatefulWidget {
-  const _ChartCard({required this.data});
+  const _ChartCard({required this.data, required this.bridgedDays});
 
   final ProgressSummary data;
+  final Set<String> bridgedDays;
 
   @override
   State<_ChartCard> createState() => _ChartCardState();
@@ -403,6 +422,7 @@ class _ChartCardState extends State<_ChartCard> {
           if (isWeekly)
             WeeklyHabitGrid(
               totalsByDay: data.totalsByDay,
+              bridgedDays: widget.bridgedDays,
               goal: data.dailyGoal,
               today: data.today,
               anchor: data.anchor,

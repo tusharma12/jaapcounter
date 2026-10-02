@@ -177,7 +177,66 @@ void main() {
     };
     expect(ids, containsAll(added));
     expect(ids.length, BuiltInMantras.all.length);
-    expect(BuiltInMantras.all.length, 21);
+    expect(BuiltInMantras.all.length, 22);
     expect(await db.query('jaap_entries'), hasLength(1));
+  });
+
+  test('v9 adds the voice note column and v8 the Hare Rama mantra', () async {
+    final dir = await Directory.systemTemp.createTemp('japmala');
+    addTearDown(() => dir.delete(recursive: true));
+    final factory = databaseFactoryFfi;
+    await factory.setDatabasesPath(dir.path);
+
+    // A v7 install: no audio column and no Hare Rama, with a custom mantra.
+    final v7 = await factory.openDatabase(
+      '${dir.path}/${AppDatabase.fileName}',
+      options: OpenDatabaseOptions(
+        version: 7,
+        onCreate: (db, _) async {
+          await db.execute('''
+            CREATE TABLE mantras (
+              id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT,
+              mala_size INTEGER NOT NULL DEFAULT 108,
+              is_built_in INTEGER NOT NULL DEFAULT 0,
+              sort_order INTEGER NOT NULL DEFAULT 0,
+              mala_base INTEGER NOT NULL DEFAULT 0)
+          ''');
+          await db.execute(
+            'CREATE TABLE jaap_entries (id TEXT PRIMARY KEY, mantra_id TEXT)',
+          );
+          await db.execute(
+            'CREATE TABLE sadhanas (id TEXT PRIMARY KEY, mantra_id TEXT)',
+          );
+          await db.insert('mantras', {'id': 'mine', 'name': 'सीता राम'});
+        },
+      ),
+    );
+    await v7.close();
+
+    final db = await AppDatabase.open(factory: factory);
+    addTearDown(db.close);
+    final rows = {for (final r in await db.query('mantras')) r['id']: r};
+
+    expect(rows['mine']!.containsKey('audio_path'), isTrue);
+    expect(rows['mine']!['audio_path'], isNull);
+    expect(rows['mine']!['name'], 'सीता राम');
+    expect(rows.containsKey('builtin.hare-rama'), isTrue);
+  });
+
+  test('upgrading twice over the same columns is safe', () async {
+    final dir = await Directory.systemTemp.createTemp('japmala');
+    addTearDown(() => dir.delete(recursive: true));
+    final factory = databaseFactoryFfi;
+    await factory.setDatabasesPath(dir.path);
+
+    // Today's schema, claiming to be v8: the column is already there, as it
+    // would be after an upgrade interrupted before the version was saved.
+    final v8 = await AppDatabase.open(factory: factory);
+    await v8.setVersion(8);
+    await v8.close();
+
+    final db = await AppDatabase.open(factory: factory);
+    addTearDown(db.close);
+    expect(await db.getVersion(), AppDatabase.schemaVersion);
   });
 }

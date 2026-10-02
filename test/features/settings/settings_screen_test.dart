@@ -64,6 +64,8 @@ void main() {
     await pumpSettings(tester, container: container);
 
     await tester.scrollUntilVisible(find.text('Feedback'), 300);
+    await tester.ensureVisible(find.text('Feedback'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Feedback'));
     await tester.pumpAndSettle();
 

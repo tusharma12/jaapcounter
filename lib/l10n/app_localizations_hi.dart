@@ -814,6 +814,48 @@ class AppL10nHi extends AppL10n {
   String get mantraDescriptionHint => 'अर्थ, स्रोत, या अपने लिए कोई नोट';
 
   @override
+  String get dictationStart => 'बोलकर मंत्र दर्ज करें';
+
+  @override
+  String get dictationListening => 'सुन रहे हैं… रोकने के लिए टैप करें';
+
+  @override
+  String get dictationUnavailable =>
+      'इस डिवाइस पर आवाज़ से टाइप करना उपलब्ध नहीं है';
+
+  @override
+  String get dictationOfflineUnavailable =>
+      'इस फ़ोन पर इस भाषा के लिए ऑफ़लाइन आवाज़ इनपुट उपलब्ध नहीं है। आपकी आवाज़ डिवाइस से बाहर नहीं जाती, इसलिए कृपया टाइप करें।';
+
+  @override
+  String get micPermissionDenied => 'इसके लिए माइक्रोफ़ोन की अनुमति आवश्यक है';
+
+  @override
+  String get voiceNote => 'आवाज़ नोट';
+
+  @override
+  String get voiceNoteHint => 'इसे स्वयं जपते हुए रिकॉर्ड करें';
+
+  @override
+  String get voiceNoteRecord => 'रिकॉर्ड करें';
+
+  @override
+  String get voiceNoteRecording =>
+      'रिकॉर्डिंग हो रही है… रोकने के लिए टैप करें';
+
+  @override
+  String get voiceNotePlay => 'आवाज़ नोट चलाएं';
+
+  @override
+  String get voiceNotePause => 'आवाज़ नोट रोकें';
+
+  @override
+  String get voiceNoteDelete => 'आवाज़ नोट हटाएं';
+
+  @override
+  String get voiceNoteMissing => 'यह आवाज़ नोट अब इस फ़ोन पर नहीं है';
+
+  @override
   String get fallingMantra => 'गिरता मंत्र';
 
   @override
@@ -904,4 +946,291 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get addToHomeScreen => 'होम स्क्रीन पर जोड़ें';
+
+  @override
+  String get countWithButtons => 'बटन से गिनें';
+
+  @override
+  String get countWithButtonsHintAndroid =>
+      'वॉल्यूम बटन, हेडसेट बटन या ब्लूटूथ क्लिकर से एक मनका गिना जाता है';
+
+  @override
+  String get countWithButtonsHintIOS =>
+      'ब्लूटूथ क्लिकर या कीबोर्ड से एक मनका गिना जाता है। iPhone के वॉल्यूम बटन ऐप्स उपयोग नहीं कर सकते।';
+
+  @override
+  String get lockScreenCounter => 'लॉक स्क्रीन काउंटर';
+
+  @override
+  String get lockScreenCounterHint =>
+      'आपकी लॉक स्क्रीन और Dynamic Island पर +1 बटन। अगली बार ऐप खोलने पर गिनती आपके जाप में जुड़ जाती है।';
+
+  @override
+  String get markerBead => 'चिह्न मनका';
+
+  @override
+  String get markerBeadHint =>
+      'माला के बीच में एक ज़ोरदार कंपन, ताकि आँखें बंद रखकर भी पता रहे कि आप कहाँ हैं';
+
+  @override
+  String markerBeadEvery(int count) {
+    return 'हर $count पर';
+  }
+
+  @override
+  String get markerBeadOff => 'बंद';
+
+  @override
+  String get graceDays => 'छूट के दिन';
+
+  @override
+  String get graceDaysHint =>
+      'लगातार हर 7 दिन पर एक छूट का दिन मिलता है (अधिकतम 2)। कोई दिन छूटने पर आपकी लय टूटने के बजाय एक छूट का दिन लग जाता है।';
+
+  @override
+  String graceDaysHeld(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count छूट के दिन शेष',
+      one: '1 छूट का दिन शेष',
+      zero: 'कोई छूट का दिन नहीं',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get graceDayUsed => 'छूट के दिन से पूरा हुआ';
+
+  @override
+  String milestoneLakh(int count) {
+    return '$count लाख जाप';
+  }
+
+  @override
+  String get milestoneSavaLakh => 'सवा लाख जाप';
+
+  @override
+  String get milestoneCrore => '1 करोड़ जाप';
+
+  @override
+  String milestoneStreak(int days) {
+    return '$days दिन की लय';
+  }
+
+  @override
+  String milestoneReached(String milestone) {
+    return '$milestone पूरे हुए। आपकी साधना का एक पड़ाव।';
+  }
+
+  @override
+  String get milestones => 'पड़ाव';
+
+  @override
+  String milestoneNext(String milestone) {
+    return 'अगला: $milestone';
+  }
+
+  @override
+  String milestoneToGo(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString शेष';
+  }
+
+  @override
+  String get milestoneAllReached => 'सभी पड़ाव पूरे हुए';
+
+  @override
+  String get yearInReview => 'वर्ष का सार';
+
+  @override
+  String yearInReviewTitle(int year) {
+    return 'जाप में आपका $year';
+  }
+
+  @override
+  String yearNoJaap(int year) {
+    return '$year में कोई जाप दर्ज नहीं';
+  }
+
+  @override
+  String get yearActiveDays => 'जाप के दिन';
+
+  @override
+  String get yearLongestRun => 'सबसे लंबी लय';
+
+  @override
+  String yearLongestRunValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन',
+      one: '1 दिन',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yearBestDay => 'सबसे अच्छा दिन';
+
+  @override
+  String get yearTopMantra => 'सबसे अधिक जपा गया';
+
+  @override
+  String get yearByMonth => 'महीनेवार';
+
+  @override
+  String get yearMilestones => 'इस वर्ष के पड़ाव';
+
+  @override
+  String yearShareText(int year, String count) {
+    return 'नाम जाप में मेरा $year: $count जाप';
+  }
+
+  @override
+  String get previousYear => 'पिछला वर्ष';
+
+  @override
+  String get nextYear => 'अगला वर्ष';
+
+  @override
+  String ekadashiName(String name) {
+    String _temp0 = intl.Intl.selectLogic(name, {
+      'indira': 'इन्दिरा एकादशी',
+      'papankusha': 'पापांकुशा एकादशी',
+      'rama': 'रमा एकादशी',
+      'devutthana': 'देवउत्थान एकादशी',
+      'utpanna': 'उत्पन्ना एकादशी',
+      'mokshada': 'मोक्षदा एकादशी',
+      'saphala': 'सफला एकादशी',
+      'paushaPutrada': 'पौष पुत्रदा एकादशी',
+      'shattila': 'षटतिला एकादशी',
+      'jaya': 'जया एकादशी',
+      'vijaya': 'विजया एकादशी',
+      'amalaki': 'आमलकी एकादशी',
+      'papamochani': 'पापमोचनी एकादशी',
+      'kamada': 'कामदा एकादशी',
+      'varuthini': 'वरूथिनी एकादशी',
+      'mohini': 'मोहिनी एकादशी',
+      'apara': 'अपरा एकादशी',
+      'nirjala': 'निर्जला एकादशी',
+      'yogini': 'योगिनी एकादशी',
+      'devshayani': 'देवशयनी एकादशी',
+      'kamika': 'कामिका एकादशी',
+      'shravanaPutrada': 'श्रावण पुत्रदा एकादशी',
+      'aja': 'अजा एकादशी',
+      'parsva': 'पार्श्व एकादशी',
+      'other': 'एकादशी',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String festivalName(String name) {
+    String _temp0 = intl.Intl.selectLogic(name, {
+      'sharadNavratri': 'शारदीय नवरात्रि',
+      'chaitraNavratri': 'चैत्र नवरात्रि',
+      'dussehra': 'दशहरा',
+      'diwali': 'दीपावली',
+      'kartikMonth': 'कार्तिक मास',
+      'kartikPurnima': 'कार्तिक पूर्णिमा',
+      'guruNanakJayanti': 'गुरु नानक जयंती',
+      'makarSankranti': 'मकर संक्रांति',
+      'vasantPanchami': 'वसंत पंचमी',
+      'mahaShivaratri': 'महाशिवरात्रि',
+      'holi': 'होली',
+      'ramNavami': 'राम नवमी',
+      'mahavirJayanti': 'महावीर जयंती',
+      'hanumanJayanti': 'हनुमान जयंती',
+      'guruPurnima': 'गुरु पूर्णिमा',
+      'shravanMonth': 'श्रावण मास',
+      'rakshaBandhan': 'रक्षा बंधन',
+      'krishnaJanmashtami': 'कृष्ण जन्माष्टमी',
+      'ganeshChaturthi': 'गणेश चतुर्थी',
+      'other': 'पर्व',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String sankalpBegins(String date) {
+    return '$date से आरंभ';
+  }
+
+  @override
+  String get upcomingObservances => 'एकादशी और पर्व';
+
+  @override
+  String get observanceToday => 'आज';
+
+  @override
+  String observanceInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दिन में',
+      one: 'कल',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String observanceDateRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String observanceSankalpTitle(String name) {
+    return '$name का संकल्प';
+  }
+
+  @override
+  String get observanceTakeSankalp => 'संकल्प लें';
+
+  @override
+  String observanceVaishnava(String date) {
+    return 'वैष्णव (इस्कॉन) व्रत: $date';
+  }
+
+  @override
+  String get observanceSourceNote =>
+      'तिथियाँ नई दिल्ली के लिए द्रिक पंचांग के अनुसार हैं। आपके स्थानीय मंदिर या परंपरा में एक दिन का अंतर हो सकता है।';
+
+  @override
+  String get observancesNone => 'आने वाले कुछ सप्ताहों में कुछ नहीं';
+
+  @override
+  String get festivalReminders => 'एकादशी और पर्व स्मरण';
+
+  @override
+  String get festivalRemindersHint =>
+      'एकादशी और पर्व के दिन सुबह 6 बजे एक सूचना';
+
+  @override
+  String festivalNotificationBody(String name) {
+    return 'आज $name है। नाम जाप के लिए एक शुभ दिन।';
+  }
+
+  @override
+  String get sendDiagnostics => 'निदान रिपोर्ट भेजें';
+
+  @override
+  String get diagnosticsExplain =>
+      'यह रिपोर्ट किसी समस्या को ठीक करने में मदद करती है। इसमें ऐप और फ़ोन के संस्करण, आपकी सेटिंग्स और ऐप की त्रुटि सूची है। इसमें कोई मंत्र, गिनती या नोट नहीं है। जब तक आप नीचे कोई तरीका नहीं चुनते, कुछ भी नहीं भेजा जाता।';
+
+  @override
+  String get diagnosticsEmail => 'ईमेल करें';
+
+  @override
+  String get diagnosticsShare => 'फ़ाइल के रूप में साझा करें';
+
+  @override
+  String get diagnosticsEmailSubject => 'Smaran निदान';
+
+  @override
+  String get diagnosticsNoMail =>
+      'कोई मेल ऐप नहीं मिला। फ़ाइल के रूप में साझा करके देखें।';
 }

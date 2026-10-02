@@ -14,6 +14,7 @@ import '../../sadhana/presentation/sadhana_controllers.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../domain/jaap_entry.dart';
 import '../domain/jaap_session.dart';
+import '../../progress/domain/milestones.dart';
 import '../domain/mala_math.dart';
 import 'jaap_state.dart';
 
@@ -39,6 +40,11 @@ class JaapController extends AsyncNotifier<JaapState> {
   int _sessionCount = 0;
   int _malaCompletions = 0;
 
+  /// Every Jaap on every mantra, for lifetime milestones.
+  int _overallLifetime = 0;
+  int? _milestone;
+  int _milestoneCount = 0;
+
   @override
   Future<JaapState> build() async {
     // Awaiting the list (rather than reading the derived provider alone) means
@@ -51,10 +57,26 @@ class JaapController extends AsyncNotifier<JaapState> {
     final day = DayKeys.of(ref.watch(clockProvider)());
     final lifetime = await repo.lifetimeFor(mantra.id);
     final todayTotal = await repo.dayTotal(day, mantraId: mantra.id);
+    _overallLifetime = await repo.lifetimeTotal();
 
     ref.onDispose(() {
       _syncTimer?.cancel();
     });
+    // Switching it on starts it at once; off takes it down.
+    ref.listen(settingsProvider.select((s) => s.lockScreenCounter), (
+      _,
+      enabled,
+    ) {
+      if (enabled) {
+        unawaited(_publishToLockScreen());
+      } else {
+        unawaited(ref.read(lockScreenCounterProvider).end());
+      }
+    });
+    if (ref.read(settingsProvider).lockScreenCounter) {
+      // Once build has resolved and there is a state to read from.
+      Timer.run(() => unawaited(_publishToLockScreen()));
+    }
     // The widget wears the app's theme, so a new theme repaints it too.
     ref.listen(settingsProvider.select((s) => s.themeId), (_, _) {
       unawaited(_publishToWidget());
@@ -75,7 +97,18 @@ class JaapController extends AsyncNotifier<JaapState> {
       sessionStartedAt: _sessionStartedAt,
       sessionCount: _sessionCount,
       malaCompletions: _malaCompletions,
+      milestone: _milestone,
+      milestoneCount: _milestoneCount,
     );
+  }
+
+  /// Notes a lifetime milestone passed in moving to [overall] Jaap.
+  void _trackMilestone(int overall) {
+    final crossed = Milestones.jaapCrossed(_overallLifetime, overall);
+    _overallLifetime = overall;
+    if (crossed == null) return;
+    _milestone = crossed;
+    _milestoneCount++;
   }
 
   // ---------------------------------------------------------------- counting
@@ -95,8 +128,15 @@ class JaapController extends AsyncNotifier<JaapState> {
       delta: delta,
       malaSize: current.mantra.malaSize,
     );
+    final crossedMarker = MalaMath.crossesMarker(
+      beadsBefore: current.position.beadsInCurrentMala,
+      delta: delta,
+      malaSize: current.mantra.malaSize,
+      interval: ref.read(settingsProvider).beadMarkerInterval,
+    );
     if (crossedMala) _malaCompletions++;
     _sessionCount += delta;
+    _trackMilestone(_overallLifetime + delta);
 
     state = AsyncData(
       current.copyWith(
@@ -106,6 +146,8 @@ class JaapController extends AsyncNotifier<JaapState> {
         undoAvailable: true,
         sessionCount: _sessionCount,
         malaCompletions: _malaCompletions,
+        milestone: _milestone,
+        milestoneCount: _milestoneCount,
       ),
     );
 
@@ -118,6 +160,8 @@ class JaapController extends AsyncNotifier<JaapState> {
       feedback.goalReached();
     } else if (crossedMala) {
       feedback.malaComplete();
+    } else if (crossedMarker) {
+      feedback.marker();
     } else {
       feedback.bead();
     }
@@ -245,6 +289,8 @@ class JaapController extends AsyncNotifier<JaapState> {
     final day = DayKeys.of(ref.read(clockProvider)());
     final lifetime = await repo.lifetimeFor(mantra.id);
     final todayTotal = await repo.dayTotal(day, mantraId: mantra.id);
+    // A manual entry can pass a milestone too; an undo never moves up.
+    _trackMilestone(await repo.lifetimeTotal());
 
     state = AsyncData(
       current.copyWith(
@@ -253,6 +299,8 @@ class JaapController extends AsyncNotifier<JaapState> {
         todayTotal: todayTotal,
         day: day,
         undoAvailable: lifetime > 0,
+        milestone: _milestone,
+        milestoneCount: _milestoneCount,
       ),
     );
     _notifyLedgerChanged();
@@ -262,7 +310,26 @@ class JaapController extends AsyncNotifier<JaapState> {
   /// moved on, and another surface (a widget tap) may have added beads.
   Future<void> refreshForResume() async {
     await flushPendingWrites();
+    await _drainLockScreenBeads();
     await _reloadFromLedger();
+  }
+
+  /// Writes the beads tapped on the lock screen to the ledger. The native
+  /// side only counts them as pending; this is the single place they become
+  /// history. The pending count is removed as it is read, so a second resume
+  /// adds nothing.
+  Future<void> _drainLockScreenBeads() async {
+    final current = state.value;
+    if (current == null) return;
+    final pending = await ref.read(lockScreenCounterProvider).drainPending();
+    if (pending.count <= 0) return;
+    await ref
+        .read(jaapRepositoryProvider)
+        .addBeads(
+          mantraId: current.mantra.id,
+          delta: pending.count,
+          at: pending.at,
+        );
   }
 
   void _enqueue(Future<void> Function() write) {
@@ -292,6 +359,25 @@ class JaapController extends AsyncNotifier<JaapState> {
   void _notifyLedgerChanged() {
     ref.read(ledgerRevisionProvider.notifier).bump();
     unawaited(_publishToWidget());
+    unawaited(_publishToLockScreen());
+  }
+
+  /// Keeps the lock-screen counter showing the same numbers as the app, and
+  /// takes it down when the setting is off.
+  Future<void> _publishToLockScreen() async {
+    final current = state.value;
+    if (current == null) return;
+    final service = ref.read(lockScreenCounterProvider);
+    if (!ref.read(settingsProvider).lockScreenCounter) return;
+    await service.show(
+      mantra: current.mantra.nameIn(
+        ref.read(settingsProvider).localeCode ??
+            PlatformDispatcher.instance.locale.languageCode,
+      ),
+      beads: current.position.beadsInCurrentMala,
+      malaSize: current.mantra.malaSize,
+      todayTotal: current.todayTotal,
+    );
   }
 
   Future<void> _publishToWidget() async {

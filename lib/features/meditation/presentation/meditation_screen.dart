@@ -19,6 +19,9 @@ import '../../mantras/domain/mantra_names.dart';
 import '../../jaap/presentation/widgets/mala_ring.dart';
 import '../../settings/presentation/settings_controller.dart';
 import 'blackout_screen.dart';
+import '../../jaap/presentation/widgets/hardware_count_keys.dart';
+import '../../jaap/presentation/auto_jaap_actions.dart';
+import '../../jaap/presentation/auto_jaap_controller.dart';
 
 /// Distraction-free chanting.
 ///
@@ -134,26 +137,35 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(jaapControllerProvider);
     final palette = context.palette;
+    reapplyWakelockWhenAutoStops(
+      ref,
+      mounted: () => mounted,
+      reapply: () =>
+          _applyWakelock(ref.read(settingsProvider).keepScreenOnInMeditation),
+    );
 
-    return Scaffold(
-      backgroundColor: palette.background,
-      body: AsyncView<JaapState>(
-        value: async,
-        builder: (context, state) => GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: (_) => ref.read(jaapControllerProvider.notifier).count(),
-          onVerticalDragEnd: (details) {
-            if ((details.primaryVelocity ?? 0) > 220) {
-              Navigator.of(context).maybePop();
-            }
-          },
-          child: SafeArea(
-            child: _MeditationView(
-              state: state,
-              elapsed: DateTime.now().difference(_enteredAt),
-              timerTarget: _timerTarget,
-              onBlackout: _openBlackout,
-              onTimer: _pickTimer,
+    return HardwareCountKeys(
+      onCount: () => countOrStopAuto(ref),
+      child: Scaffold(
+        backgroundColor: palette.background,
+        body: AsyncView<JaapState>(
+          value: async,
+          builder: (context, state) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (_) => countOrStopAuto(ref),
+            onVerticalDragEnd: (details) {
+              if ((details.primaryVelocity ?? 0) > 220) {
+                Navigator.of(context).maybePop();
+              }
+            },
+            child: SafeArea(
+              child: _MeditationView(
+                state: state,
+                elapsed: DateTime.now().difference(_enteredAt),
+                timerTarget: _timerTarget,
+                onBlackout: _openBlackout,
+                onTimer: _pickTimer,
+              ),
             ),
           ),
         ),
@@ -183,6 +195,7 @@ class _MeditationView extends ConsumerWidget {
     final theme = Theme.of(context);
     final palette = context.palette;
     final settings = ref.watch(settingsProvider);
+    final autoRunning = ref.watch(autoJaapProvider.select((s) => s.running));
     final position = state.position;
     final remaining = timerTarget == null ? null : timerTarget! - elapsed;
 
@@ -248,6 +261,7 @@ class _MeditationView extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: Insets.xl),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _Control(
                 icon: settings.soundEnabled
@@ -264,6 +278,14 @@ class _MeditationView extends ConsumerWidget {
                 label: l10n.timer,
                 active: timerTarget != null,
                 onTap: onTimer,
+              ),
+              _Control(
+                icon: autoRunning
+                    ? Icons.pause_circle_outline_rounded
+                    : Icons.play_circle_outline_rounded,
+                label: autoRunning ? l10n.autoJaapStopAction : l10n.autoJaap,
+                active: autoRunning,
+                onTap: () => toggleAutoJaap(context, ref),
               ),
               _Control(
                 icon: Icons.dark_mode_outlined,
@@ -298,25 +320,28 @@ class _Control extends StatelessWidget {
     final palette = context.palette;
     final color = active ? palette.saffron : palette.secondaryText;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Insets.md),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(Radii.md),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Insets.lg,
-            vertical: Insets.md,
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 22),
-              const SizedBox(height: Insets.xs),
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(color: color),
-              ),
-            ],
+    return Flexible(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Insets.xs),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(Radii.md),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Insets.lg,
+              vertical: Insets.md,
+            ),
+            child: Column(
+              children: [
+                Icon(icon, color: color, size: 22),
+                const SizedBox(height: Insets.xs),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(color: color),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -79,4 +79,95 @@ void main() {
     expect(settings.activeMantraId, 'builtin.radha');
     expect(settings.fallbackDailyGoal, 1188);
   });
+
+  group('the mantra page', () {
+    Future<ProviderContainer> pumpMantraPage(WidgetTester tester) async {
+      await usePhoneSurface(tester);
+      final container = await createTestContainer();
+      final router = GoRouter(
+        initialLocation: '/onboarding',
+        routes: [
+          GoRoute(
+            path: '/onboarding',
+            builder: (_, _) => const OnboardingScreen(),
+          ),
+          GoRoute(path: '/jaap', builder: (_, _) => const Text('counter')),
+        ],
+      );
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: Consumer(
+            builder: (context, ref, _) => MaterialApp.router(
+              locale: ref.watch(settingsProvider).locale,
+              theme: AppTheme.light(),
+              routerConfig: router,
+              localizationsDelegates: const [
+                AppL10n.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppL10n.supportedLocales,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
+      return container;
+    }
+
+    testWidgets('shows the mantras in the script of each language', (
+      tester,
+    ) async {
+      await pumpMantraPage(tester);
+
+      for (final (chip, ram) in [
+        ('ગુજરાતી', 'રામ'),
+        ('ਪੰਜਾਬੀ', 'ਰਾਮ'),
+        ('தமிழ்', 'ராம'),
+        ('తెలుగు', 'రామ'),
+        ('मराठी', 'राम'),
+        ('English', 'Ram'),
+      ]) {
+        await tester.tap(find.text(chip));
+        await tester.pumpAndSettle();
+        expect(find.text(ram), findsOneWidget, reason: chip);
+      }
+    });
+
+    testWidgets('scrolls from the header, not only the list', (tester) async {
+      await pumpMantraPage(tester);
+      final title = find.text('Which mantra do you chant?');
+      expect(title, findsOneWidget);
+      final before = tester.getTopLeft(title).dy;
+
+      // Dragging on the title itself: if only the list scrolled, this would
+      // do nothing.
+      await tester.drag(title, const Offset(0, -120));
+      await tester.pumpAndSettle();
+
+      expect(title, findsOneWidget);
+      expect(tester.getTopLeft(title).dy, lessThan(before - 50));
+    });
+
+    testWidgets('can reach the last mantra and add your own', (tester) async {
+      await pumpMantraPage(tester);
+
+      await tester.scrollUntilVisible(
+        find.text('Hare Rama Hare Rama Rama Rama Hare Hare'),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+
+      expect(
+        find.text('Hare Rama Hare Rama Rama Rama Hare Hare'),
+        findsOneWidget,
+      );
+    });
+  });
 }

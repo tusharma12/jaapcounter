@@ -96,16 +96,19 @@ class StreakBadge extends StatelessWidget {
             color: dimmed ? ink.withValues(alpha: 0.45) : ink,
           ),
           SizedBox(width: large ? Insets.sm : Insets.xs),
-          Text(
-            label,
-            style:
-                (large
-                        ? theme.textTheme.titleLarge
-                        : theme.textTheme.titleSmall)
-                    ?.copyWith(
-                      color: ink,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+          Flexible(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style:
+                  (large
+                          ? theme.textTheme.titleLarge
+                          : theme.textTheme.titleSmall)
+                      ?.copyWith(
+                        color: ink,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+            ),
           ),
         ],
       ),

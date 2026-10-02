@@ -4,6 +4,8 @@
     <!-- So scheduled reminders survive a restart. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Recording and transcribing a mantra's voice note. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:label="@string/app_name"

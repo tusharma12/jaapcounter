@@ -10,7 +10,7 @@ import '../services/app_logger.dart';
 /// anywhere. [openTestDatabase] lets the same schema run in unit tests.
 abstract final class AppDatabase {
   static const String fileName = 'japmala.db';
-  static const int schemaVersion = 7;
+  static const int schemaVersion = 9;
 
   static Future<Database> open({DatabaseFactory? factory}) async {
     final f = factory ?? databaseFactory;
@@ -53,12 +53,17 @@ abstract final class AppDatabase {
     AppLogger.i('Migrating database from v$from to v$to');
     // Future migrations append here, one `if (from < n)` block each, so an
     // install can hop several versions in a single upgrade.
-    if (from < 5) {
-      // First, because every seeding step below writes a description. Checked,
-      // so an upgrade interrupted after this line can safely run again.
+    if (from < 9) {
+      // First, because every seeding step below writes a description (v5) and
+      // an audio path (v9). Each column is checked before it is added, so an
+      // upgrade interrupted after this block can safely run it again.
       final columns = await db.rawQuery('PRAGMA table_info(mantras)');
-      if (!columns.any((c) => c['name'] == 'description')) {
+      final names = columns.map((c) => c['name']).toSet();
+      if (!names.contains('description')) {
         await db.execute('ALTER TABLE mantras ADD COLUMN description TEXT');
+      }
+      if (!names.contains('audio_path')) {
+        await db.execute('ALTER TABLE mantras ADD COLUMN audio_path TEXT');
       }
     }
     if (from < 2) {
@@ -136,6 +141,11 @@ abstract final class AppDatabase {
       // mantra, making 21.
       await _seedBuiltInMantras(db);
     }
+    if (from < 8) {
+      // v8 adds Hare Rama (Hare Rama Hare Rama Rama Rama Hare Hare), making 22.
+      await _seedBuiltInMantras(db);
+    }
+    // v9's own column was added above, alongside description.
   }
 
   /// Removes built-ins that are no longer shipped. One that was never used
@@ -173,7 +183,8 @@ abstract final class AppDatabase {
         mala_size INTEGER NOT NULL DEFAULT 108,
         is_built_in INTEGER NOT NULL DEFAULT 0,
         sort_order INTEGER NOT NULL DEFAULT 0,
-        mala_base INTEGER NOT NULL DEFAULT 0
+        mala_base INTEGER NOT NULL DEFAULT 0,
+        audio_path TEXT
       )
     ''');
 

@@ -5,13 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../domain/story.dart';
+import '../../../core/constants/app_languages.dart';
 
 /// The language the stories are read in: the app's setting when there is one,
 /// otherwise whatever the device is set to.
 final contentLocaleProvider = Provider<String>((ref) {
   final chosen = ref.watch(settingsProvider).localeCode;
-  if (chosen != null) return chosen;
-  return PlatformDispatcher.instance.locale.languageCode;
+  return AppLanguages.storyLanguage(
+    chosen ?? PlatformDispatcher.instance.locale.languageCode,
+  );
 });
 
 final storyLibraryProvider = FutureProvider<StoryLibrary>((ref) {

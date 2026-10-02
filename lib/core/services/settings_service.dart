@@ -30,6 +30,11 @@ class SettingsService {
   static const _kDailyGoal = 'settings.fallbackDailyGoal';
   static const _kStoryTextScale = 'settings.storyTextScale';
   static const _kKeepAwake = 'settings.keepScreenOnInMeditation';
+  static const _kHardwareKeys = 'settings.hardwareKeyCounting';
+  static const _kBeadMarker = 'settings.beadMarkerInterval';
+  static const _kGraceDays = 'settings.graceDays';
+  static const _kFestivalReminders = 'settings.festivalReminders';
+  static const _kLockScreenCounter = 'settings.lockScreenCounter';
   static const _kFavouriteStories = 'stories.favourites';
   static const _kAutoJaap = 'autoJaap.config';
   static const _kCounterHintSeen = 'counter.hintSeen';
@@ -66,6 +71,14 @@ class SettingsService {
       fallingMantra: _prefs.getBool(_kFallingMantra) ?? false,
       malaStyle:
           MalaStyle.tryParse(_prefs.getString(_kMalaStyle)) ?? MalaStyle.beads,
+      hardwareKeyCounting: _prefs.getBool(_kHardwareKeys) ?? false,
+      beadMarkerInterval: switch (_prefs.getInt(_kBeadMarker)) {
+        final v? when AppSettings.beadMarkerIntervals.contains(v) => v,
+        _ => 0,
+      },
+      graceDaysEnabled: _prefs.getBool(_kGraceDays) ?? true,
+      festivalReminders: _prefs.getBool(_kFestivalReminders) ?? false,
+      lockScreenCounter: _prefs.getBool(_kLockScreenCounter) ?? false,
     );
   }
 
@@ -97,6 +110,11 @@ class SettingsService {
     await _prefs.setDouble(_kBackgroundDim, settings.backgroundDim);
     await _prefs.setBool(_kFallingMantra, settings.fallingMantra);
     await _prefs.setString(_kMalaStyle, settings.malaStyle.name);
+    await _prefs.setBool(_kHardwareKeys, settings.hardwareKeyCounting);
+    await _prefs.setInt(_kBeadMarker, settings.beadMarkerInterval);
+    await _prefs.setBool(_kGraceDays, settings.graceDaysEnabled);
+    await _prefs.setBool(_kFestivalReminders, settings.festivalReminders);
+    await _prefs.setBool(_kLockScreenCounter, settings.lockScreenCounter);
   }
 
   List<String> favouriteStoryIds() =>

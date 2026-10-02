@@ -3,6 +3,10 @@ import 'package:meta/meta.dart';
 
 import '../../../core/providers.dart';
 import '../../../core/services/notification_service.dart';
+import '../../../core/utils/day_key.dart';
+import '../../festivals/domain/observance.dart';
+import '../../festivals/presentation/observance_providers.dart';
+import '../../settings/presentation/settings_controller.dart';
 import '../domain/reminder.dart';
 
 /// Already-translated notification wording, handed in from the widget layer
@@ -16,7 +20,14 @@ class ReminderCopy {
     required this.streakBody,
     required this.goalTitle,
     required this.goalBody,
+    this.observanceName,
+    this.observanceBody,
   });
+
+  /// An observance's name and its notification line, for Ekadashi and
+  /// festival reminders. Absent, none are scheduled.
+  final String Function(Observance)? observanceName;
+  final String Function(String name)? observanceBody;
 
   final String jaapTitle;
   final String jaapBody;
@@ -84,6 +95,13 @@ class RemindersController extends AsyncNotifier<List<Reminder>> {
     ref.invalidateSelf();
   }
 
+  /// First id for observance notifications; ordinary reminders stay below.
+  static const int observanceIdBase = 0x10000000;
+
+  /// Ekadashi and festival notifications scheduled ahead. Kept well under
+  /// iOS's limit of 64 pending notifications, and topped up on every launch.
+  static const int observancesAhead = 12;
+
   /// Rewrites the platform schedule from the stored reminders. Called after
   /// any change and whenever the app's language changes.
   Future<void> reschedule(ReminderCopy copy) async {
@@ -97,8 +115,32 @@ class RemindersController extends AsyncNotifier<List<Reminder>> {
           title: copy.forKind(reminder.kind).$1,
           body: copy.forKind(reminder.kind).$2,
         ),
+      ..._observanceReminders(copy),
     ];
     await ref.read(notificationServiceProvider).sync(scheduled);
+  }
+
+  List<ScheduledReminder> _observanceReminders(ReminderCopy copy) {
+    final name = copy.observanceName;
+    final body = copy.observanceBody;
+    if (name == null || body == null) return const [];
+    if (!ref.read(settingsProvider).festivalReminders) return const [];
+    final upcoming = ref
+        .read(observanceCalendarProvider)
+        .upcoming(ref.read(clockProvider)(), withinDays: 120)
+        .take(observancesAhead);
+    var i = 0;
+    return [
+      for (final observance in upcoming)
+        ScheduledReminder(
+          id: observanceIdBase + i++,
+          hour: 6,
+          minute: 0,
+          title: name(observance),
+          body: body(name(observance)),
+          date: DayKeys.parse(observance.start),
+        ),
+    ];
   }
 
   /// True when the platform let us post notifications.

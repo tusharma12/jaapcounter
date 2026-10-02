@@ -7,10 +7,14 @@ import '../features/mantras/data/mantra_repository.dart';
 import '../features/reminders/data/reminder_repository.dart';
 import '../features/sadhana/data/sadhana_repository.dart';
 import '../features/stories/data/story_repository.dart';
+import 'services/dictation_service.dart';
+import 'services/lock_screen_counter_service.dart';
+import 'services/mantra_audio_service.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
 import 'services/shortcut_service.dart';
 import 'services/speech_service.dart';
+import 'services/voice_note_store.dart';
 import 'services/widget_service.dart';
 import 'utils/day_key.dart';
 
@@ -36,7 +40,15 @@ final settingsServiceProvider = Provider<SettingsService>(
 );
 
 final mantraRepositoryProvider = Provider<MantraRepository>(
-  (ref) => MantraRepository(ref.watch(databaseProvider)),
+  (ref) => MantraRepository(
+    ref.watch(databaseProvider),
+    voiceNotes: ref.watch(voiceNoteStoreProvider),
+  ),
+);
+
+/// Where voice notes live on disk. Overridden in tests with a temp directory.
+final voiceNoteStoreProvider = Provider<VoiceNoteStore>(
+  (ref) => VoiceNoteStore(),
 );
 
 final jaapRepositoryProvider = Provider<JaapRepository>(
@@ -73,6 +85,28 @@ final speechServiceProvider = Provider<SpeechService>((ref) {
 });
 
 final widgetServiceProvider = Provider<WidgetService>((ref) => WidgetService());
+
+/// A mantra's voice note: recording and playback. One instance, so the mantra
+/// editor never has two microphones or two players fighting each other.
+final mantraAudioServiceProvider = Provider<MantraAudioService>((ref) {
+  final service = MantraAudioService();
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+/// The lock-screen counter (a Live Activity on iOS). Overridden in tests.
+final lockScreenCounterProvider = Provider<LockScreenCounterService>(
+  (ref) => LockScreenCounterService(),
+);
+
+/// Whether this phone can show it, for hiding the setting where it cannot.
+final lockScreenSupportedProvider = FutureProvider<bool>(
+  (ref) => ref.watch(lockScreenCounterProvider).isSupported(),
+);
+
+final dictationServiceProvider = Provider<DictationService>(
+  (ref) => DictationService(),
+);
 
 /// Bumped whenever the ledger changes, so every derived screen (progress,
 /// sadhana, widgets) recomputes from the database instead of guessing.

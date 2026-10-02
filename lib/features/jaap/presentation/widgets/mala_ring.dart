@@ -358,35 +358,40 @@ class MalaRingLabel extends StatelessWidget {
     final theme = Theme.of(context);
     final palette = context.palette;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          '$beads',
-          style:
-              (compact
-                      ? theme.textTheme.displaySmall
-                      : theme.textTheme.displayLarge)
-                  ?.copyWith(
-                    color: color ?? palette.primaryText,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-        ),
-        const SizedBox(height: Insets.sm),
-        Container(
-          width: compact ? 28 : 36,
-          height: 1.5,
-          color: (color ?? palette.primaryText).withValues(alpha: 0.18),
-        ),
-        const SizedBox(height: Insets.sm),
-        Text(
-          '$malaSize',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: (color ?? palette.secondaryText).withValues(alpha: 0.75),
-            fontFeatures: const [FontFeature.tabularFigures()],
+    // The ring is a fixed size; at large text sizes the numbers shrink to fit
+    // inside it rather than spilling out over the beads.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$beads',
+            style:
+                (compact
+                        ? theme.textTheme.displaySmall
+                        : theme.textTheme.displayLarge)
+                    ?.copyWith(
+                      color: color ?? palette.primaryText,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
           ),
-        ),
-      ],
+          const SizedBox(height: Insets.sm),
+          Container(
+            width: compact ? 28 : 36,
+            height: 1.5,
+            color: (color ?? palette.primaryText).withValues(alpha: 0.18),
+          ),
+          const SizedBox(height: Insets.sm),
+          Text(
+            '$malaSize',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: (color ?? palette.secondaryText).withValues(alpha: 0.75),
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -20,32 +20,51 @@ class AboutScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.aboutApp)),
-      body: Padding(
-        padding: const EdgeInsets.all(Insets.xxl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'ॐ',
-              style: AppTypography.mantra(size: 44, color: palette.saffron),
-            ),
-            const SizedBox(height: Insets.lg),
-            Text(l10n.appName, style: theme.textTheme.headlineMedium),
-            const SizedBox(height: Insets.sm),
-            Text(l10n.tagline, style: theme.textTheme.bodyLarge),
-            const SizedBox(height: Insets.xxl),
-            Text(l10n.aboutBody, style: theme.textTheme.bodyMedium),
-            const Spacer(),
-            if (version != null)
-              Text(
-                build == null
-                    ? l10n.version(version)
-                    : '${l10n.version(version)} · $build',
-                style: theme.textTheme.bodySmall,
+      // Scrolls at large text sizes; otherwise the version line still sits at
+      // the foot of the screen.
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          padding: const EdgeInsets.all(Insets.xxl),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: (constraints.maxHeight - Insets.xxl * 2).clamp(
+                0,
+                double.infinity,
               ),
-            const SizedBox(height: Insets.xs),
-            Text(l10n.madeWith, style: theme.textTheme.bodySmall),
-          ],
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ExcludeSemantics(
+                    child: Text(
+                      'ॐ',
+                      style: AppTypography.mantra(
+                        size: 44,
+                        color: palette.saffron,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: Insets.lg),
+                  Text(l10n.appName, style: theme.textTheme.headlineMedium),
+                  const SizedBox(height: Insets.sm),
+                  Text(l10n.tagline, style: theme.textTheme.bodyLarge),
+                  const SizedBox(height: Insets.xxl),
+                  Text(l10n.aboutBody, style: theme.textTheme.bodyMedium),
+                  const Spacer(),
+                  if (version != null)
+                    Text(
+                      build == null
+                          ? l10n.version(version)
+                          : '${l10n.version(version)} · $build',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  const SizedBox(height: Insets.xs),
+                  Text(l10n.madeWith, style: theme.textTheme.bodySmall),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

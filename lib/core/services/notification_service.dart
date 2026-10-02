@@ -20,6 +20,7 @@ class ScheduledReminder {
     required this.minute,
     required this.title,
     required this.body,
+    this.date,
   });
 
   final int id;
@@ -27,6 +28,10 @@ class ScheduledReminder {
   final int minute;
   final String title;
   final String body;
+
+  /// Set for a one-off notification on that day, such as an Ekadashi;
+  /// null repeats every day.
+  final DateTime? date;
 }
 
 /// Local notifications. No server, no push tokens - the device schedules its
@@ -137,14 +142,28 @@ class NotificationService {
     AppLogger.i('Scheduled ${reminders.length} reminder(s)');
   }
 
+  /// Schedules [reminder] daily, or once on its [ScheduledReminder.date]. A
+  /// one-off whose moment has already passed is skipped.
   Future<void> scheduleDaily(ScheduledReminder reminder) async {
     await init();
+    final date = reminder.date;
+    final at = date == null
+        ? _nextInstanceOf(reminder.hour, reminder.minute)
+        : tz.TZDateTime(
+            tz.local,
+            date.year,
+            date.month,
+            date.day,
+            reminder.hour,
+            reminder.minute,
+          );
+    if (date != null && !at.isAfter(tz.TZDateTime.now(tz.local))) return;
     try {
       await _plugin.zonedSchedule(
         id: reminder.id,
         title: reminder.title,
         body: reminder.body,
-        scheduledDate: _nextInstanceOf(reminder.hour, reminder.minute),
+        scheduledDate: at,
         notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             channelId,
@@ -158,7 +177,7 @@ class NotificationService {
         // Inexact scheduling avoids asking for the exact-alarm permission,
         // which a reminder like this does not warrant.
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
+        matchDateTimeComponents: date == null ? DateTimeComponents.time : null,
       );
     } on Object catch (error, stack) {
       AppLogger.e('Could not schedule reminder ${reminder.id}', error, stack);

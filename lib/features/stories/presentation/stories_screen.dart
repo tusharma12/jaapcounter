@@ -159,13 +159,14 @@ class StoryCard extends ConsumerWidget {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: Insets.lg),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: Insets.sm,
             children: [
               Text(
                 l10n.minRead(story.readingMinutes),
                 style: theme.textTheme.bodySmall,
               ),
-              const Spacer(),
               Text(
                 '${l10n.read} →',
                 style: theme.textTheme.titleSmall?.copyWith(

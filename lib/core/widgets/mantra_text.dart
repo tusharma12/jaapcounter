@@ -24,6 +24,9 @@ class MantraText extends StatelessWidget {
   final int maxLines;
   final TextAlign align;
 
+  static bool _isLatin(String text) =>
+      !text.runes.any((r) => r >= 0x0900 && r <= 0x0DFF);
+
   @override
   Widget build(BuildContext context) {
     final text = mantra.displayName(context);
@@ -35,7 +38,9 @@ class MantraText extends StatelessWidget {
             height: 1.25,
             fontWeight: weight,
             color: color,
-            letterSpacing: -0.4,
+            // Tighter tracking suits Roman letters, but on Indic scripts any
+            // letter spacing breaks the joined letters apart.
+            letterSpacing: _isLatin(text) ? -0.4 : 0,
           );
 
     return Text(

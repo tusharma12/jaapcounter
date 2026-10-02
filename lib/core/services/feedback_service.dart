@@ -27,6 +27,13 @@ class FeedbackService {
     if (sound) await SystemSound.play(SystemSoundType.alert);
   }
 
+  /// A marker partway through the mala - every 27 or 54 beads - felt as one
+  /// firm knock: stronger than a bead, fewer than a mala's two.
+  Future<void> marker() async {
+    if (haptics) await HapticFeedback.mediumImpact();
+    if (sound) await SystemSound.play(SystemSoundType.click);
+  }
+
   /// The day's goal reached: three knocks, one more than a mala, so the two
   /// are never confused.
   Future<void> goalReached() async {

@@ -22,7 +22,15 @@ class AppSettings {
     this.backgroundDim = defaultBackgroundDim,
     this.fallingMantra = false,
     this.malaStyle = MalaStyle.beads,
+    this.hardwareKeyCounting = false,
+    this.beadMarkerInterval = 0,
+    this.graceDaysEnabled = true,
+    this.festivalReminders = false,
+    this.lockScreenCounter = false,
   });
+
+  /// Choices for [beadMarkerInterval]; 0 means off.
+  static const List<int> beadMarkerIntervals = [0, 27, 54];
 
   static const double defaultBackgroundDim = 0.45;
   static const double minBackgroundDim = 0.0;
@@ -63,6 +71,24 @@ class AppSettings {
   /// Beads or a plain ring, on the counter and in meditation.
   final MalaStyle malaStyle;
 
+  /// Volume buttons, a headset button or a Bluetooth clicker count a bead,
+  /// for chanting with eyes closed or the phone in a pocket.
+  final bool hardwareKeyCounting;
+
+  /// A distinct knock every this many beads within a mala, so the user can
+  /// feel a quarter or half mala without looking. 0 is off.
+  final int beadMarkerInterval;
+
+  /// Whether held grace days can bridge a missed day in the streak.
+  final bool graceDaysEnabled;
+
+  /// A notification on the morning of Ekadashi and other observances.
+  final bool festivalReminders;
+
+  /// A +1 button on the lock screen, kept in step with the counter. A
+  /// per-device choice, so it is not part of a backup.
+  final bool lockScreenCounter;
+
   Locale? get locale => localeCode == null ? null : Locale(localeCode!);
 
   /// Light or dark as far as the platform is concerned.
@@ -87,6 +113,11 @@ class AppSettings {
     double? backgroundDim,
     bool? fallingMantra,
     MalaStyle? malaStyle,
+    bool? hardwareKeyCounting,
+    int? beadMarkerInterval,
+    bool? graceDaysEnabled,
+    bool? festivalReminders,
+    bool? lockScreenCounter,
   }) {
     return AppSettings(
       themeId: themeId ?? this.themeId,
@@ -110,6 +141,11 @@ class AppSettings {
       backgroundDim: backgroundDim ?? this.backgroundDim,
       fallingMantra: fallingMantra ?? this.fallingMantra,
       malaStyle: malaStyle ?? this.malaStyle,
+      hardwareKeyCounting: hardwareKeyCounting ?? this.hardwareKeyCounting,
+      beadMarkerInterval: beadMarkerInterval ?? this.beadMarkerInterval,
+      graceDaysEnabled: graceDaysEnabled ?? this.graceDaysEnabled,
+      festivalReminders: festivalReminders ?? this.festivalReminders,
+      lockScreenCounter: lockScreenCounter ?? this.lockScreenCounter,
     );
   }
 
@@ -152,6 +188,10 @@ class AppSettings {
       keepScreenOnInMeditation: read<bool>('keepScreenOnInMeditation'),
       fallingMantra: read<bool>('fallingMantra'),
       malaStyle: MalaStyle.tryParse(read<String>('malaStyle')),
+      hardwareKeyCounting: read<bool>('hardwareKeyCounting'),
+      beadMarkerInterval: _validInterval(read<int>('beadMarkerInterval')),
+      graceDaysEnabled: read<bool>('graceDaysEnabled'),
+      festivalReminders: read<bool>('festivalReminders'),
     );
   }
 
@@ -169,7 +209,14 @@ class AppSettings {
     'keepScreenOnInMeditation': keepScreenOnInMeditation,
     'fallingMantra': fallingMantra,
     'malaStyle': malaStyle.name,
+    'hardwareKeyCounting': hardwareKeyCounting,
+    'beadMarkerInterval': beadMarkerInterval,
+    'graceDaysEnabled': graceDaysEnabled,
+    'festivalReminders': festivalReminders,
   };
+
+  static int? _validInterval(int? value) =>
+      beadMarkerIntervals.contains(value) ? value : null;
 
   @override
   bool operator ==(Object other) =>
@@ -187,10 +234,15 @@ class AppSettings {
       other.backgroundPhotoPath == backgroundPhotoPath &&
       other.backgroundDim == backgroundDim &&
       other.fallingMantra == fallingMantra &&
-      other.malaStyle == malaStyle;
+      other.malaStyle == malaStyle &&
+      other.hardwareKeyCounting == hardwareKeyCounting &&
+      other.beadMarkerInterval == beadMarkerInterval &&
+      other.graceDaysEnabled == graceDaysEnabled &&
+      other.festivalReminders == festivalReminders &&
+      other.lockScreenCounter == lockScreenCounter;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     themeId,
     localeCode,
     hapticsEnabled,
@@ -205,7 +257,12 @@ class AppSettings {
     backgroundDim,
     fallingMantra,
     malaStyle,
-  );
+    hardwareKeyCounting,
+    beadMarkerInterval,
+    graceDaysEnabled,
+    festivalReminders,
+    lockScreenCounter,
+  ]);
 }
 
 const Object _sentinel = Object();

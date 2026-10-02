@@ -76,6 +76,23 @@ abstract final class MalaMath {
     return (beadsBefore + delta) ~/ malaSize > beadsBefore ~/ malaSize;
   }
 
+  /// True when adding [delta] beads passes a marker every [interval] beads
+  /// within the mala. The mala's own end is not a marker: that bead already
+  /// has its own, stronger signal.
+  static bool crossesMarker({
+    required int beadsBefore,
+    required int delta,
+    required int malaSize,
+    required int interval,
+  }) {
+    if (interval < 1 || malaSize < 1 || interval >= malaSize) return false;
+    for (var bead = beadsBefore + 1; bead <= beadsBefore + delta; bead++) {
+      final inMala = bead % malaSize;
+      if (inMala != 0 && inMala % interval == 0) return true;
+    }
+    return false;
+  }
+
   /// The new [Mantra.malaBase] after the user resets the mala in progress:
   /// the partial beads stop counting toward malas but stay in the totals.
   static int baseAfterMalaReset({

@@ -17,6 +17,8 @@ class JaapState {
     this.sessionStartedAt,
     this.sessionCount = 0,
     this.malaCompletions = 0,
+    this.milestone,
+    this.milestoneCount = 0,
   });
 
   final Mantra mantra;
@@ -41,6 +43,11 @@ class JaapState {
   /// Increments each time a mala is finished. The screen watches this to run
   /// the completion animation exactly once per mala.
   final int malaCompletions;
+
+  /// The lifetime Jaap milestone most recently reached while counting, and
+  /// how many have been reached this run, so the screen celebrates each once.
+  final int? milestone;
+  final int milestoneCount;
 
   bool get sessionRunning => sessionId != null;
 
@@ -71,6 +78,8 @@ class JaapState {
     Object? sessionStartedAt = _sentinel,
     int? sessionCount,
     int? malaCompletions,
+    int? milestone,
+    int? milestoneCount,
   }) {
     return JaapState(
       mantra: mantra ?? this.mantra,
@@ -85,6 +94,8 @@ class JaapState {
           : sessionStartedAt as DateTime?,
       sessionCount: sessionCount ?? this.sessionCount,
       malaCompletions: malaCompletions ?? this.malaCompletions,
+      milestone: milestone ?? this.milestone,
+      milestoneCount: milestoneCount ?? this.milestoneCount,
     );
   }
 }

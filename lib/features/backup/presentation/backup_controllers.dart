@@ -20,5 +20,6 @@ final backupServiceProvider = FutureProvider<BackupService>((ref) async {
     settingsService: ref.watch(settingsServiceProvider),
     version: await ref.watch(appVersionProvider.future),
     clock: ref.watch(clockProvider),
+    voiceNotes: ref.watch(voiceNoteStoreProvider),
   );
 });

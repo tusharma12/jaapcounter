@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:japmala/core/utils/day_key.dart';
 import 'package:japmala/features/sadhana/domain/sadhana.dart';
 import 'package:japmala/features/sadhana/domain/streak.dart';
 
@@ -198,6 +199,129 @@ void main() {
       expect(open.isOpenEnded, isTrue);
       expect(open.lastDay, isNull);
       expect(open.hasRunItsCourse(DateTime(2030, 1, 1)), isFalse);
+    });
+  });
+
+  group('grace days', () {
+    StreakInfo graceStreak(Map<String, int> totals, DateTime today) =>
+        StreakCalculator.calculate(
+          totalsByDay: totals,
+          today: today,
+          goalFor: (_) => 108,
+          graceDays: true,
+        );
+
+    /// [count] qualifying days ending on [last], inclusive.
+    Map<String, int> run(DateTime last, int count) => {
+      for (var i = 0; i < count; i++)
+        DayKeys.of(DateTime(last.year, last.month, last.day - i)): 108,
+    };
+
+    test('a week in a row earns one', () {
+      final streak = graceStreak(
+        run(DateTime(2026, 9, 7), 7),
+        DateTime(2026, 9, 7, 21),
+      );
+
+      expect(streak.current, 7);
+      expect(streak.graceDaysHeld, 1);
+    });
+
+    test('six days earn nothing, so a miss still breaks the streak', () {
+      final streak = graceStreak({
+        ...run(DateTime(2026, 9, 6), 6),
+        '2026-09-08': 108,
+      }, DateTime(2026, 9, 8, 21));
+
+      expect(streak.current, 1);
+      expect(streak.bridgedDays, isEmpty);
+    });
+
+    test('a missed day spends one instead of breaking the streak', () {
+      // Seven days, a day off ill on the 8th, then back on the 9th.
+      final streak = graceStreak({
+        ...run(DateTime(2026, 9, 7), 7),
+        '2026-09-09': 108,
+      }, DateTime(2026, 9, 9, 21));
+
+      expect(streak.current, 8, reason: 'the covered day does not add');
+      expect(streak.graceDaysHeld, 0);
+      expect(streak.bridgedDays, {'2026-09-08'});
+    });
+
+    test('no more than two are ever held', () {
+      final streak = graceStreak(
+        run(DateTime(2026, 9, 30), 30),
+        DateTime(2026, 9, 30, 21),
+      );
+
+      expect(streak.graceDaysHeld, StreakCalculator.maxGraceDays);
+    });
+
+    test('two held cover a two-day trip, but not a third day', () {
+      final before = run(DateTime(2026, 9, 14), 14);
+      final covered = graceStreak({
+        ...before,
+        '2026-09-17': 108,
+      }, DateTime(2026, 9, 17, 21));
+      expect(covered.current, 15);
+      expect(covered.bridgedDays, {'2026-09-15', '2026-09-16'});
+
+      final broken = graceStreak({
+        ...before,
+        '2026-09-18': 108,
+      }, DateTime(2026, 9, 18, 21));
+      expect(broken.current, 1);
+      expect(broken.best, 14);
+    });
+
+    test('today, still open, never spends one', () {
+      final streak = graceStreak(
+        run(DateTime(2026, 9, 7), 7),
+        DateTime(2026, 9, 8, 8),
+      );
+
+      expect(streak.current, 7);
+      expect(streak.countedToday, isFalse);
+      expect(streak.graceDaysHeld, 1);
+      expect(streak.bridgedDays, isEmpty);
+    });
+
+    test('a day short of the goal is a missed day', () {
+      final streak = graceStreak({
+        ...run(DateTime(2026, 9, 7), 7),
+        '2026-09-08': 50,
+        '2026-09-09': 108,
+      }, DateTime(2026, 9, 9, 21));
+
+      expect(streak.current, 8);
+      expect(streak.bridgedDays, {'2026-09-08'});
+    });
+
+    test('a broken streak forfeits what it held', () {
+      // Earns one, breaks over three days off, then starts again.
+      final streak = graceStreak({
+        ...run(DateTime(2026, 9, 7), 7),
+        ...run(DateTime(2026, 9, 13), 3),
+      }, DateTime(2026, 9, 13, 21));
+
+      expect(streak.current, 3);
+      expect(streak.graceDaysHeld, 0);
+      expect(streak.bridgedDays, isEmpty);
+    });
+
+    test('spans a month and a year end', () {
+      final streak = graceStreak({
+        ...run(DateTime(2026, 12, 30), 7),
+        '2027-01-01': 108,
+      }, DateTime(2027, 1, 1, 21));
+
+      expect(streak.current, 8);
+      expect(streak.bridgedDays, {'2026-12-31'});
+    });
+
+    test('nothing at all is the empty streak', () {
+      expect(graceStreak(const {}, DateTime(2026, 9, 3)), StreakInfo.empty);
     });
   });
 }

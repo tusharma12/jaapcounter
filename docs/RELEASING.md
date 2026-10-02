@@ -46,7 +46,9 @@ create or refresh the distribution profiles for the app and the widget
 extension without an Apple ID login.
 
 In App Store Connect, before the first submission, fill in what fastlane
-cannot: the privacy questionnaire (the app collects no data), the age rating,
+cannot: the privacy questionnaire (the app collects no data: voice notes stay
+on the device and dictation is on-device only, so Audio Data is not
+"collected" in Apple's sense), the age rating,
 pricing, and App Review contact name and phone.
 
 ### Android: upload key and Play access
@@ -123,3 +125,13 @@ Regenerate after any visible UI change, then run the `screenshots` /
   contact (`codivolabs@gmail.com`) separately from these files.
 - Release notes: `ios/fastlane/metadata/*/release_notes.txt` and
   `android/fastlane/metadata/android/*/changelogs/default.txt`.
+
+## Store category
+
+Both stores take the category from the listing, not the app bundle:
+
+- **App Store Connect:** App Information > Category > Primary: **Utilities**.
+  `LSApplicationCategoryType` in `ios/Runner/Info.plist` is set to
+  `public.app-category.utilities` to match.
+- **Google Play Console:** Store settings > App category > **Tools**
+  (Play's name for utilities).

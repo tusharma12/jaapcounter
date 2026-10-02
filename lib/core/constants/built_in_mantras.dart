@@ -160,6 +160,14 @@ abstract final class BuiltInMantras {
       isBuiltIn: true,
       sortOrder: 20,
     ),
+    // The Hare Rama half of the Maha Mantra, chanted on its own.
+    Mantra(
+      id: 'builtin.hare-rama',
+      name: 'हरे राम हरे राम राम राम हरे हरे',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 21,
+    ),
   ];
 
   /// Each built-in in Roman letters, shown when the app is in English. Kept
@@ -193,6 +201,7 @@ abstract final class BuiltInMantras {
     'builtin.om-namo-narayanaya': 'Om Namo Narayanaya',
     'builtin.om-sai-ram': 'Om Sai Ram',
     'builtin.om-dum-durgayei-namah': 'Om Dum Durgayei Namah',
+    'builtin.hare-rama': 'Hare Rama Hare Rama Rama Rama Hare Hare',
   };
 
   static final Map<String, String> _shipped = {

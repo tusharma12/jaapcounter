@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/mantra_text.dart';
 import '../../../core/widgets/pill_tabs.dart';
@@ -17,10 +18,24 @@ import '../../reminders/presentation/reminders_screen.dart';
 import 'daily_goal_picker.dart';
 import 'sadhana_controllers.dart';
 
-Future<bool> showCreateSankalp(BuildContext context) async {
+/// Opens the Sankalp sheet. An observance passes its own mantra, length and
+/// first day, so a Navratri Sankalp begins on Ghatasthapana and runs nine
+/// days; everything stays editable.
+Future<bool> showCreateSankalp(
+  BuildContext context, {
+  String? mantraId,
+  int? durationDays,
+  DateTime? startAt,
+  String? title,
+}) async {
   final created = await showAppSheet<bool>(
     context,
-    builder: (context) => const CreateSankalpSheet(),
+    builder: (context) => CreateSankalpSheet(
+      initialMantraId: mantraId,
+      initialDurationDays: durationDays,
+      startAt: startAt,
+      title: title,
+    ),
     expand: true,
   );
   return created ?? false;
@@ -29,7 +44,22 @@ Future<bool> showCreateSankalp(BuildContext context) async {
 /// Taking a vow: a mantra, a number, a length, and optionally a time of day
 /// to be reminded.
 class CreateSankalpSheet extends ConsumerStatefulWidget {
-  const CreateSankalpSheet({super.key});
+  const CreateSankalpSheet({
+    this.initialMantraId,
+    this.initialDurationDays,
+    this.startAt,
+    this.title,
+    super.key,
+  });
+
+  final String? initialMantraId;
+  final int? initialDurationDays;
+
+  /// The first day of the vow, when it is not today.
+  final DateTime? startAt;
+
+  /// Replaces the generic heading, such as "Sankalp for Sharad Navratri".
+  final String? title;
 
   @override
   ConsumerState<CreateSankalpSheet> createState() => _CreateSankalpSheetState();
@@ -43,12 +73,23 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
   bool _saving = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.initialDurationDays != null) {
+      _durationDays = widget.initialDurationDays;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
     final palette = context.palette;
     final mantras = ref.watch(mantraListProvider).value ?? const <Mantra>[];
-    final mantra = _mantra ?? ref.watch(activeMantraProvider);
+    final mantra =
+        _mantra ??
+        mantras.where((m) => m.id == widget.initialMantraId).firstOrNull ??
+        ref.watch(activeMantraProvider);
 
     return SafeArea(
       top: false,
@@ -60,7 +101,24 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
           Insets.xl,
         ),
         children: [
-          Text(l10n.createSankalp, style: theme.textTheme.headlineSmall),
+          Text(
+            widget.title ?? l10n.createSankalp,
+            style: theme.textTheme.headlineSmall,
+          ),
+          if (widget.startAt != null) ...[
+            const SizedBox(height: Insets.sm),
+            Text(
+              l10n.sankalpBegins(
+                Fmt.dayLabel(
+                  widget.startAt!,
+                  Localizations.localeOf(context).toLanguageTag(),
+                ),
+              ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: palette.secondaryText,
+              ),
+            ),
+          ],
           const SizedBox(height: Insets.xl),
 
           _FieldLabel(l10n.chooseMantra),
@@ -201,6 +259,7 @@ class _CreateSankalpSheetState extends ConsumerState<CreateSankalpSheet> {
           durationDays: _durationDays,
           reminderEnabled: reminderMinutes != null,
           reminderMinutes: reminderMinutes,
+          startAt: widget.startAt,
         );
 
     // A Sankalp with a reminder time also creates the reminder, so the vow

@@ -12,6 +12,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
 import '../../../core/providers.dart';
 import '../../../core/services/app_logger.dart';
+import '../../../core/utils/day_key.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/async_view.dart';
@@ -318,7 +319,7 @@ class ShareCard extends StatelessWidget {
                         ),
                         child: Text(
                           '${l10n.sankalpDays(total)} · '
-                          '${l10n.dayXofY(sadhana.dayNumber(data.today), total)}',
+                          '${sadhana.dayNumber(data.today) == 0 ? l10n.sankalpBegins(Fmt.dayLabel(DayKeys.parse(sadhana.startDay), Localizations.localeOf(context).toLanguageTag())) : l10n.dayXofY(sadhana.dayNumber(data.today), total)}',
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: palette.secondary,
                           ),

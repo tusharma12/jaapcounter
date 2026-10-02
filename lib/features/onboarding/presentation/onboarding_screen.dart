@@ -12,6 +12,7 @@ import '../../mantras/presentation/mantra_editor_sheet.dart';
 import '../../mantras/presentation/mantra_tile.dart';
 import '../../sadhana/presentation/daily_goal_picker.dart';
 import '../../settings/presentation/settings_controller.dart';
+import '../../../core/constants/app_languages.dart';
 
 /// Three screens of welcome, then two that make the app the user's own:
 /// which mantra they chant and how much each day. Then out of the way.
@@ -169,27 +170,32 @@ class _OnboardingPage extends StatelessWidget {
     final theme = Theme.of(context);
     final palette = context.palette;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Insets.xxl),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const _AppIconMark(size: 132),
-          const SizedBox(height: Insets.xxxl),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineLarge,
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: Insets.xxl),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const _AppIconMark(size: 132),
+              const SizedBox(height: Insets.xxxl),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineLarge,
+              ),
+              const SizedBox(height: Insets.md),
+              Text(
+                body,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: palette.secondaryText,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: Insets.md),
-          Text(
-            body,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: palette.secondaryText,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -227,9 +233,9 @@ class _StepHeader extends StatelessWidget {
   }
 }
 
-/// English or Hindi for the mantra names and the rest of the app. Shown here
+/// The app's language, and with it how the mantra names read. Shown here
 /// rather than buried in Settings, since it decides whether the list below
-/// is legible the moment it appears.
+/// is legible the moment it appears. Each is named in its own script.
 class _LanguageToggle extends StatelessWidget {
   const _LanguageToggle({required this.locale, required this.onChanged});
 
@@ -238,16 +244,22 @@ class _LanguageToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return SegmentedButton<String>(
-      showSelectedIcon: false,
-      segments: [
-        ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
-        ButtonSegment(value: 'hi', label: Text(l10n.languageHindi)),
+    // Shows the device's own language until the user picks one explicitly.
+    final current = locale ?? Localizations.localeOf(context).languageCode;
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: Insets.sm,
+      runSpacing: Insets.sm,
+      children: [
+        for (final MapEntry(key: code, value: name)
+            in AppLanguages.names.entries)
+          ChoiceChip(
+            label: Text(name),
+            selected: code == current,
+            showCheckmark: false,
+            onSelected: (_) => onChanged(code),
+          ),
       ],
-      // Shows the device's own language until the user picks one explicitly.
-      selected: {locale ?? Localizations.localeOf(context).languageCode},
-      onSelectionChanged: (selection) => onChanged(selection.first),
     );
   }
 }
@@ -267,69 +279,64 @@ class _MantraPage extends ConsumerWidget {
 
     final locale = ref.watch(settingsProvider.select((s) => s.localeCode));
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Insets.page),
-      child: Column(
-        children: [
-          const SizedBox(height: Insets.lg),
-          _StepHeader(title: l10n.onbMantraTitle, body: l10n.onbMantraBody),
-          const SizedBox(height: Insets.md),
-          _LanguageToggle(
-            locale: locale,
-            onChanged: (code) =>
-                ref.read(settingsProvider.notifier).setLocale(code),
-          ),
-          const SizedBox(height: Insets.lg),
-          Expanded(
-            child: ListView(
-              children: [
-                for (final mantra in mantras)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: Insets.sm),
-                    child: Material(
-                      color: mantra.id == active?.id
-                          ? palette.softSaffron
-                          : palette.card,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(Radii.md),
-                        side: BorderSide(
-                          color: mantra.id == active?.id
-                              ? palette.saffron
-                              : palette.divider,
-                        ),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: ListTile(
-                        title: MantraText(
-                          mantra,
-                          size: 19,
-                          maxLines: 2,
-                          align: TextAlign.start,
-                          color: palette.primaryText,
-                        ),
-                        trailing: mantra.id == active?.id
-                            ? Icon(
-                                Icons.check_circle_rounded,
-                                color: palette.saffron,
-                              )
-                            : null,
-                        onTap: () => controller.setActive(mantra.id),
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: Insets.xs),
-                AddOwnMantraTile(
-                  onTap: () async {
-                    final created = await showMantraEditor(context);
-                    if (created != null) await controller.setActive(created.id);
-                  },
+    // One scrolling list for the whole page. The header and the seven
+    // language chips take real room on a phone; if only the mantras below them
+    // scrolled, they would be left a thin strip to move in.
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        Insets.page,
+        Insets.lg,
+        Insets.page,
+        Insets.lg,
+      ),
+      children: [
+        _StepHeader(title: l10n.onbMantraTitle, body: l10n.onbMantraBody),
+        const SizedBox(height: Insets.md),
+        _LanguageToggle(
+          locale: locale,
+          onChanged: (code) =>
+              ref.read(settingsProvider.notifier).setLocale(code),
+        ),
+        const SizedBox(height: Insets.lg),
+        for (final mantra in mantras)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Insets.sm),
+            child: Material(
+              color: mantra.id == active?.id
+                  ? palette.softSaffron
+                  : palette.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(Radii.md),
+                side: BorderSide(
+                  color: mantra.id == active?.id
+                      ? palette.saffron
+                      : palette.divider,
                 ),
-                const SizedBox(height: Insets.lg),
-              ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: ListTile(
+                title: MantraText(
+                  mantra,
+                  size: 19,
+                  maxLines: 2,
+                  align: TextAlign.start,
+                  color: palette.primaryText,
+                ),
+                trailing: mantra.id == active?.id
+                    ? Icon(Icons.check_circle_rounded, color: palette.saffron)
+                    : null,
+                onTap: () => controller.setActive(mantra.id),
+              ),
             ),
           ),
-        ],
-      ),
+        const SizedBox(height: Insets.xs),
+        AddOwnMantraTile(
+          onTap: () async {
+            final created = await showMantraEditor(context);
+            if (created != null) await controller.setActive(created.id);
+          },
+        ),
+      ],
     );
   }
 }

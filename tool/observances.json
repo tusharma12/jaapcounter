@@ -1,0 +1,819 @@
+{
+  "source": "Drik Panchang (drikpanchang.com), geoname-id=1261481 (New Delhi). Ekadashi: /vrats/ekadashidates.html?year=YYYY. Festivals: /festivals/month/festivals-<month>.html?year=YYYY, /navratri/ashwin-shardiya-navratri-dates.html, /navratri/chaitra-vasant-navratri-dates.html, /festivals/holi/festivals-holika-dahan-timings.html, /dashavatara/lord-krishna/krishna-janmashtami-date-time.html. Cross-checked with mPanchang Ekadashi list (New Delhi), AstroSage Indian Calendar (2026-2028), and Prokerala Hindu Calendar (2026-2027). Fetched 2026-10-01.",
+  "location": "New Delhi",
+  "range": {
+    "from": "2026-10-01",
+    "to": "2028-12-31"
+  },
+  "ekadashi": [
+    {
+      "date": "2026-10-06",
+      "name": "Indira Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2026-10-22",
+      "name": "Papankusha Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2026-11-05",
+      "name": "Rama Ekadashi",
+      "month": "Kartika",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2026-11-20",
+      "name": "Devutthana Ekadashi",
+      "month": "Kartika",
+      "paksha": "Shukla",
+      "vaishnavaDate": "2026-11-21",
+      "verified": true
+    },
+    {
+      "date": "2026-12-04",
+      "name": "Utpanna Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2026-12-20",
+      "name": "Mokshada Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "Drik Panchang also lists Vaikuntha Ekadashi on this date."
+    },
+    {
+      "date": "2027-01-03",
+      "name": "Saphala Ekadashi",
+      "month": "Pausha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-01-18",
+      "name": "Pausha Putrada Ekadashi",
+      "month": "Pausha",
+      "paksha": "Shukla",
+      "vaishnavaDate": "2027-01-19",
+      "verified": true,
+      "note": "mPanchang (New Delhi) lists 2027-01-19, which is Drik's Gauna/Vaishnava date."
+    },
+    {
+      "date": "2027-02-02",
+      "name": "Shattila Ekadashi",
+      "month": "Magha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-02-17",
+      "name": "Jaya Ekadashi",
+      "month": "Magha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-03-04",
+      "name": "Vijaya Ekadashi",
+      "month": "Phalguna",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "mPanchang lists Vijaya Ekadashi on both 2027-03-03 and 2027-03-04; Drik lists only 03-04."
+    },
+    {
+      "date": "2027-03-18",
+      "name": "Amalaki Ekadashi",
+      "month": "Phalguna",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-04-02",
+      "name": "Papamochani Ekadashi",
+      "month": "Chaitra",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-04-17",
+      "name": "Kamada Ekadashi",
+      "month": "Chaitra",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-05-02",
+      "name": "Varuthini Ekadashi",
+      "month": "Vaishakha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-05-16",
+      "name": "Mohini Ekadashi",
+      "month": "Vaishakha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-06-01",
+      "name": "Apara Ekadashi",
+      "month": "Jyeshtha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-06-14",
+      "name": "Nirjala Ekadashi",
+      "month": "Jyeshtha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-06-30",
+      "name": "Yogini Ekadashi",
+      "month": "Ashadha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-07-14",
+      "name": "Devshayani Ekadashi",
+      "month": "Ashadha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-07-29",
+      "name": "Kamika Ekadashi",
+      "month": "Shravana",
+      "paksha": "Krishna",
+      "vaishnavaDate": "2027-07-30",
+      "verified": true
+    },
+    {
+      "date": "2027-08-12",
+      "name": "Shravana Putrada Ekadashi",
+      "month": "Shravana",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-08-28",
+      "name": "Aja Ekadashi",
+      "month": "Bhadrapada",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-09-11",
+      "name": "Parsva Ekadashi",
+      "month": "Bhadrapada",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-09-26",
+      "name": "Indira Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-10-11",
+      "name": "Papankusha Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-10-25",
+      "name": "Rama Ekadashi",
+      "month": "Kartika",
+      "paksha": "Krishna",
+      "vaishnavaDate": "2027-10-26",
+      "verified": true
+    },
+    {
+      "date": "2027-11-10",
+      "name": "Devutthana Ekadashi",
+      "month": "Kartika",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-11-24",
+      "name": "Utpanna Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2027-12-09",
+      "name": "Mokshada Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "Drik Panchang also lists Guruvayur Ekadashi on this date."
+    },
+    {
+      "date": "2027-12-23",
+      "name": "Saphala Ekadashi",
+      "month": "Pausha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-01-08",
+      "name": "Pausha Putrada Ekadashi",
+      "month": "Pausha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "Drik Panchang also lists Vaikuntha Ekadashi on this date."
+    },
+    {
+      "date": "2028-01-22",
+      "name": "Shattila Ekadashi",
+      "month": "Magha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-02-06",
+      "name": "Jaya Ekadashi",
+      "month": "Magha",
+      "paksha": "Shukla",
+      "vaishnavaDate": "2028-02-07",
+      "verified": true,
+      "note": "mPanchang (New Delhi) lists 2028-02-07, which is Drik's Gauna/Vaishnava date."
+    },
+    {
+      "date": "2028-02-20",
+      "name": "Vijaya Ekadashi",
+      "month": "Phalguna",
+      "paksha": "Krishna",
+      "vaishnavaDate": "2028-02-21",
+      "verified": true
+    },
+    {
+      "date": "2028-03-07",
+      "name": "Amalaki Ekadashi",
+      "month": "Phalguna",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-03-21",
+      "name": "Papamochani Ekadashi",
+      "month": "Chaitra",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-04-05",
+      "name": "Kamada Ekadashi",
+      "month": "Chaitra",
+      "paksha": "Shukla",
+      "vaishnavaDate": "2028-04-06",
+      "verified": true
+    },
+    {
+      "date": "2028-04-20",
+      "name": "Varuthini Ekadashi",
+      "month": "Vaishakha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-05-05",
+      "name": "Mohini Ekadashi",
+      "month": "Vaishakha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-05-20",
+      "name": "Apara Ekadashi",
+      "month": "Jyeshtha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-06-03",
+      "name": "Nirjala Ekadashi",
+      "month": "Jyeshtha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-06-18",
+      "name": "Yogini Ekadashi",
+      "month": "Ashadha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-07-02",
+      "name": "Devshayani Ekadashi",
+      "month": "Ashadha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-07-18",
+      "name": "Kamika Ekadashi",
+      "month": "Shravana",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-08-01",
+      "name": "Shravana Putrada Ekadashi",
+      "month": "Shravana",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-08-16",
+      "name": "Aja Ekadashi",
+      "month": "Bhadrapada",
+      "paksha": "Krishna",
+      "vaishnavaDate": "2028-08-17",
+      "verified": true
+    },
+    {
+      "date": "2028-08-30",
+      "name": "Parsva Ekadashi",
+      "month": "Bhadrapada",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-09-15",
+      "name": "Indira Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-09-29",
+      "name": "Papankusha Ekadashi",
+      "month": "Ashwina",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-10-14",
+      "name": "Rama Ekadashi",
+      "month": "Kartika",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-10-28",
+      "name": "Devutthana Ekadashi",
+      "month": "Kartika",
+      "paksha": "Shukla",
+      "vaishnavaDate": "2028-10-29",
+      "verified": true
+    },
+    {
+      "date": "2028-11-12",
+      "name": "Utpanna Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Krishna",
+      "vaishnavaDate": "2028-11-13",
+      "verified": true
+    },
+    {
+      "date": "2028-11-27",
+      "name": "Mokshada Ekadashi",
+      "month": "Margashirsha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "Drik Panchang also lists Guruvayur Ekadashi on this date."
+    },
+    {
+      "date": "2028-12-12",
+      "name": "Saphala Ekadashi",
+      "month": "Pausha",
+      "paksha": "Krishna",
+      "vaishnavaDate": null,
+      "verified": true
+    },
+    {
+      "date": "2028-12-27",
+      "name": "Pausha Putrada Ekadashi",
+      "month": "Pausha",
+      "paksha": "Shukla",
+      "vaishnavaDate": null,
+      "verified": true,
+      "note": "Drik Panchang also lists Vaikuntha Ekadashi on this date."
+    }
+  ],
+  "festivals": [
+    {
+      "id": "sharad-navratri",
+      "name": "Sharad Navratri",
+      "start": "2026-10-11",
+      "end": "2026-10-19",
+      "verified": true,
+      "note": "Ghatasthapana 10-11; Maha Navami 10-19 (Drik Navratri calendar). Navratri Parana 10-20. AstroSage agrees."
+    },
+    {
+      "id": "dussehra",
+      "name": "Dussehra / Vijayadashami",
+      "start": "2026-10-20",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "kartik-month",
+      "name": "Kartik Month (Purnimanta, North)",
+      "start": "2026-10-27",
+      "end": "2026-11-24",
+      "verified": true,
+      "note": "Start = 'Kartika Begins *North' on Drik; end = Kartika Purnima."
+    },
+    {
+      "id": "diwali",
+      "name": "Diwali (Lakshmi Puja)",
+      "start": "2026-11-08",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "kartik-purnima",
+      "name": "Kartik Purnima",
+      "start": "2026-11-24",
+      "end": null,
+      "verified": true
+    },
+    {
+      "id": "guru-nanak-jayanti",
+      "name": "Guru Nanak Jayanti (Gurpurab)",
+      "start": "2026-11-24",
+      "end": null,
+      "verified": true,
+      "note": "Prokerala agrees."
+    },
+    {
+      "id": "makar-sankranti",
+      "name": "Makar Sankranti",
+      "start": "2027-01-15",
+      "end": null,
+      "verified": true,
+      "note": "Drik and AstroSage: 01-15. Prokerala lists 01-14 (disagreement)."
+    },
+    {
+      "id": "vasant-panchami",
+      "name": "Vasant Panchami",
+      "start": "2027-02-11",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "maha-shivaratri",
+      "name": "Maha Shivaratri",
+      "start": "2027-03-06",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "holi",
+      "name": "Holi (Dhulandi / Rangwali Holi)",
+      "start": "2027-03-22",
+      "end": null,
+      "verified": true,
+      "note": "Drik: Holika Dahan 03-21, Rangwali Holi 03-22 (Purnima ends 04:13 PM on 03-22, so no Purnima at Pradosh that evening). AstroSage and Prokerala both list Holika Dahan 03-22 and Holi 03-23 (disagreement)."
+    },
+    {
+      "id": "chaitra-navratri",
+      "name": "Chaitra Navratri",
+      "start": "2027-04-07",
+      "end": "2027-04-15",
+      "verified": true,
+      "note": "Ghatasthapana 04-07; Navami/Rama Navami 04-15 (Drik Chaitra Navratri calendar). AstroSage agrees."
+    },
+    {
+      "id": "ram-navami",
+      "name": "Ram Navami",
+      "start": "2027-04-15",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "mahavir-jayanti",
+      "name": "Mahavir Jayanti",
+      "start": "2027-04-19",
+      "end": null,
+      "verified": true,
+      "note": "Prokerala agrees."
+    },
+    {
+      "id": "hanuman-jayanti",
+      "name": "Hanuman Jayanti (Chaitra Purnima)",
+      "start": "2027-04-20",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "guru-purnima",
+      "name": "Guru Purnima",
+      "start": "2027-07-18",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "shravan-month",
+      "name": "Shravan Month (Purnimanta, North)",
+      "start": "2027-07-19",
+      "end": "2027-08-17",
+      "verified": true,
+      "note": "Start = 'Shravana Begins *North' on Drik; end = Shravana Purnima (Drik lists Shravana Purnima Vrat on 08-16, Shravana Purnima 08-17)."
+    },
+    {
+      "id": "raksha-bandhan",
+      "name": "Raksha Bandhan",
+      "start": "2027-08-17",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "krishna-janmashtami",
+      "name": "Krishna Janmashtami",
+      "start": "2027-08-25",
+      "end": null,
+      "verified": true,
+      "note": "Drik lists a single date (Smarta and Vaishnava same). AstroSage and Prokerala agree."
+    },
+    {
+      "id": "ganesh-chaturthi",
+      "name": "Ganesh Chaturthi",
+      "start": "2027-09-04",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "sharad-navratri",
+      "name": "Sharad Navratri",
+      "start": "2027-09-30",
+      "end": "2027-10-08",
+      "verified": true,
+      "note": "Ghatasthapana 09-30; Maha Navami 10-08 (Drik). Navratri Parana 10-09."
+    },
+    {
+      "id": "dussehra",
+      "name": "Dussehra / Vijayadashami",
+      "start": "2027-10-09",
+      "end": null,
+      "verified": true,
+      "note": "Drik and Prokerala: 10-09. AstroSage lists Dussehra on 10-10 (disagreement)."
+    },
+    {
+      "id": "kartik-month",
+      "name": "Kartik Month (Purnimanta, North)",
+      "start": "2027-10-16",
+      "end": "2027-11-14",
+      "verified": true,
+      "note": "Start = 'Kartika Begins *North'; end = Kartika Purnima."
+    },
+    {
+      "id": "diwali",
+      "name": "Diwali (Lakshmi Puja)",
+      "start": "2027-10-29",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage and Prokerala agree."
+    },
+    {
+      "id": "kartik-purnima",
+      "name": "Kartik Purnima",
+      "start": "2027-11-14",
+      "end": null,
+      "verified": true,
+      "note": "Drik lists Kartika Purnima Vrat (and Dev Diwali) on 11-13 and Kartika Purnima on 11-14."
+    },
+    {
+      "id": "guru-nanak-jayanti",
+      "name": "Guru Nanak Jayanti (Gurpurab)",
+      "start": "2027-11-14",
+      "end": null,
+      "verified": true,
+      "note": "Prokerala agrees."
+    },
+    {
+      "id": "makar-sankranti",
+      "name": "Makar Sankranti",
+      "start": "2028-01-15",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "vasant-panchami",
+      "name": "Vasant Panchami",
+      "start": "2028-01-31",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "maha-shivaratri",
+      "name": "Maha Shivaratri",
+      "start": "2028-02-23",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "holi",
+      "name": "Holi (Dhulandi / Rangwali Holi)",
+      "start": "2028-03-11",
+      "end": null,
+      "verified": true,
+      "note": "Holika Dahan 03-10. AstroSage agrees."
+    },
+    {
+      "id": "chaitra-navratri",
+      "name": "Chaitra Navratri",
+      "start": "2028-03-27",
+      "end": "2028-04-03",
+      "verified": true,
+      "note": "Ghatasthapana 03-27; Ashtami and Rama Navami both on 04-03 per Drik (8-day Navratri, a tithi is skipped). Navratri Parana 04-04."
+    },
+    {
+      "id": "ram-navami",
+      "name": "Ram Navami",
+      "start": "2028-04-03",
+      "end": null,
+      "verified": true,
+      "note": "Drik: Smarta 04-03, ISKCON 04-04. AstroSage agrees on 04-03."
+    },
+    {
+      "id": "mahavir-jayanti",
+      "name": "Mahavir Jayanti",
+      "start": "2028-04-07",
+      "end": null,
+      "verified": true,
+      "note": "Only Drik checked; no second source."
+    },
+    {
+      "id": "hanuman-jayanti",
+      "name": "Hanuman Jayanti (Chaitra Purnima)",
+      "start": "2028-04-09",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "guru-purnima",
+      "name": "Guru Purnima",
+      "start": "2028-07-06",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "shravan-month",
+      "name": "Shravan Month (Purnimanta, North)",
+      "start": "2028-07-07",
+      "end": "2028-08-05",
+      "verified": true,
+      "note": "Start = 'Shravana Begins *North' on Drik; end = Shravana Purnima (Drik lists Shravana Purnima Vrat 08-04, Shravana Purnima 08-05)."
+    },
+    {
+      "id": "raksha-bandhan",
+      "name": "Raksha Bandhan",
+      "start": "2028-08-05",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "krishna-janmashtami",
+      "name": "Krishna Janmashtami",
+      "start": "2028-08-13",
+      "end": null,
+      "verified": true,
+      "note": "Drik lists a single date (Smarta and Vaishnava same). AstroSage agrees."
+    },
+    {
+      "id": "ganesh-chaturthi",
+      "name": "Ganesh Chaturthi",
+      "start": "2028-08-23",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "sharad-navratri",
+      "name": "Sharad Navratri",
+      "start": "2028-09-19",
+      "end": "2028-09-26",
+      "verified": true,
+      "note": "Ghatasthapana 09-19; Durga Ashtami and Maha Navami both on 09-26 per Drik (8-day Navratri). Navratri Parana 09-27. AstroSage agrees."
+    },
+    {
+      "id": "dussehra",
+      "name": "Dussehra / Vijayadashami",
+      "start": "2028-09-27",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "kartik-month",
+      "name": "Kartik Month (Purnimanta, North)",
+      "start": "2028-10-04",
+      "end": "2028-11-02",
+      "verified": true,
+      "note": "Start = 'Kartika Begins *North'; end = Kartika Purnima."
+    },
+    {
+      "id": "diwali",
+      "name": "Diwali (Lakshmi Puja)",
+      "start": "2028-10-17",
+      "end": null,
+      "verified": true,
+      "note": "AstroSage agrees."
+    },
+    {
+      "id": "kartik-purnima",
+      "name": "Kartik Purnima",
+      "start": "2028-11-02",
+      "end": null,
+      "verified": true,
+      "note": "Drik lists Kartika Purnima Vrat (and Dev Diwali) on 11-01 and Kartika Purnima on 11-02."
+    },
+    {
+      "id": "guru-nanak-jayanti",
+      "name": "Guru Nanak Jayanti (Gurpurab)",
+      "start": "2028-11-02",
+      "end": null,
+      "verified": true,
+      "note": "Only Drik checked; no second source."
+    }
+  ]
+}

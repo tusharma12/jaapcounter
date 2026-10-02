@@ -12,6 +12,9 @@ import '../../jaap/presentation/jaap_controller.dart';
 import '../../jaap/presentation/jaap_state.dart';
 import '../../mantras/domain/mantra_names.dart';
 import '../../settings/presentation/settings_controller.dart';
+import '../../jaap/presentation/widgets/hardware_count_keys.dart';
+import '../../jaap/presentation/auto_jaap_actions.dart';
+import '../../jaap/presentation/auto_jaap_controller.dart';
 
 /// A pure black screen for chanting with the eyes closed or the phone face
 /// up in a dark room.
@@ -62,75 +65,95 @@ class _BlackoutScreenState extends ConsumerState<BlackoutScreen> {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final async = ref.watch(jaapControllerProvider);
+    final autoRunning = ref.watch(autoJaapProvider.select((s) => s.running));
+    reapplyWakelockWhenAutoStops(
+      ref,
+      mounted: () => mounted,
+      reapply: () =>
+          _applyWakelock(ref.read(settingsProvider).keepScreenOnInMeditation),
+    );
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: AsyncView<JaapState>(
-          value: async,
-          builder: (context, state) => Stack(
-            children: [
-              // The buttons sit above this, not inside it, so pressing one
-              // never counts a bead as well.
-              Positioned.fill(
-                child: Semantics(
-                  button: true,
-                  label: l10n.semanticCounter(
-                    state.position.beadsInCurrentMala,
-                    state.position.malaSize,
-                  ),
-                  child: GestureDetector(
-                    key: const ValueKey('blackout-tap-area'),
-                    behavior: HitTestBehavior.opaque,
-                    onTapDown: (_) =>
-                        ref.read(jaapControllerProvider.notifier).count(),
-                    onVerticalDragEnd: (details) {
-                      if ((details.primaryVelocity ?? 0) > 220) {
-                        Navigator.of(context).maybePop();
-                      }
-                    },
-                    child: _showMantra
-                        ? _MantraAndCount(state: state)
-                        : const SizedBox.expand(),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: Insets.md),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _BlackoutButton(
-                          key: const ValueKey('blackout-show-mantra'),
-                          tooltip: _showMantra
-                              ? l10n.hideMantra
-                              : l10n.showMantra,
-                          onTap: () =>
-                              setState(() => _showMantra = !_showMantra),
-                          icon: _showMantra
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                        ),
-                        const SizedBox(width: Insets.xl),
-                        _BlackoutButton(
-                          key: const ValueKey('blackout-exit'),
-                          tooltip: l10n.exitBlackout,
-                          onTap: () => Navigator.of(context).maybePop(),
-                          icon: Icons.close_rounded,
-                        ),
-                      ],
+    return HardwareCountKeys(
+      onCount: () => countOrStopAuto(ref),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: AsyncView<JaapState>(
+            value: async,
+            builder: (context, state) => Stack(
+              children: [
+                // The buttons sit above this, not inside it, so pressing one
+                // never counts a bead as well.
+                Positioned.fill(
+                  child: Semantics(
+                    button: true,
+                    label: l10n.semanticCounter(
+                      state.position.beadsInCurrentMala,
+                      state.position.malaSize,
+                    ),
+                    child: GestureDetector(
+                      key: const ValueKey('blackout-tap-area'),
+                      behavior: HitTestBehavior.opaque,
+                      onTapDown: (_) => countOrStopAuto(ref),
+                      onVerticalDragEnd: (details) {
+                        if ((details.primaryVelocity ?? 0) > 220) {
+                          Navigator.of(context).maybePop();
+                        }
+                      },
+                      child: _showMantra
+                          ? _MantraAndCount(state: state)
+                          : const SizedBox.expand(),
                     ),
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: Insets.md),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _BlackoutButton(
+                            key: const ValueKey('blackout-show-mantra'),
+                            tooltip: _showMantra
+                                ? l10n.hideMantra
+                                : l10n.showMantra,
+                            onTap: () =>
+                                setState(() => _showMantra = !_showMantra),
+                            icon: _showMantra
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          const SizedBox(width: Insets.xl),
+                          _BlackoutButton(
+                            key: const ValueKey('blackout-auto-jaap'),
+                            tooltip: autoRunning
+                                ? l10n.autoJaapStopAction
+                                : l10n.autoJaap,
+                            onTap: () => toggleAutoJaap(context, ref),
+                            icon: autoRunning
+                                ? Icons.pause_circle_outline_rounded
+                                : Icons.play_circle_outline_rounded,
+                          ),
+                          const SizedBox(width: Insets.xl),
+                          _BlackoutButton(
+                            key: const ValueKey('blackout-exit'),
+                            tooltip: l10n.exitBlackout,
+                            onTap: () => Navigator.of(context).maybePop(),
+                            icon: Icons.close_rounded,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

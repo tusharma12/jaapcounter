@@ -71,7 +71,8 @@ class _Pill extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(Radii.pill),
           child: Container(
-            height: 40,
+            // 48 is Android's minimum tap target, and above iOS's 44.
+            height: 48,
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: Insets.sm),
             // Four pills share a phone's width, so a long label ("Monthly",

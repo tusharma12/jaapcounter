@@ -20,11 +20,16 @@ class WeeklyHabitGrid extends StatelessWidget {
     required this.anchor,
     required this.selected,
     required this.onSelect,
+    this.bridgedDays = const {},
     this.maxWeeks = 26,
     super.key,
   });
 
   final Map<String, int> totalsByDay;
+
+  /// Missed days a grace day covered, outlined so the streak's unbroken line
+  /// can be read across them.
+  final Set<String> bridgedDays;
   final int goal;
   final DateTime today;
 
@@ -148,6 +153,7 @@ class WeeklyHabitGrid extends StatelessWidget {
                               today: todayDate,
                               selectedKey: selectedKey,
                               totalsByDay: totalsByDay,
+                              bridgedDays: bridgedDays,
                               goal: goal,
                               size: cell,
                               onSelect: onSelect,
@@ -191,11 +197,13 @@ class _DayCell extends StatelessWidget {
     required this.today,
     required this.selectedKey,
     required this.totalsByDay,
+    required this.bridgedDays,
     required this.goal,
     required this.size,
     required this.onSelect,
   });
 
+  final Set<String> bridgedDays;
   final DateTime date;
   final DateTime today;
   final String selectedKey;
@@ -216,22 +224,45 @@ class _DayCell extends StatelessWidget {
     final total = totalsByDay[key] ?? 0;
     final isSelected = key == selectedKey;
     final isToday = key == DayKeys.of(today);
+    final bridged = bridgedDays.contains(key);
 
-    return GestureDetector(
-      onTap: () => onSelect(date),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: _fill(palette, _intensity(total, goal)),
-          borderRadius: radius,
-          border: isSelected
-              ? Border.all(color: palette.primaryText, width: 2)
-              : isToday
-              ? Border.all(color: palette.tertiaryText, width: 1)
-              : null,
+    final l10n = AppL10n.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    // Each square reads as its day and its count, so the grid is a calendar
+    // to a screen reader too, not a run of unlabelled buttons.
+    final cell = Semantics(
+      button: true,
+      selected: isSelected,
+      label: [
+        Fmt.dayLabel(date, locale),
+        l10n.jaapCount(total),
+        if (bridged) l10n.graceDayUsed,
+      ].join(', '),
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () => onSelect(date),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: _fill(palette, _intensity(total, goal)),
+            borderRadius: radius,
+            border: isSelected
+                ? Border.all(color: palette.primaryText, width: 2)
+                : bridged
+                ? Border.all(color: palette.saffron, width: 1.5)
+                : isToday
+                ? Border.all(color: palette.tertiaryText, width: 1)
+                : null,
+          ),
         ),
       ),
+    );
+    if (!bridged) return cell;
+    return Tooltip(
+      message: l10n.graceDayUsed,
+      excludeFromSemantics: true,
+      child: cell,
     );
   }
 }

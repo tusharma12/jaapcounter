@@ -6,7 +6,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_gu.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_mr.dart';
+import 'app_localizations_pa.dart';
+import 'app_localizations_ta.dart';
+import 'app_localizations_te.dart';
 
 // ignore_for_file: type=lint
 
@@ -94,7 +99,12 @@ abstract class AppL10n {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('gu'),
     Locale('hi'),
+    Locale('mr'),
+    Locale('pa'),
+    Locale('ta'),
+    Locale('te'),
   ];
 
   /// No description provided for @appName.
@@ -1513,6 +1523,84 @@ abstract class AppL10n {
   /// **'A meaning, a source, or a note to yourself'**
   String get mantraDescriptionHint;
 
+  /// No description provided for @dictationStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the mantra by speaking it'**
+  String get dictationStart;
+
+  /// No description provided for @dictationListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening… tap to stop'**
+  String get dictationListening;
+
+  /// No description provided for @dictationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech input isn\'t available on this device'**
+  String get dictationUnavailable;
+
+  /// No description provided for @dictationOfflineUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline speech input isn\'t available for this language on this phone. Your voice never leaves the device, so please type it instead.'**
+  String get dictationOfflineUnavailable;
+
+  /// No description provided for @micPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone access is needed for this'**
+  String get micPermissionDenied;
+
+  /// No description provided for @voiceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice note'**
+  String get voiceNote;
+
+  /// No description provided for @voiceNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Record yourself chanting it'**
+  String get voiceNoteHint;
+
+  /// No description provided for @voiceNoteRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get voiceNoteRecord;
+
+  /// No description provided for @voiceNoteRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording… tap to stop'**
+  String get voiceNoteRecording;
+
+  /// No description provided for @voiceNotePlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play voice note'**
+  String get voiceNotePlay;
+
+  /// No description provided for @voiceNotePause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause voice note'**
+  String get voiceNotePause;
+
+  /// No description provided for @voiceNoteDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete voice note'**
+  String get voiceNoteDelete;
+
+  /// No description provided for @voiceNoteMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This voice note is no longer on this phone'**
+  String get voiceNoteMissing;
+
   /// No description provided for @fallingMantra.
   ///
   /// In en, this message translates to:
@@ -1674,6 +1762,342 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Add to Home Screen'**
   String get addToHomeScreen;
+
+  /// No description provided for @countWithButtons.
+  ///
+  /// In en, this message translates to:
+  /// **'Count with buttons'**
+  String get countWithButtons;
+
+  /// No description provided for @countWithButtonsHintAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume buttons, a headset button or a Bluetooth clicker count a bead'**
+  String get countWithButtonsHintAndroid;
+
+  /// No description provided for @countWithButtonsHintIOS.
+  ///
+  /// In en, this message translates to:
+  /// **'A Bluetooth clicker or keyboard counts a bead. iPhone volume buttons can\'t be used by apps.'**
+  String get countWithButtonsHintIOS;
+
+  /// No description provided for @lockScreenCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock screen counter'**
+  String get lockScreenCounter;
+
+  /// No description provided for @lockScreenCounterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A +1 button on your lock screen and Dynamic Island. Taps are added to your Jaap when you next open the app.'**
+  String get lockScreenCounterHint;
+
+  /// No description provided for @markerBead.
+  ///
+  /// In en, this message translates to:
+  /// **'Marker bead'**
+  String get markerBead;
+
+  /// No description provided for @markerBeadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'One firm knock partway through the mala, so you can feel where you are with eyes closed'**
+  String get markerBeadHint;
+
+  /// No description provided for @markerBeadEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {count}'**
+  String markerBeadEvery(int count);
+
+  /// No description provided for @markerBeadOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get markerBeadOff;
+
+  /// No description provided for @graceDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Grace days'**
+  String get graceDays;
+
+  /// No description provided for @graceDaysHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 7 days in a row earns a grace day (up to 2). A missed day uses one instead of breaking your streak.'**
+  String get graceDaysHint;
+
+  /// No description provided for @graceDaysHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No grace days held} =1{1 grace day held} other{{count} grace days held}}'**
+  String graceDaysHeld(int count);
+
+  /// No description provided for @graceDayUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Covered by a grace day'**
+  String get graceDayUsed;
+
+  /// No description provided for @milestoneLakh.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} lakh Jaap'**
+  String milestoneLakh(int count);
+
+  /// No description provided for @milestoneSavaLakh.
+  ///
+  /// In en, this message translates to:
+  /// **'Sava lakh Jaap'**
+  String get milestoneSavaLakh;
+
+  /// No description provided for @milestoneCrore.
+  ///
+  /// In en, this message translates to:
+  /// **'1 crore Jaap'**
+  String get milestoneCrore;
+
+  /// No description provided for @milestoneStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}-day streak'**
+  String milestoneStreak(int days);
+
+  /// No description provided for @milestoneReached.
+  ///
+  /// In en, this message translates to:
+  /// **'{milestone} reached. A milestone in your practice.'**
+  String milestoneReached(String milestone);
+
+  /// No description provided for @milestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get milestones;
+
+  /// No description provided for @milestoneNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {milestone}'**
+  String milestoneNext(String milestone);
+
+  /// No description provided for @milestoneToGo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} to go'**
+  String milestoneToGo(int count);
+
+  /// No description provided for @milestoneAllReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Every milestone reached'**
+  String get milestoneAllReached;
+
+  /// No description provided for @yearInReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Year in review'**
+  String get yearInReview;
+
+  /// No description provided for @yearInReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {year} in Jaap'**
+  String yearInReviewTitle(int year);
+
+  /// No description provided for @yearNoJaap.
+  ///
+  /// In en, this message translates to:
+  /// **'No Jaap recorded in {year}'**
+  String yearNoJaap(int year);
+
+  /// No description provided for @yearActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Days chanted'**
+  String get yearActiveDays;
+
+  /// No description provided for @yearLongestRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest run'**
+  String get yearLongestRun;
+
+  /// No description provided for @yearLongestRunValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String yearLongestRunValue(int count);
+
+  /// No description provided for @yearBestDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Best day'**
+  String get yearBestDay;
+
+  /// No description provided for @yearTopMantra.
+  ///
+  /// In en, this message translates to:
+  /// **'Most chanted'**
+  String get yearTopMantra;
+
+  /// No description provided for @yearByMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'By month'**
+  String get yearByMonth;
+
+  /// No description provided for @yearMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones this year'**
+  String get yearMilestones;
+
+  /// No description provided for @yearShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'My {year} in Naam Jap: {count} Jaap'**
+  String yearShareText(int year, String count);
+
+  /// No description provided for @previousYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous year'**
+  String get previousYear;
+
+  /// No description provided for @nextYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Next year'**
+  String get nextYear;
+
+  /// No description provided for @ekadashiName.
+  ///
+  /// In en, this message translates to:
+  /// **'{name, select, indira{Indira Ekadashi} papankusha{Papankusha Ekadashi} rama{Rama Ekadashi} devutthana{Devutthana Ekadashi} utpanna{Utpanna Ekadashi} mokshada{Mokshada Ekadashi} saphala{Saphala Ekadashi} paushaPutrada{Pausha Putrada Ekadashi} shattila{Shattila Ekadashi} jaya{Jaya Ekadashi} vijaya{Vijaya Ekadashi} amalaki{Amalaki Ekadashi} papamochani{Papamochani Ekadashi} kamada{Kamada Ekadashi} varuthini{Varuthini Ekadashi} mohini{Mohini Ekadashi} apara{Apara Ekadashi} nirjala{Nirjala Ekadashi} yogini{Yogini Ekadashi} devshayani{Devshayani Ekadashi} kamika{Kamika Ekadashi} shravanaPutrada{Shravana Putrada Ekadashi} aja{Aja Ekadashi} parsva{Parsva Ekadashi} other{Ekadashi}}'**
+  String ekadashiName(String name);
+
+  /// No description provided for @festivalName.
+  ///
+  /// In en, this message translates to:
+  /// **'{name, select, sharadNavratri{Sharad Navratri} chaitraNavratri{Chaitra Navratri} dussehra{Dussehra} diwali{Diwali} kartikMonth{Kartik month} kartikPurnima{Kartik Purnima} guruNanakJayanti{Guru Nanak Jayanti} makarSankranti{Makar Sankranti} vasantPanchami{Vasant Panchami} mahaShivaratri{Maha Shivaratri} holi{Holi} ramNavami{Ram Navami} mahavirJayanti{Mahavir Jayanti} hanumanJayanti{Hanuman Jayanti} guruPurnima{Guru Purnima} shravanMonth{Shravan month} rakshaBandhan{Raksha Bandhan} krishnaJanmashtami{Krishna Janmashtami} ganeshChaturthi{Ganesh Chaturthi} other{Festival}}'**
+  String festivalName(String name);
+
+  /// No description provided for @sankalpBegins.
+  ///
+  /// In en, this message translates to:
+  /// **'Begins {date}'**
+  String sankalpBegins(String date);
+
+  /// No description provided for @upcomingObservances.
+  ///
+  /// In en, this message translates to:
+  /// **'Ekadashi and festivals'**
+  String get upcomingObservances;
+
+  /// No description provided for @observanceToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get observanceToday;
+
+  /// No description provided for @observanceInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Tomorrow} other{In {count} days}}'**
+  String observanceInDays(int count);
+
+  /// No description provided for @observanceDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} – {end}'**
+  String observanceDateRange(String start, String end);
+
+  /// No description provided for @observanceSankalpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sankalp for {name}'**
+  String observanceSankalpTitle(String name);
+
+  /// No description provided for @observanceTakeSankalp.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a Sankalp'**
+  String get observanceTakeSankalp;
+
+  /// No description provided for @observanceVaishnava.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaishnava (ISKCON) observance: {date}'**
+  String observanceVaishnava(String date);
+
+  /// No description provided for @observanceSourceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates follow Drik Panchang for New Delhi. Your local temple or tradition may observe a day apart.'**
+  String get observanceSourceNote;
+
+  /// No description provided for @observancesNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in the next few weeks'**
+  String get observancesNone;
+
+  /// No description provided for @festivalReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Ekadashi and festival reminders'**
+  String get festivalReminders;
+
+  /// No description provided for @festivalRemindersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A note at 6 am on Ekadashi and festival days'**
+  String get festivalRemindersHint;
+
+  /// No description provided for @festivalNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Today is {name}. A blessed day for Naam Jap.'**
+  String festivalNotificationBody(String name);
+
+  /// No description provided for @sendDiagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'Send diagnostics'**
+  String get sendDiagnostics;
+
+  /// No description provided for @diagnosticsExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'This report helps fix a problem. It has the app and phone versions, your settings and the app\'s error log. It has no mantras, counts or notes. Nothing is sent until you choose how below.'**
+  String get diagnosticsExplain;
+
+  /// No description provided for @diagnosticsEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email it'**
+  String get diagnosticsEmail;
+
+  /// No description provided for @diagnosticsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as a file'**
+  String get diagnosticsShare;
+
+  /// No description provided for @diagnosticsEmailSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaran diagnostics'**
+  String get diagnosticsEmailSubject;
+
+  /// No description provided for @diagnosticsNoMail.
+  ///
+  /// In en, this message translates to:
+  /// **'No mail app found. Try sharing it as a file.'**
+  String get diagnosticsNoMail;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
@@ -1685,8 +2109,15 @@ class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'hi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'en',
+    'gu',
+    'hi',
+    'mr',
+    'pa',
+    'ta',
+    'te',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppL10nDelegate old) => false;
@@ -1697,8 +2128,18 @@ AppL10n lookupAppL10n(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppL10nEn();
+    case 'gu':
+      return AppL10nGu();
     case 'hi':
       return AppL10nHi();
+    case 'mr':
+      return AppL10nMr();
+    case 'pa':
+      return AppL10nPa();
+    case 'ta':
+      return AppL10nTa();
+    case 'te':
+      return AppL10nTe();
   }
 
   throw FlutterError(

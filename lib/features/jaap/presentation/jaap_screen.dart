@@ -28,6 +28,9 @@ import 'widgets/falling_mantra.dart';
 import 'widgets/mala_complete_overlay.dart';
 import 'widgets/mala_ring.dart';
 import 'widgets/session_pill.dart';
+import 'widgets/hardware_count_keys.dart';
+import '../../progress/presentation/milestone_labels.dart';
+import '../../share/presentation/share_card.dart';
 
 /// The counter. This is the screen the app exists for, so it opens straight
 /// into a countable state and everything else is one tap away.
@@ -40,6 +43,7 @@ class JaapScreen extends ConsumerStatefulWidget {
 
 class _JaapScreenState extends ConsumerState<JaapScreen> {
   int? _seenMalaCompletions;
+  int? _seenMilestones;
   bool _celebrating = false;
   Timer? _celebrationTimer;
 
@@ -55,6 +59,29 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
     _celebrationTimer = Timer(Motion.celebration, () {
       if (mounted) setState(() => _celebrating = false);
     });
+  }
+
+  /// A lifetime milestone is marked without stopping the count: a snackbar,
+  /// not a dialog, so a tap with eyes closed still lands on the counter.
+  void _onMilestone(int threshold) {
+    final l10n = AppL10n.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.milestoneReached(jaapMilestoneLabel(l10n, threshold)),
+          ),
+          duration: const Duration(seconds: 6),
+          margin: const EdgeInsets.all(Insets.lg),
+          action: SnackBarAction(
+            label: l10n.share,
+            onPressed: () => showShareCardSheet(context),
+          ),
+        ),
+      );
   }
 
   Future<void> _undo() async {
@@ -179,32 +206,47 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
       }
     }
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          const Positioned.fill(child: CounterBackdrop()),
-          SafeArea(
-            child: AsyncView<JaapState>(
-              value: async,
-              onRetry: () => ref.invalidate(jaapControllerProvider),
-              builder: (context, state) => _CounterBody(
-                state: state,
-                celebrating: _celebrating,
-                autoRunning: autoRunning,
-                hideMantra: ref.watch(hideMantraProvider),
-                fallingMantra: ref.watch(
-                  settingsProvider.select((s) => s.fallingMantra),
+    final milestones = async.value?.milestoneCount;
+    if (milestones != null && milestones != _seenMilestones) {
+      final isFirstBuild = _seenMilestones == null;
+      _seenMilestones = milestones;
+      final reached = async.value?.milestone;
+      if (!isFirstBuild && reached != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _onMilestone(reached);
+        });
+      }
+    }
+
+    return HardwareCountKeys(
+      onCount: () => _onTapArea(autoRunning),
+      child: Scaffold(
+        body: Stack(
+          children: [
+            const Positioned.fill(child: CounterBackdrop()),
+            SafeArea(
+              child: AsyncView<JaapState>(
+                value: async,
+                onRetry: () => ref.invalidate(jaapControllerProvider),
+                builder: (context, state) => _CounterBody(
+                  state: state,
+                  celebrating: _celebrating,
+                  autoRunning: autoRunning,
+                  hideMantra: ref.watch(hideMantraProvider),
+                  fallingMantra: ref.watch(
+                    settingsProvider.select((s) => s.fallingMantra),
+                  ),
+                  malaStyle: ref.watch(
+                    settingsProvider.select((s) => s.malaStyle),
+                  ),
+                  showHint: !ref.watch(counterHintSeenProvider),
+                  onTap: () => _onTapArea(autoRunning),
+                  onMenu: (action) => _onMenu(action, state),
                 ),
-                malaStyle: ref.watch(
-                  settingsProvider.select((s) => s.malaStyle),
-                ),
-                showHint: !ref.watch(counterHintSeenProvider),
-                onTap: () => _onTapArea(autoRunning),
-                onMenu: (action) => _onMenu(action, state),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -456,6 +498,17 @@ class _TopBar extends ConsumerWidget {
           ),
           _StreakChip(days: streak),
           IconButton(
+            key: const ValueKey('counter-auto-jaap'),
+            onPressed: () => onMenu(_MenuAction.autoJaap),
+            tooltip: autoRunning ? l10n.autoJaapStopAction : l10n.autoJaap,
+            icon: Icon(
+              autoRunning
+                  ? Icons.pause_circle_outline_rounded
+                  : Icons.play_circle_outline_rounded,
+            ),
+            color: autoRunning ? palette.saffron : palette.secondaryText,
+          ),
+          IconButton(
             key: const ValueKey('counter-meditation'),
             onPressed: () => onMenu(_MenuAction.meditation),
             tooltip: l10n.meditationMode,
@@ -614,32 +667,41 @@ class _MantraChip extends ConsumerWidget {
       child: InkWell(
         onTap: () => showMantraPicker(context),
         borderRadius: BorderRadius.circular(Radii.pill),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Insets.md,
-            vertical: Insets.sm,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: Text(
-                  state.mantra.displayName(context),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: palette.primaryText,
+        // Tall enough to be an easy tap target, without widening the chip.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Insets.md,
+              vertical: Insets.sm,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // The full mantra is shown large below; the chip caps its
+                // growth so it stays readable beside the top bar's buttons.
+                Flexible(
+                  child: Text(
+                    state.mantra.displayName(context),
+                    textScaler: MediaQuery.textScalerOf(
+                      context,
+                    ).clamp(maxScaleFactor: 1.5),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: palette.primaryText,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: Insets.xs),
-              Icon(
-                Icons.expand_more_rounded,
-                size: 20,
-                color: palette.tertiaryText,
-              ),
-            ],
+                const SizedBox(width: Insets.xs),
+                Icon(
+                  Icons.expand_more_rounded,
+                  size: 20,
+                  color: palette.tertiaryText,
+                ),
+              ],
+            ),
           ),
         ),
       ),

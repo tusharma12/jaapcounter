@@ -7,6 +7,7 @@ import 'package:japmala/app/theme/app_theme.dart';
 import 'package:japmala/core/database/app_database.dart';
 import 'package:japmala/core/providers.dart';
 import 'package:japmala/core/utils/day_key.dart';
+import 'package:japmala/core/utils/formatters.dart';
 import 'package:japmala/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -18,6 +19,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 /// a fake async zone, and work completing on a background isolate would never
 /// be delivered while `pumpAndSettle` spins the fake clock.
 Future<Database> openTestDatabase() async {
+  Fmt.useLatinDigits();
   sqfliteFfiInit();
   return AppDatabase.openInMemory(databaseFactoryFfiNoIsolate);
 }
