@@ -137,7 +137,11 @@ void main() {
     expect(rows['mine']!['description'], 'Sita Ram');
     expect(rows['plain']!['name'], 'Jai Mata Di');
     expect(rows['plain']!['description'], isNull);
-    expect(rows['builtin.ram']!['name'], 'राम');
+    expect(
+      rows['builtin.ram']!['name'],
+      'राम राम',
+      reason: 'an unedited built-in is brought up to date',
+    );
   });
 
   test('v7 adds the four new built-ins without touching Jaap', () async {
@@ -151,7 +155,6 @@ void main() {
       'builtin.radhe-krishna',
       'builtin.om-namo-narayanaya',
       'builtin.om-sai-ram',
-      'builtin.om-dum-durgayei-namah',
     ];
     final v6 = await AppDatabase.open(factory: factory);
     await v6.delete(
@@ -177,7 +180,7 @@ void main() {
     };
     expect(ids, containsAll(added));
     expect(ids.length, BuiltInMantras.all.length);
-    expect(BuiltInMantras.all.length, 22);
+    expect(BuiltInMantras.all.length, 21);
     expect(await db.query('jaap_entries'), hasLength(1));
   });
 
@@ -238,5 +241,93 @@ void main() {
     final db = await AppDatabase.open(factory: factory);
     addTearDown(db.close);
     expect(await db.getVersion(), AppDatabase.schemaVersion);
+  });
+
+  group('v10', () {
+    const durga = 'builtin.om-dum-durgayei-namah';
+
+    /// Today's schema made to look like a v9 install: the Durga mantra still
+    /// there, and the single-word mantras as they used to ship.
+    Future<(DatabaseFactory, Directory)> v9Install({
+      bool durgaUsed = false,
+    }) async {
+      final dir = await Directory.systemTemp.createTemp('japmala');
+      addTearDown(() => dir.delete(recursive: true));
+      final factory = databaseFactoryFfi;
+      await factory.setDatabasesPath(dir.path);
+      final db = await AppDatabase.open(factory: factory);
+      await db.insert('mantras', {
+        'id': durga,
+        'name': 'ॐ दुं दुर्गायै नमः',
+        'is_built_in': 1,
+        'sort_order': 20,
+      });
+      await db.update('mantras', {'name': 'राम'}, where: "id = 'builtin.ram'");
+      await db.update('mantras', {
+        'name': 'My own Radha',
+      }, where: "id = 'builtin.radha'");
+      await db.update('mantras', {
+        'name': 'वाहेगुरु',
+      }, where: "id = 'builtin.waheguru'");
+      if (durgaUsed) {
+        await db.insert('jaap_entries', {
+          'id': 'e1',
+          'mantra_id': durga,
+          'count': 108,
+          'day': '2026-09-27',
+          'timestamp': 0,
+        });
+      }
+      await db.setVersion(9);
+      await db.close();
+      return (factory, dir);
+    }
+
+    test('chants Ram and Waheguru twice, and keeps a user\'s edit', () async {
+      final (factory, _) = await v9Install();
+
+      final db = await AppDatabase.open(factory: factory);
+      addTearDown(db.close);
+      final rows = {for (final r in await db.query('mantras')) r['id']: r};
+
+      expect(rows['builtin.ram']!['name'], 'राम राम');
+      expect(rows['builtin.waheguru']!['name'], 'वाहेगुरु वाहेगुरु');
+      expect(rows['builtin.radha']!['name'], 'My own Radha');
+      expect(await db.getVersion(), AppDatabase.schemaVersion);
+    });
+
+    test(
+      'an unused Durga mantra is removed and the order is closed up',
+      () async {
+        final (factory, _) = await v9Install();
+
+        final db = await AppDatabase.open(factory: factory);
+        addTearDown(db.close);
+        final rows = {for (final r in await db.query('mantras')) r['id']: r};
+
+        expect(rows.containsKey(durga), isFalse);
+        expect(rows['builtin.hare-rama']!['sort_order'], 20);
+      },
+    );
+
+    test('a Durga mantra with Jaap becomes the user\'s own', () async {
+      final (factory, _) = await v9Install(durgaUsed: true);
+
+      final db = await AppDatabase.open(factory: factory);
+      addTearDown(db.close);
+      final rows = {for (final r in await db.query('mantras')) r['id']: r};
+
+      expect(rows[durga]!['is_built_in'], 0);
+      expect(rows[durga]!['name'], 'ॐ दुं दुर्गायै नमः');
+      expect(
+        (await db.query(
+          'jaap_entries',
+          where: 'mantra_id = ?',
+          whereArgs: [durga],
+        )).length,
+        1,
+        reason: 'the Jaap recorded against it is untouched',
+      );
+    });
   });
 }

@@ -8,6 +8,7 @@ import '../../../core/providers.dart';
 import '../../../core/services/app_logger.dart';
 import '../../mantras/domain/mantra.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
+import '../../meditation/presentation/music_playback.dart';
 import '../domain/jaap_entry.dart';
 import 'jaap_controller.dart';
 
@@ -19,7 +20,7 @@ class AutoJaapConfig {
   const AutoJaapConfig({
     this.interval = const Duration(seconds: 2),
     this.stopAfter = AutoJaapStop.mala,
-    this.playChant = true,
+    this.playMusic = false,
   });
 
   /// Paces offered in the sheet, in seconds per bead.
@@ -29,18 +30,18 @@ class AutoJaapConfig {
   final Duration interval;
   final AutoJaapStop stopAfter;
 
-  /// Whether the mantra's own recording plays with each bead, when it has one.
-  final bool playChant;
+  /// Whether the chosen sound plays while Auto Jaap runs.
+  final bool playMusic;
 
   AutoJaapConfig copyWith({
     Duration? interval,
     AutoJaapStop? stopAfter,
-    bool? playChant,
+    bool? playMusic,
   }) {
     return AutoJaapConfig(
       interval: interval ?? this.interval,
       stopAfter: stopAfter ?? this.stopAfter,
-      playChant: playChant ?? this.playChant,
+      playMusic: playMusic ?? this.playMusic,
     );
   }
 
@@ -50,7 +51,7 @@ class AutoJaapConfig {
     '${interval.inMilliseconds}',
     'false',
     stopAfter.name,
-    '$playChant',
+    '$playMusic',
   ];
 
   /// Reads what [toPrefs] wrote, and also the longer lists older versions
@@ -67,24 +68,37 @@ class AutoJaapConfig {
         (s) => s.name == values[2],
         orElse: () => fallback.stopAfter,
       ),
-      // Older versions stored only three values; the chant plays for them.
-      playChant: values.length > 3 ? values[3] != 'false' : true,
+      // Longer lists from older versions carry other things here; only an
+      // explicit 'true' counts.
+      playMusic: values.length > 3 && values[3] == 'true',
     );
   }
 }
 
 @immutable
 class AutoJaapState {
-  const AutoJaapState({required this.config, this.running = false});
+  const AutoJaapState({
+    required this.config,
+    this.running = false,
+    this.awaitingGoalChoice = false,
+  });
 
   final AutoJaapConfig config;
   final bool running;
 
-  AutoJaapState copyWith({AutoJaapConfig? config, bool? running}) =>
-      AutoJaapState(
-        config: config ?? this.config,
-        running: running ?? this.running,
-      );
+  /// The daily goal was reached mid-run: counting is paused until the user
+  /// chooses to continue or stop.
+  final bool awaitingGoalChoice;
+
+  AutoJaapState copyWith({
+    AutoJaapConfig? config,
+    bool? running,
+    bool? awaitingGoalChoice,
+  }) => AutoJaapState(
+    config: config ?? this.config,
+    running: running ?? this.running,
+    awaitingGoalChoice: awaitingGoalChoice ?? this.awaitingGoalChoice,
+  );
 }
 
 final autoJaapProvider = NotifierProvider<AutoJaapController, AutoJaapState>(
@@ -99,6 +113,9 @@ class AutoJaapController extends Notifier<AutoJaapState> {
   // Bumped on every start and stop. A loop that finds the generation changed
   // under it exits, so a quick stop-then-start never leaves two loops running.
   int _generation = 0;
+
+  // Completed by the user's answer to the goal prompt: true to keep going.
+  Completer<bool>? _goalChoice;
 
   @override
   AutoJaapState build() {
@@ -123,6 +140,10 @@ class AutoJaapController extends Notifier<AutoJaapState> {
     await ref.read(settingsServiceProvider).setAutoJaapConfig(config.toPrefs());
   }
 
+  /// Whether it is counting now; unlike [state], readable from a widget's
+  /// dispose, where `ref` is no longer safe.
+  bool get isRunning => ref.mounted && state.running;
+
   void start() {
     if (state.running) return;
     final jaap = ref.read(jaapControllerProvider).value;
@@ -131,6 +152,9 @@ class AutoJaapController extends Notifier<AutoJaapState> {
     final generation = ++_generation;
     state = state.copyWith(running: true);
     _applyWakelock(true);
+    if (state.config.playMusic) {
+      unawaited(ref.read(musicPlaybackProvider.notifier).startForAuto());
+    }
     unawaited(
       _run(
         generation,
@@ -143,38 +167,32 @@ class AutoJaapController extends Notifier<AutoJaapState> {
   void stop() {
     if (!state.running) return;
     _generation++;
+    _answerGoalPrompt(false);
     state = state.copyWith(running: false);
     _applyWakelock(false);
-    unawaited(_stopVoice());
+    unawaited(ref.read(musicPlaybackProvider.notifier).stopForAuto());
   }
 
-  /// Plays the active mantra's own recording, if it has one, and completes
-  /// when it ends. Auto Jaap then chants at the pace of the user's voice
-  /// when a recording is longer than the chosen interval.
-  Future<void> _playVoice() async {
-    try {
-      if (!state.config.playChant) return;
-      final mantra = ref.read(activeMantraProvider);
-      if (mantra == null || !mantra.hasAudio) return;
-      final store = ref.read(voiceNoteStoreProvider);
-      if (!await store.exists(mantra.audioPath)) return;
-      await ref
-          .read(mantraAudioServiceProvider)
-          .playToEnd(await store.pathFor(mantra.audioPath!));
-    } on Object catch (error, stack) {
-      // A recording that will not play must not stop the counting.
-      AppLogger.e('Could not play the mantra recording', error, stack);
+  /// Keeps counting past the daily goal.
+  void continueAfterGoal() => _answerGoalPrompt(true);
+
+  void _answerGoalPrompt(bool keepGoing) {
+    final choice = _goalChoice;
+    _goalChoice = null;
+    if (choice != null && !choice.isCompleted) choice.complete(keepGoing);
+    if (state.awaitingGoalChoice) {
+      state = state.copyWith(awaitingGoalChoice: false);
     }
   }
 
-  Future<void> _stopVoice() async {
-    try {
-      if (ref.read(activeMantraProvider)?.hasAudio ?? false) {
-        await ref.read(mantraAudioServiceProvider).stopPlayback();
-      }
-    } on Object catch (error, stack) {
-      AppLogger.e('Could not stop the mantra recording', error, stack);
-    }
+  /// Pauses at the goal until the user decides. Counting past a goal is
+  /// something to choose, not something to stumble into, and so is stopping:
+  /// a sudden halt in the middle of a sitting is jarring.
+  Future<bool> _askAboutGoal() {
+    final choice = Completer<bool>();
+    _goalChoice = choice;
+    state = state.copyWith(awaitingGoalChoice: true);
+    return choice.future;
   }
 
   Future<void> _run(
@@ -186,30 +204,36 @@ class AutoJaapController extends Notifier<AutoJaapState> {
       final config = state.config;
       final beadStarted = DateTime.now();
 
-      final voice = _playVoice();
       ref.read(jaapControllerProvider.notifier).count(1, JaapSource.auto);
 
       final jaap = ref.read(jaapControllerProvider).value;
       if (jaap != null) {
-        final done = switch (config.stopAfter) {
-          AutoJaapStop.mala => jaap.malaCompletions != startCompletions,
-          AutoJaapStop.goal => !goalAlreadyReached && jaap.goalReached,
-          AutoJaapStop.never => false,
-        };
-        if (done) {
-          // Let the last recording finish rather than cutting it off.
-          await voice;
-          if (generation == _generation) stop();
-          return;
+        switch (config.stopAfter) {
+          case AutoJaapStop.mala:
+            if (jaap.malaCompletions != startCompletions) {
+              stop();
+              return;
+            }
+          case AutoJaapStop.goal:
+            if (!goalAlreadyReached && jaap.goalReached) {
+              final keepGoing = await _askAboutGoal();
+              if (generation != _generation) return;
+              if (!keepGoing) {
+                stop();
+                return;
+              }
+              // Asked once; from here the run goes on until it is stopped.
+              goalAlreadyReached = true;
+              continue;
+            }
+          case AutoJaapStop.never:
+            break;
         }
       }
 
       final remaining =
           config.interval - DateTime.now().difference(beadStarted);
-      await Future.wait([
-        voice,
-        if (remaining > Duration.zero) Future<void>.delayed(remaining),
-      ]);
+      if (remaining > Duration.zero) await Future<void>.delayed(remaining);
     }
   }
 

@@ -13,7 +13,6 @@ class Mantra {
     this.isBuiltIn = false,
     this.sortOrder = 0,
     this.malaBase = 0,
-    this.audioPath,
   });
 
   final String id;
@@ -36,10 +35,6 @@ class Mantra {
   /// delete history: totals stay intact while the bead position moves.
   final int malaBase;
 
-  /// Path to a voice recording of this mantra, chanted in the user's own
-  /// voice, or null if none was recorded.
-  final String? audioPath;
-
   static final _devanagari = RegExp('[ऀ-ॿ]');
 
   /// Whether the mantra needs the Devanagari typeface to render well.
@@ -50,8 +45,6 @@ class Mantra {
 
   bool get hasDescription => description != null && description!.isNotEmpty;
 
-  bool get hasAudio => audioPath != null && audioPath!.isNotEmpty;
-
   Mantra copyWith({
     String? id,
     String? name,
@@ -60,7 +53,6 @@ class Mantra {
     bool? isBuiltIn,
     int? sortOrder,
     int? malaBase,
-    Object? audioPath = _sentinel,
   }) {
     return Mantra(
       id: id ?? this.id,
@@ -72,7 +64,6 @@ class Mantra {
       isBuiltIn: isBuiltIn ?? this.isBuiltIn,
       sortOrder: sortOrder ?? this.sortOrder,
       malaBase: malaBase ?? this.malaBase,
-      audioPath: audioPath == _sentinel ? this.audioPath : audioPath as String?,
     );
   }
 
@@ -84,7 +75,6 @@ class Mantra {
     'is_built_in': isBuiltIn ? 1 : 0,
     'sort_order': sortOrder,
     'mala_base': malaBase,
-    'audio_path': audioPath,
   };
 
   /// Also reads rows and backups from before mantras had a description,
@@ -106,7 +96,6 @@ class Mantra {
       isBuiltIn: (map['is_built_in'] as int? ?? 0) == 1,
       sortOrder: (map['sort_order'] as int?) ?? 0,
       malaBase: (map['mala_base'] as int?) ?? 0,
-      audioPath: map['audio_path'] as String?,
     );
   }
 
@@ -134,8 +123,7 @@ class Mantra {
       other.malaSize == malaSize &&
       other.isBuiltIn == isBuiltIn &&
       other.sortOrder == sortOrder &&
-      other.malaBase == malaBase &&
-      other.audioPath == audioPath;
+      other.malaBase == malaBase;
 
   @override
   int get hashCode => Object.hash(
@@ -146,7 +134,6 @@ class Mantra {
     isBuiltIn,
     sortOrder,
     malaBase,
-    audioPath,
   );
 
   @override

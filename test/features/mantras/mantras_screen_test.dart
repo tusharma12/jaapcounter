@@ -25,8 +25,8 @@ void main() {
   ) async {
     await pumpLibrary(tester);
 
-    expect(find.text('Ram'), findsOneWidget);
-    expect(find.text('Radha'), findsOneWidget);
+    expect(find.text('Ram Ram'), findsOneWidget);
+    expect(find.text('Radha Radha'), findsOneWidget);
     expect(find.text('Om Namah Shivaya'), findsOneWidget);
     expect(find.text('108 beads'), findsWidgets);
   });
@@ -41,7 +41,7 @@ void main() {
   testWidgets('tapping a mantra makes it the active one', (tester) async {
     await pumpLibrary(tester);
 
-    await tester.tap(find.text('Radha'));
+    await tester.tap(find.text('Radha Radha'));
     await tester.pumpAndSettle();
 
     expect(container.read(activeMantraProvider)!.id, 'builtin.radha');

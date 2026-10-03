@@ -5,36 +5,43 @@ import 'package:flutter/foundation.dart';
 
 import 'app_logger.dart';
 
-/// One background sound for meditation.
+/// One background sound for meditation: a short loop that ships with the
+/// app, or a file the user recorded or picked.
 @immutable
 class AmbientChant {
-  const AmbientChant(this.id, this.label);
+  /// A bundled loop. [id] is also its file name under assets/chants/loops/.
+  const AmbientChant(this.id, this.label) : filePath = null;
 
-  /// Also the file name under assets/chants/loops/.
+  /// The user's own sound, at an absolute path on this phone today.
+  const AmbientChant.file(this.id, this.label, String this.filePath);
+
   final String id;
   final String label;
+  final String? filePath;
 
-  String get asset => 'chants/loops/$id.m4a';
+  bool get isUserFile => filePath != null;
+
+  Source get source => isUserFile
+      ? DeviceFileSource(filePath!)
+      : AssetSource('chants/loops/$id.m4a');
 }
 
 /// Quiet background sound for meditation.
 ///
-/// Each track is a short seamless loop (about 45 seconds) that repeats for as
-/// long as the session lasts, so the app ships a few seconds of audio rather
-/// than a recording as long as the longest sitting. It has its own player, so
+/// Each track repeats for as long as the session lasts. The bundled ones are
+/// short seamless loops (about a minute, stereo AAC), so the app ships a little audio
+/// rather than a recording as long as the longest sitting. It has its own player, so
 /// it can sound together with a mantra's own recording during Auto Jaap.
 class AmbientChantService {
   AmbientChantService([this._player]);
 
   static const List<AmbientChant> chants = [
-    AmbientChant('ram_ram', 'Ram Ram'),
-    AmbientChant('solemn_offering', 'Solemn Offering'),
-    AmbientChant('sitar_flute', 'Sitar and Flute'),
+    AmbientChant('breath_of_the_valley', 'Breath of the Valley'),
+    AmbientChant('morning_high_plateau', 'Morning on the High Plateau'),
     AmbientChant('white_noise', 'Soft Noise'),
-    AmbientChant('meditation_1', 'Meditation 1'),
-    AmbientChant('meditation_2', 'Meditation 2'),
-    AmbientChant('meditation_3', 'Meditation 3'),
-    AmbientChant('meditation_4', 'Meditation 4'),
+    AmbientChant('meditation_2', 'Still Waters'),
+    AmbientChant('meditation_3', 'Evening Stillness'),
+    AmbientChant('meditation_4', 'Inner Peace'),
   ];
 
   static const double _volume = 0.7;
@@ -57,9 +64,7 @@ class AmbientChantService {
 
   AudioPlayer get _audio => _player ??= AudioPlayer();
 
-  Future<void> play(String id) async {
-    final chant = byId(id);
-    if (chant == null) return;
+  Future<void> play(AmbientChant chant) async {
     final generation = ++_generation;
     try {
       final player = _audio;
@@ -79,8 +84,8 @@ class AmbientChantService {
       );
       await player.setVolume(_volume);
       if (generation != _generation) return;
-      await player.play(AssetSource(chant.asset));
-      _playing = id;
+      await player.play(chant.source);
+      _playing = chant.id;
     } on Object catch (error, stack) {
       // No background sound must ever stop the sitting itself.
       _playing = null;

@@ -265,6 +265,13 @@ class AppL10nTa extends AppL10n {
   String get goalReached => 'தினசரி இலக்கு நிறைவு';
 
   @override
+  String get goalReachedAutoBody =>
+      'தானியங்கி ஜபம் இடைநிறுத்தப்பட்டுள்ளது. தொடரவா அல்லது இங்கேயே நிறுத்தவா?';
+
+  @override
+  String get keepGoing => 'தொடர்';
+
+  @override
   String get setDailyGoal => 'தினசரி இலக்கை அமை';
 
   @override
@@ -585,6 +592,20 @@ class AppL10nTa extends AppL10n {
       'தெளிவான, அமைதியான கவுன்ட்டருடன் தியான முறைக்குள் செல்லுங்கள்.';
 
   @override
+  String get onbFeaturesTitle => 'எல்லாம் உங்கள் கையில்';
+
+  @override
+  String get onbFeaturesBody =>
+      'தொடங்கும் முன் அறிந்துகொள்ள வேண்டிய சில விஷயங்கள்.';
+
+  @override
+  String get soundsFeatureTitle => 'அமைதியான ஒலிகள்';
+
+  @override
+  String get soundsFeatureBody =>
+      'தியானத்தின் போது, நீங்கள் அமரும் வரை மென்மையான பின்னணி இசையை ஒலிக்கச் செய்யுங்கள்.';
+
+  @override
   String get startJap => 'ஜபம் தொடங்கு';
 
   @override
@@ -632,26 +653,52 @@ class AppL10nTa extends AppL10n {
   String get autoJaapStopNever => 'நிறுத்த வேண்டாம்';
 
   @override
-  String get autoJaapPlayChant => 'என் ஜபத்தை ஒலிக்கவும்';
-
-  @override
-  String get autoJaapPlayChantHint =>
-      'ஒவ்வொரு மணியிலும் உங்கள் பதிவு ஒலிக்கும்';
-
-  @override
   String get autoJaapStart => 'தானியங்கி ஜபம் தொடங்கு';
 
   @override
   String get autoJaapStopAction => 'தானியங்கி ஜபத்தை நிறுத்து';
 
   @override
-  String get chantSound => 'இசை';
-
-  @override
   String get chantPlay => 'இயக்கு';
 
   @override
   String get chantStop => 'நிறுத்து';
+
+  @override
+  String get music => 'இசை';
+
+  @override
+  String get chooseSound => 'ஒலியைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get musicRecord => 'பதிவு செய்';
+
+  @override
+  String get musicUpload => 'பதிவேற்று';
+
+  @override
+  String get musicYours => 'என் இசை';
+
+  @override
+  String musicRecordingName(int n) {
+    return 'பதிவு $n';
+  }
+
+  @override
+  String get musicNameTitle => 'பதிவுக்குப் பெயரிடுங்கள்';
+
+  @override
+  String get musicRemove => 'நீக்கு';
+
+  @override
+  String get musicAddFailed => 'இந்தக் கோப்பைச் சேர்க்க முடியவில்லை';
+
+  @override
+  String get ownMusicTitle => 'உங்கள் சொந்த இசையைக் கொண்டு வாருங்கள்';
+
+  @override
+  String get ownMusicBody =>
+      'உங்கள் ஜபத்தைப் பதிவு செய்யுங்கள் அல்லது தியான ஒலியைப் பதிவேற்றுங்கள்; அது உங்கள் முழு தியானத்திலும் ஒலிக்கும்.';
 
   @override
   String counterCount(String count) {
@@ -852,31 +899,6 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get micPermissionDenied => 'இதற்கு மைக்ரோஃபோன் அனுமதி தேவை';
-
-  @override
-  String get voiceNote => 'குரல் குறிப்பு';
-
-  @override
-  String get voiceNoteHint => 'நீங்கள் இதை ஜபிப்பதைப் பதிவு செய்யுங்கள்';
-
-  @override
-  String get voiceNoteRecord => 'பதிவு செய்';
-
-  @override
-  String get voiceNoteRecording => 'பதிவாகிறது… நிறுத்தத் தட்டவும்';
-
-  @override
-  String get voiceNotePlay => 'குரல் குறிப்பை இயக்கு';
-
-  @override
-  String get voiceNotePause => 'குரல் குறிப்பை இடைநிறுத்து';
-
-  @override
-  String get voiceNoteDelete => 'குரல் குறிப்பை நீக்கு';
-
-  @override
-  String get voiceNoteMissing =>
-      'இந்தக் குரல் குறிப்பு இப்போது இந்த ஃபோனில் இல்லை';
 
   @override
   String get fallingMantra => 'பொழியும் மந்திரம்';

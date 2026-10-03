@@ -78,10 +78,10 @@ void main() {
   test('Marathi shows the built-in mantras in Devanagari, like Hindi', () {
     final ram = BuiltInMantras.all.first;
 
-    expect(ram.nameIn('mr'), 'राम');
-    expect(ram.nameIn('hi'), 'राम');
-    expect(ram.nameIn('ta'), 'ராம', reason: 'Tamil reads its own script');
-    expect(ram.nameIn('en'), 'Ram');
+    expect(ram.nameIn('mr'), 'राम राम');
+    expect(ram.nameIn('hi'), 'राम राम');
+    expect(ram.nameIn('ta'), 'ராம ராம', reason: 'Tamil reads its own script');
+    expect(ram.nameIn('en'), 'Ram Ram');
   });
 
   test('stories fall back to the telling a reader can read', () {

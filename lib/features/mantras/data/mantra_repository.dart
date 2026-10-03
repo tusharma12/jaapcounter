@@ -2,19 +2,16 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/built_in_mantras.dart';
-import '../../../core/services/voice_note_store.dart';
 import '../../../core/utils/ids.dart';
 import '../domain/mantra.dart';
 
 /// Reads and writes the mantra library.
 class MantraRepository {
-  MantraRepository(this._db, {IdFactory? idFactory, VoiceNoteStore? voiceNotes})
-    : _newId = idFactory ?? newId,
-      _voiceNotes = voiceNotes ?? VoiceNoteStore();
+  MantraRepository(this._db, {IdFactory? idFactory})
+    : _newId = idFactory ?? newId;
 
   final Database _db;
   final IdFactory _newId;
-  final VoiceNoteStore _voiceNotes;
 
   static const String _table = 'mantras';
 
@@ -43,7 +40,6 @@ class MantraRepository {
     required String name,
     String? description,
     int malaSize = AppConstants.defaultMalaSize,
-    String? audioPath,
   }) async {
     final nextOrder = await _nextSortOrder();
     final mantra = Mantra(
@@ -55,25 +51,18 @@ class MantraRepository {
         AppConstants.maxMalaSize,
       ),
       sortOrder: nextOrder,
-      audioPath: audioPath,
     );
     await _db.insert(_table, mantra.toMap());
     return mantra;
   }
 
   Future<void> update(Mantra mantra) async {
-    final previous = await byId(mantra.id);
     await _db.update(
       _table,
       mantra.toMap(),
       where: 'id = ?',
       whereArgs: [mantra.id],
     );
-    // The old recording is orphaned the moment it stops being referenced, so
-    // it is removed here rather than left on disk.
-    if (previous != null && previous.audioPath != mantra.audioPath) {
-      await _voiceNotes.delete(previous.audioPath);
-    }
   }
 
   /// Deletes a custom mantra. Built-in mantras are refused outright, which is
@@ -85,7 +74,6 @@ class MantraRepository {
       throw const BuiltInMantraDeletionError();
     }
     await _db.delete(_table, where: 'id = ?', whereArgs: [id]);
-    await _voiceNotes.delete(mantra.audioPath);
   }
 
   /// Replaces the whole library, then makes sure the built-ins are present.

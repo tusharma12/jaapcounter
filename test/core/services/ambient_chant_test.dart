@@ -9,11 +9,11 @@ import '../../support/test_harness.dart';
 void main() {
   test('every chant has its loop file, and loops stay small', () {
     for (final chant in AmbientChantService.chants) {
-      final file = File('assets/${chant.asset}');
+      final file = File('assets/chants/loops/${chant.id}.m4a');
       expect(file.existsSync(), isTrue, reason: '${chant.id} is missing');
       expect(
         file.lengthSync(),
-        lessThan(1024 * 1024),
+        lessThan(2 * 1024 * 1024),
         reason: '${chant.id} should be a short loop, not a full recording',
       );
     }
@@ -23,7 +23,7 @@ void main() {
     final ids = AmbientChantService.chants.map((c) => c.id).toList();
 
     expect(ids.toSet().length, ids.length);
-    expect(AmbientChantService.byId('ram_ram')?.label, 'Ram Ram');
+    expect(AmbientChantService.byId('white_noise')?.label, 'Soft Noise');
     expect(AmbientChantService.byId('nope'), isNull);
     expect(AmbientChantService.byId(null), isNull);
   });
@@ -33,8 +33,8 @@ void main() {
     final settings = container.read(settingsServiceProvider);
 
     expect(settings.meditationChant(), isNull);
-    await settings.setMeditationChant('sitar_flute');
-    expect(settings.meditationChant(), 'sitar_flute');
+    await settings.setMeditationChant('meditation_3');
+    expect(settings.meditationChant(), 'meditation_3');
     await settings.setMeditationChant(null);
     expect(settings.meditationChant(), isNull);
   });

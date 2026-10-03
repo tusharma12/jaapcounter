@@ -8,8 +8,8 @@ void main() {
   final ram = BuiltInMantras.all.firstWhere((m) => m.id == 'builtin.ram');
 
   test('a built-in reads in the app language', () {
-    expect(ram.nameIn('en'), 'Ram');
-    expect(ram.nameIn('hi'), 'राम');
+    expect(ram.nameIn('en'), 'Ram Ram');
+    expect(ram.nameIn('hi'), 'राम राम');
   });
 
   test('every built-in has an English name', () {
@@ -75,11 +75,11 @@ void main() {
     }
 
     test('Marathi reads the stored Devanagari', () {
-      expect(ram.nameIn('mr'), 'राम');
+      expect(ram.nameIn('mr'), 'राम राम');
     });
 
     test('a language without its own script reads Roman letters', () {
-      expect(ram.nameIn('fr'), 'Ram');
+      expect(ram.nameIn('fr'), 'Ram Ram');
     });
 
     test('a rewritten built-in is not replaced in any script', () {

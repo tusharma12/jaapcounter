@@ -264,6 +264,13 @@ class AppL10nEn extends AppL10n {
   String get goalReached => 'Daily goal reached';
 
   @override
+  String get goalReachedAutoBody =>
+      'Auto Jaap is paused. Keep going or stop here?';
+
+  @override
+  String get keepGoing => 'Continue';
+
+  @override
   String get setDailyGoal => 'Set daily goal';
 
   @override
@@ -582,6 +589,19 @@ class AppL10nEn extends AppL10n {
       'Enter meditation mode with a clean, peaceful counter.';
 
   @override
+  String get onbFeaturesTitle => 'Everything in your hands';
+
+  @override
+  String get onbFeaturesBody => 'A few things worth knowing before you begin.';
+
+  @override
+  String get soundsFeatureTitle => 'Calming sounds';
+
+  @override
+  String get soundsFeatureBody =>
+      'Play a soft background chant during meditation, for as long as you sit.';
+
+  @override
   String get startJap => 'Start Jap';
 
   @override
@@ -629,25 +649,52 @@ class AppL10nEn extends AppL10n {
   String get autoJaapStopNever => 'Don\'t stop';
 
   @override
-  String get autoJaapPlayChant => 'Play my chant';
-
-  @override
-  String get autoJaapPlayChantHint => 'Plays your recording with each bead';
-
-  @override
   String get autoJaapStart => 'Start Auto Jaap';
 
   @override
   String get autoJaapStopAction => 'Stop Auto Jaap';
 
   @override
-  String get chantSound => 'Chant';
-
-  @override
   String get chantPlay => 'Play';
 
   @override
   String get chantStop => 'Stop';
+
+  @override
+  String get music => 'Music';
+
+  @override
+  String get chooseSound => 'Choose sound';
+
+  @override
+  String get musicRecord => 'Record';
+
+  @override
+  String get musicUpload => 'Upload';
+
+  @override
+  String get musicYours => 'My music';
+
+  @override
+  String musicRecordingName(int n) {
+    return 'Recording $n';
+  }
+
+  @override
+  String get musicNameTitle => 'Name your recording';
+
+  @override
+  String get musicRemove => 'Remove';
+
+  @override
+  String get musicAddFailed => 'That file couldn\'t be added';
+
+  @override
+  String get ownMusicTitle => 'Bring your own music';
+
+  @override
+  String get ownMusicBody =>
+      'Record your own chant or upload a meditation sound, and it plays for your whole sitting.';
 
   @override
   String counterCount(String count) {
@@ -846,30 +893,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get micPermissionDenied => 'Microphone access is needed for this';
-
-  @override
-  String get voiceNote => 'Voice note';
-
-  @override
-  String get voiceNoteHint => 'Record yourself chanting it';
-
-  @override
-  String get voiceNoteRecord => 'Record';
-
-  @override
-  String get voiceNoteRecording => 'Recording… tap to stop';
-
-  @override
-  String get voiceNotePlay => 'Play voice note';
-
-  @override
-  String get voiceNotePause => 'Pause voice note';
-
-  @override
-  String get voiceNoteDelete => 'Delete voice note';
-
-  @override
-  String get voiceNoteMissing => 'This voice note is no longer on this phone';
 
   @override
   String get fallingMantra => 'Falling mantra';

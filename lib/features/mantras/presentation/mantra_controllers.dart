@@ -19,16 +19,10 @@ class MantraListController extends AsyncNotifier<List<Mantra>> {
     required String name,
     String? description,
     int malaSize = AppConstants.defaultMalaSize,
-    String? audioPath,
   }) async {
     final mantra = await ref
         .read(mantraRepositoryProvider)
-        .create(
-          name: name,
-          description: description,
-          malaSize: malaSize,
-          audioPath: audioPath,
-        );
+        .create(name: name, description: description, malaSize: malaSize);
     ref.invalidateSelf();
     return mantra;
   }

@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +16,7 @@ import '../../sadhana/presentation/daily_goal_picker.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../../../core/constants/app_languages.dart';
 
-/// Three screens of welcome, then two that make the app the user's own:
+/// Three screens of welcome, one tour of the features, then two that make the app the user's own:
 /// which mantra they chant and how much each day. Then out of the way.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -75,6 +77,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _OnboardingPage(title: l10n.onb1Title, body: l10n.onb1Body),
       _OnboardingPage(title: l10n.onb2Title, body: l10n.onb2Body),
       _OnboardingPage(title: l10n.onb3Title, body: l10n.onb3Body),
+      const _FeaturesPage(),
       const _MantraPage(),
       _GoalPage(
         goal: _goal ?? ref.watch(settingsProvider).fallbackDailyGoal,
@@ -197,6 +200,89 @@ class _OnboardingPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// What the app can do beyond counting, so a new user meets the features
+/// they would otherwise only find by wandering through Settings.
+class _FeaturesPage extends StatelessWidget {
+  const _FeaturesPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final features = <(IconData, String, String)>[
+      (Icons.play_circle_outline_rounded, l10n.autoJaap, l10n.autoJaapBody),
+      (Icons.library_music_outlined, l10n.ownMusicTitle, l10n.ownMusicBody),
+      (
+        Icons.music_note_outlined,
+        l10n.soundsFeatureTitle,
+        l10n.soundsFeatureBody,
+      ),
+      (Icons.dark_mode_outlined, l10n.onb3Title, l10n.onb3Body),
+      (
+        Icons.local_fire_department_outlined,
+        l10n.graceDays,
+        l10n.graceDaysHint,
+      ),
+      (
+        Icons.nightlight_outlined,
+        l10n.festivalReminders,
+        l10n.festivalRemindersHint,
+      ),
+      if (Platform.isIOS)
+        (
+          Icons.phonelink_lock_outlined,
+          l10n.lockScreenCounter,
+          l10n.lockScreenCounterHint,
+        ),
+      (
+        Icons.widgets_outlined,
+        l10n.homeScreenWidget,
+        l10n.homeScreenWidgetBody,
+      ),
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Insets.page,
+        vertical: Insets.md,
+      ),
+      children: [
+        _StepHeader(title: l10n.onbFeaturesTitle, body: l10n.onbFeaturesBody),
+        const SizedBox(height: Insets.xl),
+        for (final (icon, title, body) in features)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Insets.lg),
+            child: MergeSemantics(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(icon, color: context.palette.saffron, size: 26),
+                  const SizedBox(width: Insets.lg),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          body,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: context.palette.secondaryText),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

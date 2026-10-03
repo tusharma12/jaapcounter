@@ -13,10 +13,10 @@ haptics, and every Jaap is stored only on the device.
 | Area | What it does |
 | --- | --- |
 | **Jaap** | The mala ring, current bead over mala size, today's total and malas, undo, timed sessions, manual entry, mala reset, an optional marker knock every 27 or 54 beads, counting with volume buttons, a headset button or a Bluetooth clicker, and on iOS 17+ a lock-screen +1 button (Live Activity) |
-| **Mantras** | Built-in mantras in Devanagari plus custom ones, each with its own mala size (27 / 54 / 108 / custom), an optional voice note in the user's own voice, and on-device dictation |
+| **Mantras** | Built-in mantras in Devanagari plus custom ones, each with its own mala size (27 / 54 / 108 / custom), and on-device dictation |
 | **Sadhana** | A daily goal, and a Sankalp - a vow of *n* Jaap a day for *n* days - with day-by-day progress; upcoming Ekadashis and festivals, each offering a Sankalp that fits it |
 | **Progress** | Streak and best streak (with grace days), today against the goal, a daily/weekly/monthly/yearly chart, lifetime totals, a habit grid, a per-mantra breakdown, lifetime milestones (1,008 Jaap to 1 crore) and a shareable year in review |
-| **Meditation** | Distraction-free counting, a session timer, and a blackout mode for chanting with eyes closed |
+| **Meditation** | Distraction-free counting, a session timer, a blackout mode for chanting with eyes closed, and one Music place: bundled loops, plus your own recording or an uploaded sound that repeats for the whole sitting |
 | **Stories** | Seven short original retellings, in English and Hindi, with favourites, adjustable text and read-aloud |
 | **Reminders** | Local daily reminders, a streak nudge, a goal nudge, and a 6 am note on Ekadashi and festival days |
 | **Backup** | Readable JSON export and restore of everything, validated before it replaces anything |
@@ -160,7 +160,7 @@ ledger behaviour is tested rather than mocked.
   Android upload key (`android/key.properties`) and Play service account.
 - Point `AppConstants` at real privacy, terms, support and store URLs; the
   store listings use the same privacy and support URLs.
-- The privacy policy must mention the microphone (voice notes and dictation,
+- The privacy policy must mention the microphone (recording the user's own meditation sound and dictation,
   both on-device) and that a diagnostics report is sent only when the user
   chooses to.
 - The Ekadashi and festival table ends on the last date in

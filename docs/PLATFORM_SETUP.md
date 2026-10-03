@@ -96,7 +96,7 @@ The widget reads these from the shared app group, all written by
 | Permission | When | Why |
 | --- | --- | --- |
 | Notifications | The moment a reminder is switched on - never at first launch | Daily reminders, streak and goal nudges |
-| Microphone (`RECORD_AUDIO`, `NSMicrophoneUsageDescription`) | The first time the user records a voice note or dictates a mantra | Recording a mantra's voice note; dictating the mantra text |
+| Microphone (`RECORD_AUDIO`, `NSMicrophoneUsageDescription`) | The first time the user records their own meditation sound or dictates a mantra | Recording a chant for the Music list in Meditation; dictating the mantra text |
 | Speech recognition (iOS, `NSSpeechRecognitionUsageDescription`) | The first time the user dictates a mantra | Dictation, which runs **on-device only** (`onDevice: true`); where no offline model exists the app says so instead of going online |
 | Live Activities (iOS 17+, `NSSupportsLiveActivities`) | When the user turns on Lock screen counter | A +1 button on the lock screen; see [IOS_LIVE_ACTIVITY.md](IOS_LIVE_ACTIVITY.md) |
 | Nothing else | - | No camera, contacts, location, storage or network permission is requested |

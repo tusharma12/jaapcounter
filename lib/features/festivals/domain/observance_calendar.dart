@@ -44,7 +44,6 @@ String? suggestedMantraFor(Observance observance) {
     return 'builtin.om-namo-bhagavate-vasudevaya';
   }
   return switch (observance.id) {
-    'sharad-navratri' || 'chaitra-navratri' => 'builtin.om-dum-durgayei-namah',
     'dussehra' || 'ram-navami' => 'builtin.ram',
     'diwali' => 'builtin.om-shri-mahalakshmyai-namah',
     'kartik-month' || 'kartik-purnima' => 'builtin.om-namo-narayanaya',

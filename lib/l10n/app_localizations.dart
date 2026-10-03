@@ -515,6 +515,18 @@ abstract class AppL10n {
   /// **'Daily goal reached'**
   String get goalReached;
 
+  /// No description provided for @goalReachedAutoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Jaap is paused. Keep going or stop here?'**
+  String get goalReachedAutoBody;
+
+  /// No description provided for @keepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get keepGoing;
+
   /// No description provided for @setDailyGoal.
   ///
   /// In en, this message translates to:
@@ -1103,6 +1115,30 @@ abstract class AppL10n {
   /// **'Enter meditation mode with a clean, peaceful counter.'**
   String get onb3Body;
 
+  /// No description provided for @onbFeaturesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything in your hands'**
+  String get onbFeaturesTitle;
+
+  /// No description provided for @onbFeaturesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A few things worth knowing before you begin.'**
+  String get onbFeaturesBody;
+
+  /// No description provided for @soundsFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calming sounds'**
+  String get soundsFeatureTitle;
+
+  /// No description provided for @soundsFeatureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Play a soft background chant during meditation, for as long as you sit.'**
+  String get soundsFeatureBody;
+
   /// No description provided for @startJap.
   ///
   /// In en, this message translates to:
@@ -1187,18 +1223,6 @@ abstract class AppL10n {
   /// **'Don\'t stop'**
   String get autoJaapStopNever;
 
-  /// No description provided for @autoJaapPlayChant.
-  ///
-  /// In en, this message translates to:
-  /// **'Play my chant'**
-  String get autoJaapPlayChant;
-
-  /// No description provided for @autoJaapPlayChantHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Plays your recording with each bead'**
-  String get autoJaapPlayChantHint;
-
   /// No description provided for @autoJaapStart.
   ///
   /// In en, this message translates to:
@@ -1211,12 +1235,6 @@ abstract class AppL10n {
   /// **'Stop Auto Jaap'**
   String get autoJaapStopAction;
 
-  /// No description provided for @chantSound.
-  ///
-  /// In en, this message translates to:
-  /// **'Chant'**
-  String get chantSound;
-
   /// No description provided for @chantPlay.
   ///
   /// In en, this message translates to:
@@ -1228,6 +1246,72 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Stop'**
   String get chantStop;
+
+  /// No description provided for @music.
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get music;
+
+  /// No description provided for @chooseSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose sound'**
+  String get chooseSound;
+
+  /// No description provided for @musicRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get musicRecord;
+
+  /// No description provided for @musicUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get musicUpload;
+
+  /// No description provided for @musicYours.
+  ///
+  /// In en, this message translates to:
+  /// **'My music'**
+  String get musicYours;
+
+  /// No description provided for @musicRecordingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording {n}'**
+  String musicRecordingName(int n);
+
+  /// No description provided for @musicNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your recording'**
+  String get musicNameTitle;
+
+  /// No description provided for @musicRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get musicRemove;
+
+  /// No description provided for @musicAddFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That file couldn\'t be added'**
+  String get musicAddFailed;
+
+  /// No description provided for @ownMusicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bring your own music'**
+  String get ownMusicTitle;
+
+  /// No description provided for @ownMusicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Record your own chant or upload a meditation sound, and it plays for your whole sitting.'**
+  String get ownMusicBody;
 
   /// No description provided for @counterCount.
   ///
@@ -1582,54 +1666,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Microphone access is needed for this'**
   String get micPermissionDenied;
-
-  /// No description provided for @voiceNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Voice note'**
-  String get voiceNote;
-
-  /// No description provided for @voiceNoteHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Record yourself chanting it'**
-  String get voiceNoteHint;
-
-  /// No description provided for @voiceNoteRecord.
-  ///
-  /// In en, this message translates to:
-  /// **'Record'**
-  String get voiceNoteRecord;
-
-  /// No description provided for @voiceNoteRecording.
-  ///
-  /// In en, this message translates to:
-  /// **'Recording… tap to stop'**
-  String get voiceNoteRecording;
-
-  /// No description provided for @voiceNotePlay.
-  ///
-  /// In en, this message translates to:
-  /// **'Play voice note'**
-  String get voiceNotePlay;
-
-  /// No description provided for @voiceNotePause.
-  ///
-  /// In en, this message translates to:
-  /// **'Pause voice note'**
-  String get voiceNotePause;
-
-  /// No description provided for @voiceNoteDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete voice note'**
-  String get voiceNoteDelete;
-
-  /// No description provided for @voiceNoteMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'This voice note is no longer on this phone'**
-  String get voiceNoteMissing;
 
   /// No description provided for @fallingMantra.
   ///

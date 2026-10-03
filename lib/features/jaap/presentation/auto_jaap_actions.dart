@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import 'auto_jaap_controller.dart';
 import 'jaap_controller.dart';
 import 'widgets/auto_jaap_sheet.dart';
@@ -43,4 +44,31 @@ void reapplyWakelockWhenAutoStops(
       });
     }
   });
+}
+
+/// The daily goal was reached during Auto Jaap. Counting waits here, so the
+/// user decides whether to carry on. Resolves with true to continue.
+Future<bool> showGoalReachedDialog(BuildContext context) async {
+  final l10n = AppL10n.of(context);
+  final keepGoing = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.goalReached),
+      content: Text(l10n.goalReachedAutoBody),
+      actions: [
+        TextButton(
+          key: const ValueKey('goal-stop'),
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.autoJaapStopAction),
+        ),
+        FilledButton(
+          key: const ValueKey('goal-continue'),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.keepGoing),
+        ),
+      ],
+    ),
+  );
+  return keepGoing ?? false;
 }

@@ -58,7 +58,6 @@ class DiagnosticsReport {
           '(app expects v${AppDatabase.schemaVersion})',
       'Rows: ${await count('jaap_entries')} entries, '
           '${await count('mantras', 'is_built_in = 0')} custom mantras, '
-          '${await count('mantras', "audio_path IS NOT NULL AND audio_path != ''")} voice notes, '
           '${await count('sessions')} sessions, '
           '${await count('sadhanas', 'is_active = 1')} active Sankalp, '
           '${await count('reminders', 'enabled = 1')} reminders on',

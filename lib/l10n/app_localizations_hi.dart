@@ -264,6 +264,13 @@ class AppL10nHi extends AppL10n {
   String get goalReached => 'आज का लक्ष्य पूर्ण';
 
   @override
+  String get goalReachedAutoBody =>
+      'ऑटो जाप रुका हुआ है। जारी रखें या यहीं रोकें?';
+
+  @override
+  String get keepGoing => 'जारी रखें';
+
+  @override
   String get setDailyGoal => 'दैनिक लक्ष्य तय करें';
 
   @override
@@ -580,6 +587,20 @@ class AppL10nHi extends AppL10n {
   String get onb3Body => 'स्वच्छ, शांत काउंटर के साथ ध्यान मोड में जाएँ।';
 
   @override
+  String get onbFeaturesTitle => 'सब कुछ आपके हाथ में';
+
+  @override
+  String get onbFeaturesBody =>
+      'शुरू करने से पहले कुछ बातें जो जानने लायक हैं।';
+
+  @override
+  String get soundsFeatureTitle => 'शांत ध्वनियाँ';
+
+  @override
+  String get soundsFeatureBody =>
+      'ध्यान के दौरान, जब तक आप बैठें, हल्की पृष्ठभूमि धुन बजाएँ।';
+
+  @override
   String get startJap => 'जप आरंभ करें';
 
   @override
@@ -627,25 +648,52 @@ class AppL10nHi extends AppL10n {
   String get autoJaapStopNever => 'न रुकें';
 
   @override
-  String get autoJaapPlayChant => 'मेरा जाप सुनाएँ';
-
-  @override
-  String get autoJaapPlayChantHint => 'हर मनके पर आपकी रिकॉर्डिंग बजेगी';
-
-  @override
   String get autoJaapStart => 'स्वतः जाप शुरू करें';
 
   @override
   String get autoJaapStopAction => 'स्वतः जाप रोकें';
 
   @override
-  String get chantSound => 'धुन';
-
-  @override
   String get chantPlay => 'चलाएँ';
 
   @override
   String get chantStop => 'रोकें';
+
+  @override
+  String get music => 'संगीत';
+
+  @override
+  String get chooseSound => 'ध्वनि चुनें';
+
+  @override
+  String get musicRecord => 'रिकॉर्ड करें';
+
+  @override
+  String get musicUpload => 'अपलोड करें';
+
+  @override
+  String get musicYours => 'मेरा संगीत';
+
+  @override
+  String musicRecordingName(int n) {
+    return 'रिकॉर्डिंग $n';
+  }
+
+  @override
+  String get musicNameTitle => 'रिकॉर्डिंग को नाम दें';
+
+  @override
+  String get musicRemove => 'हटाएँ';
+
+  @override
+  String get musicAddFailed => 'यह फ़ाइल जोड़ी नहीं जा सकी';
+
+  @override
+  String get ownMusicTitle => 'अपना संगीत लाएँ';
+
+  @override
+  String get ownMusicBody =>
+      'अपना जाप रिकॉर्ड करें या ध्यान की ध्वनि अपलोड करें; वह आपके पूरे ध्यान के दौरान बजेगी।';
 
   @override
   String counterCount(String count) {
@@ -844,31 +892,6 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get micPermissionDenied => 'इसके लिए माइक्रोफ़ोन की अनुमति आवश्यक है';
-
-  @override
-  String get voiceNote => 'आवाज़ नोट';
-
-  @override
-  String get voiceNoteHint => 'इसे स्वयं जपते हुए रिकॉर्ड करें';
-
-  @override
-  String get voiceNoteRecord => 'रिकॉर्ड करें';
-
-  @override
-  String get voiceNoteRecording =>
-      'रिकॉर्डिंग हो रही है… रोकने के लिए टैप करें';
-
-  @override
-  String get voiceNotePlay => 'आवाज़ नोट चलाएं';
-
-  @override
-  String get voiceNotePause => 'आवाज़ नोट रोकें';
-
-  @override
-  String get voiceNoteDelete => 'आवाज़ नोट हटाएं';
-
-  @override
-  String get voiceNoteMissing => 'यह आवाज़ नोट अब इस फ़ोन पर नहीं है';
 
   @override
   String get fallingMantra => 'गिरता मंत्र';

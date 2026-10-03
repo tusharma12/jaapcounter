@@ -119,11 +119,11 @@ final _shots = <_Shot>[
   _Shot(
     file: '04_mantras',
     lightCanvas: true,
-    headline: [('21 Sacred', true), (' Mantras\n— or Your Own', false)],
+    headline: [('21 Sacred', true), (' Mantras\n- or Your Own', false)],
     sub: 'Ram, Radha, Shiva, Gayatri & more',
     headlineHi: [
       ('21 पवित्र मंत्र', true),
-      ('\n— या अपना खुद का', false),
+      ('\n- या अपना खुद का', false),
     ],
     subHi: 'राम, राधा, शिव, गायत्री और भी बहुत कुछ',
     capture: (tester, c, router) async {

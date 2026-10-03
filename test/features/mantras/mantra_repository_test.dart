@@ -22,7 +22,7 @@ void main() {
 
     expect(all.length, BuiltInMantras.all.length);
     expect(all.every((m) => m.isBuiltIn), isTrue);
-    expect(all.first.name, 'राम');
+    expect(all.first.name, 'राम राम');
     expect(all.first.description, isNull);
     expect(all.every((m) => m.malaSize == 108), isTrue);
   });

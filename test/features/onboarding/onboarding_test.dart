@@ -51,18 +51,25 @@ void main() {
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
     }
+    // The tour of features sits between the welcome and the personal steps.
+    expect(find.text('Everything in your hands'), findsOneWidget);
+    expect(find.text('Auto Jaap'), findsOneWidget);
+    expect(find.text('Bring your own music'), findsOneWidget);
+    expect(find.text('Calming sounds'), findsOneWidget);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
     expect(find.text('Which mantra do you chant?'), findsOneWidget);
     expect(container.read(settingsProvider).localeCode, isNull);
     await tester.tap(find.text('हिन्दी'));
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).localeCode, 'hi');
-    expect(find.text('राधा'), findsOneWidget, reason: 'mantras follow');
+    expect(find.text('राधा राधा'), findsOneWidget, reason: 'mantras follow');
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).localeCode, 'en');
-    expect(find.text('राधा'), findsNothing);
+    expect(find.text('राधा राधा'), findsNothing);
 
-    await tester.tap(find.text('Radha'));
+    await tester.tap(find.text('Radha Radha'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
@@ -114,7 +121,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < 4; i++) {
         await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
       }
@@ -127,12 +134,12 @@ void main() {
       await pumpMantraPage(tester);
 
       for (final (chip, ram) in [
-        ('ગુજરાતી', 'રામ'),
-        ('ਪੰਜਾਬੀ', 'ਰਾਮ'),
-        ('தமிழ்', 'ராம'),
-        ('తెలుగు', 'రామ'),
-        ('मराठी', 'राम'),
-        ('English', 'Ram'),
+        ('ગુજરાતી', 'રામ રામ'),
+        ('ਪੰਜਾਬੀ', 'ਰਾਮ ਰਾਮ'),
+        ('தமிழ்', 'ராம ராம'),
+        ('తెలుగు', 'రామ రామ'),
+        ('मराठी', 'राम राम'),
+        ('English', 'Ram Ram'),
       ]) {
         await tester.tap(find.text(chip));
         await tester.pumpAndSettle();

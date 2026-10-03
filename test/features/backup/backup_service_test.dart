@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:japmala/core/constants/built_in_mantras.dart';
 import 'package:japmala/core/database/app_database.dart';
 import 'package:japmala/core/services/settings_service.dart';
-import 'package:japmala/core/services/voice_note_store.dart';
 import 'package:japmala/features/backup/data/backup_service.dart';
 import 'package:japmala/features/jaap/data/jaap_repository.dart';
 import 'package:japmala/features/jaap/domain/jaap_entry.dart';
@@ -26,12 +23,8 @@ void main() {
   late MantraRepository mantras;
   late SadhanaRepository sadhanas;
   late ReminderRepository reminders;
-  late VoiceNoteStore voiceNotes;
 
   setUp(() async {
-    final audioDir = await Directory.systemTemp.createTemp('voice');
-    addTearDown(() => audioDir.delete(recursive: true));
-    voiceNotes = VoiceNoteStore(baseDirectory: () async => audioDir);
     SharedPreferences.setMockInitialValues({});
     db = await openTestDatabase();
     clock = TestClock(DateTime(2026, 9, 3, 9));
@@ -41,10 +34,9 @@ void main() {
       settingsService: settings,
       version: '1.0.0',
       clock: clock.call,
-      voiceNotes: voiceNotes,
     );
     jaap = JaapRepository(db, clock: clock.call);
-    mantras = MantraRepository(db, voiceNotes: voiceNotes);
+    mantras = MantraRepository(db);
     sadhanas = SadhanaRepository(db, clock: clock.call);
     reminders = ReminderRepository(db);
     addTearDown(db.close);
@@ -169,119 +161,21 @@ void main() {
     },
   );
 
-  group('voice notes', () {
-    const audio = [1, 2, 3, 4, 5];
-
-    Future<void> seedRecording(String stored) async {
-      await voiceNotes.write(stored, audio);
-      await mantras.create(name: 'सीता राम', audioPath: stored);
-    }
-
-    Map<String, Object?> customRow(Map<String, Object?> data) =>
-        (data['mantras']! as List).cast<Map<String, Object?>>().singleWhere(
-          (m) => m['is_built_in'] == 0,
-        );
-
-    test('travel inside the file and come back after a wipe', () async {
-      await seedRecording('note.m4a');
-      final json = jsonEncode(await backup.buildBackup());
-
-      await AppDatabase.clearAll(db);
-      await voiceNotes.delete('note.m4a');
-
-      await backup.restore(json);
-
-      final restored = (await mantras.all()).singleWhere((m) => !m.isBuiltIn);
-      expect(restored.audioPath, 'note.m4a');
-      expect(await voiceNotes.read('note.m4a'), audio);
+  test('a backup from when mantras had voice notes still restores', () async {
+    // Voice notes were removed; their rows and audio are simply ignored.
+    final json = jsonEncode({
+      'app': 'japmala',
+      'schemaVersion': 1,
+      'mantras': [
+        {'id': 'mine', 'name': 'सीता राम', 'audio_path': 'old.m4a'},
+      ],
+      'voiceNotes': {'old.m4a': 'AQIDBAU='},
     });
 
-    test('are exported by file name, never by absolute path', () async {
-      // A row written by an earlier build, which stored the full path.
-      final legacy = await voiceNotes.pathFor('old.m4a');
-      await seedRecording(legacy);
+    await backup.restore(json);
 
-      final data = await backup.buildBackup();
-
-      expect(customRow(data)['audio_path'], 'old.m4a');
-      expect((data['voiceNotes']! as Map).keys, ['old.m4a']);
-    });
-
-    test('a row whose recording is missing is exported without one', () async {
-      await mantras.create(name: 'सीता राम', audioPath: 'gone.m4a');
-
-      final data = await backup.buildBackup();
-
-      expect(customRow(data)['audio_path'], isNull);
-      expect(data['voiceNotes'], isEmpty);
-    });
-
-    test(
-      'a row whose recording is not in the file comes back without one',
-      () async {
-        final json = jsonEncode({
-          'app': 'japmala',
-          'schemaVersion': 1,
-          'mantras': [
-            {'id': 'mine', 'name': 'सीता राम', 'audio_path': 'lost.m4a'},
-          ],
-        });
-
-        await backup.restore(json);
-
-        expect((await mantras.byId('mine'))!.audioPath, isNull);
-      },
-    );
-
-    test(
-      'restoring removes the recordings of the library it replaced',
-      () async {
-        await seedRecording('kept.m4a');
-        final json = jsonEncode(await backup.buildBackup());
-        await voiceNotes.write('stray.m4a', audio);
-
-        await backup.restore(json);
-
-        expect(await voiceNotes.exists('kept.m4a'), isTrue);
-        expect(await voiceNotes.exists('stray.m4a'), isFalse);
-      },
-    );
-
-    test('a name that tries to leave the audio folder is ignored', () async {
-      final json = jsonEncode({
-        'app': 'japmala',
-        'schemaVersion': 1,
-        'voiceNotes': {'../escape.m4a': base64Encode(audio)},
-      });
-
-      await backup.restore(json);
-
-      final outside = File(
-        '${(await voiceNotes.directory()).parent.path}/escape.m4a',
-      );
-      expect(await outside.exists(), isFalse);
-    });
-
-    test(
-      'a corrupt recording rejects the file before anything is written',
-      () async {
-        await seed();
-        final before = await jaap.lifetimeTotal();
-
-        await expectLater(
-          backup.restore(
-            jsonEncode({
-              'app': 'japmala',
-              'schemaVersion': 1,
-              'voiceNotes': {'note.m4a': 'not base64!'},
-            }),
-          ),
-          throwsA(isA<InvalidBackupException>()),
-        );
-
-        expect(await jaap.lifetimeTotal(), before);
-      },
-    );
+    expect((await mantras.byId('mine'))!.name, 'सीता राम');
+    expect((await backup.buildBackup()).containsKey('voiceNotes'), isFalse);
   });
 
   group('rejects files that are not ours', () {

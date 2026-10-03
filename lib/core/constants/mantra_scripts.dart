@@ -20,8 +20,8 @@ abstract final class MantraScripts {
   };
 
   static const Map<String, String> _gujarati = {
-    'builtin.ram': 'રામ',
-    'builtin.radha': 'રાધા',
+    'builtin.ram': 'રામ રામ',
+    'builtin.radha': 'રાધા રાધા',
     'builtin.om-namah-shivaya': 'ૐ નમઃ શિવાય',
     'builtin.om-hanumate-namah': 'ૐ હનુમતે નમઃ',
     'builtin.hare-krishna': 'હરે કૃષ્ણ',
@@ -35,7 +35,7 @@ abstract final class MantraScripts {
     'builtin.mahamrityunjaya':
         'ૐ ત્ર્યમ્બકં યજામહે સુગન્ધિં પુષ્ટિવર્ધનમ્\n'
         'ઉર્વારુકમિવ બન્ધનાન્ મૃત્યોર્મુક્ષીય મામૃતાત્',
-    'builtin.waheguru': 'વાહેગુરુ',
+    'builtin.waheguru': 'વાહેગુરુ વાહેગુરુ',
     'builtin.satnam-waheguru': 'સતનામ વાહેગુરુ',
     'builtin.sita-ram': 'સીતા રામ',
     'builtin.shri-ram-jai-ram': 'શ્રી રામ જય રામ જય જય રામ',
@@ -46,14 +46,13 @@ abstract final class MantraScripts {
     'builtin.radhe-krishna': 'રાધે કૃષ્ણ',
     'builtin.om-namo-narayanaya': 'ૐ નમો નારાયણાય',
     'builtin.om-sai-ram': 'ૐ સાંઈ રામ',
-    'builtin.om-dum-durgayei-namah': 'ૐ દું દુર્ગાયૈ નમઃ',
     'builtin.hare-rama': 'હરે રામ હરે રામ રામ રામ હરે હરે',
   };
 
   /// Gurmukhi has no Om sign of its own, so Om is written ਓਮ.
   static const Map<String, String> _gurmukhi = {
-    'builtin.ram': 'ਰਾਮ',
-    'builtin.radha': 'ਰਾਧਾ',
+    'builtin.ram': 'ਰਾਮ ਰਾਮ',
+    'builtin.radha': 'ਰਾਧਾ ਰਾਧਾ',
     'builtin.om-namah-shivaya': 'ਓਮ ਨਮਃ ਸ਼ਿਵਾਯ',
     'builtin.om-hanumate-namah': 'ਓਮ ਹਨੁਮਤੇ ਨਮਃ',
     'builtin.hare-krishna': 'ਹਰੇ ਕ੍ਰਿਸ਼ਨ',
@@ -67,7 +66,7 @@ abstract final class MantraScripts {
     'builtin.mahamrityunjaya':
         'ਓਮ ਤ੍ਰ੍ਯੰਬਕੰ ਯਜਾਮਹੇ ਸੁਗੰਧਿੰ ਪੁਸ਼ਟਿਵਰ੍ਧਨਮ੍\n'
         'ਉਰ੍ਵਾਰੁਕਮਿਵ ਬੰਧਨਾਨ੍ ਮ੍ਰਿਤ੍ਯੋਰ੍ਮੁਕ੍ਸ਼ੀਯ ਮਾਮ੍ਰਿਤਾਤ੍',
-    'builtin.waheguru': 'ਵਾਹਿਗੁਰੂ',
+    'builtin.waheguru': 'ਵਾਹਿਗੁਰੂ ਵਾਹਿਗੁਰੂ',
     'builtin.satnam-waheguru': 'ਸਤਿ ਨਾਮੁ ਵਾਹਿਗੁਰੂ',
     'builtin.sita-ram': 'ਸੀਤਾ ਰਾਮ',
     'builtin.shri-ram-jai-ram': 'ਸ਼੍ਰੀ ਰਾਮ ਜੈ ਰਾਮ ਜੈ ਜੈ ਰਾਮ',
@@ -78,15 +77,14 @@ abstract final class MantraScripts {
     'builtin.radhe-krishna': 'ਰਾਧੇ ਕ੍ਰਿਸ਼ਨ',
     'builtin.om-namo-narayanaya': 'ਓਮ ਨਮੋ ਨਾਰਾਯਣਾਯ',
     'builtin.om-sai-ram': 'ਓਮ ਸਾਈਂ ਰਾਮ',
-    'builtin.om-dum-durgayei-namah': 'ਓਮ ਦੁੰ ਦੁਰ੍ਗਾਯੈ ਨਮਃ',
     'builtin.hare-rama': 'ਹਰੇ ਰਾਮ ਹਰੇ ਰਾਮ ਰਾਮ ਰਾਮ ਹਰੇ ਹਰੇ',
   };
 
   /// Sanskrit sounds Tamil script lacks are written with the Grantha letters
   /// (ஸ, ஷ, ஹ, க்ஷ), as in Tamil devotional printing.
   static const Map<String, String> _tamil = {
-    'builtin.ram': 'ராம',
-    'builtin.radha': 'ராதா',
+    'builtin.ram': 'ராம ராம',
+    'builtin.radha': 'ராதா ராதா',
     'builtin.om-namah-shivaya': 'ஓம் நமஃ சிவாய',
     'builtin.om-hanumate-namah': 'ஓம் ஹனுமதே நமஃ',
     'builtin.hare-krishna': 'ஹரே கிருஷ்ண',
@@ -100,7 +98,7 @@ abstract final class MantraScripts {
     'builtin.mahamrityunjaya':
         'ஓம் த்ர்யம்பகம் யஜாமஹே ஸுகந்திம் புஷ்டிவர்தனம்\n'
         'உர்வாருகமிவ பந்தனாந் ம்ருத்யோர்முக்ஷீய மாம்ருதாத்',
-    'builtin.waheguru': 'வாஹேகுரு',
+    'builtin.waheguru': 'வாஹேகுரு வாஹேகுரு',
     'builtin.satnam-waheguru': 'சத்நாம் வாஹேகுரு',
     'builtin.sita-ram': 'சீதா ராம',
     'builtin.shri-ram-jai-ram': 'ஸ்ரீ ராம ஜெய ராம ஜெய ஜெய ராம',
@@ -111,13 +109,12 @@ abstract final class MantraScripts {
     'builtin.radhe-krishna': 'ராதே கிருஷ்ண',
     'builtin.om-namo-narayanaya': 'ஓம் நமோ நாராயணாய',
     'builtin.om-sai-ram': 'ஓம் ஸாயி ராம',
-    'builtin.om-dum-durgayei-namah': 'ஓம் தும் துர்காயை நமஃ',
     'builtin.hare-rama': 'ஹரே ராம ஹரே ராம ராம ராம ஹரே ஹரே',
   };
 
   static const Map<String, String> _telugu = {
-    'builtin.ram': 'రామ',
-    'builtin.radha': 'రాధా',
+    'builtin.ram': 'రామ రామ',
+    'builtin.radha': 'రాధా రాధా',
     'builtin.om-namah-shivaya': 'ఓం నమః శివాయ',
     'builtin.om-hanumate-namah': 'ఓం హనుమతే నమః',
     'builtin.hare-krishna': 'హరే కృష్ణ',
@@ -131,7 +128,7 @@ abstract final class MantraScripts {
     'builtin.mahamrityunjaya':
         'ఓం త్ర్యంబకం యజామహే సుగంధిం పుష్టివర్ధనం\n'
         'ఉర్వారుకమివ బంధనాన్ మృత్యోర్ముక్షీయ మామృతాత్',
-    'builtin.waheguru': 'వాహెగురు',
+    'builtin.waheguru': 'వాహెగురు వాహెగురు',
     'builtin.satnam-waheguru': 'సత్నామ్ వాహెగురు',
     'builtin.sita-ram': 'సీతా రామ',
     'builtin.shri-ram-jai-ram': 'శ్రీ రామ జయ రామ జయ జయ రామ',
@@ -142,7 +139,6 @@ abstract final class MantraScripts {
     'builtin.radhe-krishna': 'రాధే కృష్ణ',
     'builtin.om-namo-narayanaya': 'ఓం నమో నారాయణాయ',
     'builtin.om-sai-ram': 'ఓం సాయి రామ',
-    'builtin.om-dum-durgayei-namah': 'ఓం దుం దుర్గాయై నమః',
     'builtin.hare-rama': 'హరే రామ హరే రామ రామ రామ హరే హరే',
   };
 }

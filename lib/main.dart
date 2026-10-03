@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
 
@@ -11,6 +12,7 @@ import 'app/app.dart';
 import 'core/database/app_database.dart';
 import 'core/providers.dart';
 import 'core/services/app_logger.dart';
+import 'core/services/user_music_store.dart';
 import 'core/utils/formatters.dart';
 
 Future<void> main() async {
@@ -30,6 +32,9 @@ Future<void> main() async {
   // screen has to deal with an uninitialised repository.
   final preferences = await SharedPreferences.getInstance();
   final database = await AppDatabase.open();
+
+  // Per-mantra voice notes no longer exist; their audio is cleared once.
+  unawaited(UserMusicStore().purgeLegacyVoiceNotes());
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

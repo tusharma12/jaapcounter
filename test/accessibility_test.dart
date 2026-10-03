@@ -30,6 +30,9 @@ void main() {
     'progress': () => const ProgressScreen(),
     'sadhana': () => const SadhanaScreen(),
     'settings': () => const SettingsScreen(),
+    'settings counter': () =>
+        const SettingsScreen(section: SettingsSection.counter),
+    'settings jaap': () => const SettingsScreen(section: SettingsSection.jaap),
     'year in review': () => const YearReviewScreen(),
     'mantras': () => const MantrasScreen(),
     'meditation': () => const MeditationScreen(),

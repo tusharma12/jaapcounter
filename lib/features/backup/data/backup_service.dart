@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -9,7 +8,6 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/services/app_logger.dart';
 import '../../../core/services/settings_service.dart';
-import '../../../core/services/voice_note_store.dart';
 import '../../../core/utils/day_key.dart';
 import '../../jaap/domain/jaap_entry.dart';
 import '../../jaap/domain/jaap_session.dart';
@@ -52,18 +50,15 @@ class BackupService {
     required SettingsService settingsService,
     required String version,
     Clock? clock,
-    VoiceNoteStore? voiceNotes,
   }) : _db = database,
        _settings = settingsService,
        _appVersion = version,
-       _now = clock ?? systemClock,
-       _voiceNotes = voiceNotes ?? VoiceNoteStore();
+       _now = clock ?? systemClock;
 
   final Database _db;
   final SettingsService _settings;
   final String _appVersion;
   final Clock _now;
-  final VoiceNoteStore _voiceNotes;
 
   static const String _appTag = 'japmala';
 
@@ -76,29 +71,12 @@ class BackupService {
     final sessions = await _db.query('sessions');
     final reminders = await _db.query('reminders');
 
-    // Voice notes travel inside the file, keyed by file name, so a restore on
-    // another phone brings the recordings and not just paths to them.
-    final voiceNotes = <String, String>{};
-    final exported = <Map<String, Object?>>[];
-    for (final mantra in mantras) {
-      String? name;
-      if (mantra.hasAudio) {
-        final bytes = await _voiceNotes.read(mantra.audioPath!);
-        if (bytes != null) {
-          name = p.basename(mantra.audioPath!);
-          voiceNotes[name] = base64Encode(bytes);
-        }
-      }
-      exported.add(mantra.copyWith(audioPath: name).toMap());
-    }
-
     return {
       'app': _appTag,
       'schemaVersion': AppConstants.backupSchemaVersion,
       'appVersion': _appVersion,
       'exportedAt': _now().toIso8601String(),
-      'mantras': exported,
-      'voiceNotes': voiceNotes,
+      'mantras': mantras.map((m) => m.toMap()).toList(),
       'jaapEntries': entries,
       'sadhanas': sadhanas,
       'sessions': sessions,
@@ -148,16 +126,6 @@ class BackupService {
     final sadhanas = _parseList(data['sadhanas'], Sadhana.fromMap);
     final sessions = _parseList(data['sessions'], JaapSession.fromMap);
     final reminders = _parseList(data['reminders'], Reminder.fromMap);
-    final voiceNotes = _parseVoiceNotes(data['voiceNotes']);
-
-    // A row whose recording is not in the file would claim audio that no
-    // longer exists on this phone, so it comes back without one.
-    final restoredMantras = [
-      for (final mantra in mantras)
-        mantra.hasAudio && voiceNotes.containsKey(p.basename(mantra.audioPath!))
-            ? mantra.copyWith(audioPath: p.basename(mantra.audioPath!))
-            : mantra.copyWith(audioPath: null),
-    ];
 
     await _db.transaction((txn) async {
       for (final table in const [
@@ -181,7 +149,7 @@ class BackupService {
         }
       }
 
-      insertAll('mantras', restoredMantras.map((m) => m.toMap()).toList());
+      insertAll('mantras', mantras.map((m) => m.toMap()).toList());
       insertAll('jaap_entries', entries.map((e) => e.toMap()).toList());
       insertAll('sadhanas', sadhanas.map((s) => s.toMap()).toList());
       insertAll('sessions', sessions.map((s) => s.toMap()).toList());
@@ -191,11 +159,6 @@ class BackupService {
 
     // A backup made before a mantra shipped should not remove it.
     await AppDatabase.ensureBuiltInMantras(_db);
-
-    for (final MapEntry(key: name, value: bytes) in voiceNotes.entries) {
-      await _voiceNotes.write(name, bytes);
-    }
-    await _voiceNotes.deleteAllExcept(voiceNotes.keys.toSet());
 
     final restoredSettings = data['settings'];
     if (restoredSettings is Map<String, Object?>) {
@@ -218,26 +181,6 @@ class BackupService {
       jaap: jaap,
     );
   }
-
-  /// Decoded before anything is written, so a corrupt recording rejects the
-  /// whole file rather than half-restoring it. Names are reduced to a bare
-  /// file name so a crafted backup cannot write outside the audio folder.
-  static Map<String, List<int>> _parseVoiceNotes(Object? raw) {
-    if (raw == null) return const {};
-    if (raw is! Map) throw const InvalidBackupException('malformed section');
-    try {
-      return {
-        for (final MapEntry(:key, :value) in raw.entries)
-          if (_isSafeName(key as String)) key: base64Decode(value as String),
-      };
-    } on Object catch (error, stack) {
-      AppLogger.e('Voice notes could not be decoded', error, stack);
-      throw const InvalidBackupException('malformed voice note');
-    }
-  }
-
-  static bool _isSafeName(String name) =>
-      name.isNotEmpty && name == p.basename(name) && !name.startsWith('.');
 
   static List<T> _parseList<T>(
     Object? raw,

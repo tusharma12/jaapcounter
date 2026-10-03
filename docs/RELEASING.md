@@ -46,8 +46,8 @@ create or refresh the distribution profiles for the app and the widget
 extension without an Apple ID login.
 
 In App Store Connect, before the first submission, fill in what fastlane
-cannot: the privacy questionnaire (the app collects no data: voice notes stay
-on the device and dictation is on-device only, so Audio Data is not
+cannot: the privacy questionnaire (the app collects no data: recordings and uploaded
+sounds stay on the device and dictation is on-device only, so Audio Data is not
 "collected" in Apple's sense), the age rating,
 pricing, and App Review contact name and phone.
 

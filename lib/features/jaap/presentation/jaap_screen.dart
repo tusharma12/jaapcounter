@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
+import '../../../core/providers.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/async_view.dart';
@@ -59,6 +60,8 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
     _celebrationTimer = Timer(Motion.celebration, () {
       if (mounted) setState(() => _celebrating = false);
     });
+    // A finished mala is the happiest moment to ask for a rating.
+    unawaited(ref.read(reviewPromptProvider).maybeAsk());
   }
 
   /// A lifetime milestone is marked without stopping the count: a snackbar,
@@ -185,8 +188,6 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
         await _resetMala();
       case _MenuAction.mantras:
         await context.push('/mantras');
-      case _MenuAction.sadhana:
-        await context.push('/sadhana');
     }
   }
 
@@ -265,7 +266,6 @@ enum _MenuAction {
   addCount,
   resetMala,
   mantras,
-  sadhana,
 }
 
 class _CounterBody extends StatelessWidget {
@@ -595,11 +595,6 @@ class _TopBar extends ConsumerWidget {
                 _MenuAction.mantras,
                 Icons.format_list_bulleted_rounded,
                 l10n.myMantras,
-              ),
-              _item(
-                _MenuAction.sadhana,
-                Icons.auto_awesome_outlined,
-                l10n.mySadhana,
               ),
             ],
           ),

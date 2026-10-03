@@ -51,9 +51,10 @@ void main() {
   Future<void> pumpSettings(
     WidgetTester tester, {
     required ProviderContainer container,
+    SettingsSection? section,
   }) async {
     await usePhoneSurface(tester);
-    await pumpScreen(tester, container, const SettingsScreen());
+    await pumpScreen(tester, container, SettingsScreen(section: section));
     await tester.pumpAndSettle();
   }
 
@@ -61,7 +62,11 @@ void main() {
     tester,
   ) async {
     final container = await createTestContainer();
-    await pumpSettings(tester, container: container);
+    await pumpSettings(
+      tester,
+      container: container,
+      section: SettingsSection.support,
+    );
 
     await tester.scrollUntilVisible(find.text('Feedback'), 300);
     await tester.ensureVisible(find.text('Feedback'));
@@ -86,7 +91,11 @@ void main() {
         ),
       ],
     );
-    await pumpSettings(tester, container: container);
+    await pumpSettings(
+      tester,
+      container: container,
+      section: SettingsSection.counter,
+    );
 
     await tester.scrollUntilVisible(find.text('Home screen widget'), 100);
     await tester.pumpAndSettle();
@@ -118,7 +127,11 @@ void main() {
         ),
       ],
     );
-    await pumpSettings(tester, container: container);
+    await pumpSettings(
+      tester,
+      container: container,
+      section: SettingsSection.counter,
+    );
 
     await tester.scrollUntilVisible(find.text('Home screen widget'), 100);
     await tester.pumpAndSettle();
@@ -131,5 +144,54 @@ void main() {
     await tester.tap(find.text('Close'));
     await tester.pumpAndSettle();
     expect(find.text('Home screen widget'), findsOneWidget, reason: 'closed');
+  });
+
+  testWidgets('the main page is a short menu of groups', (tester) async {
+    final container = await createTestContainer();
+    await pumpSettings(tester, container: container);
+
+    for (final label in [
+      'Jaap',
+      'Reminders',
+      'Counter',
+      'Appearance',
+      'Support',
+      'About',
+      'Backup & Restore',
+    ]) {
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+    // Rating and inviting are on the main page itself, not a page deeper.
+    expect(find.text('Sadhana Goals'), findsOneWidget);
+    expect(find.text('Rate Smaran'), findsOneWidget);
+    expect(find.text('Invite Family and Friends'), findsOneWidget);
+    // The switches themselves live one page deeper.
+    expect(find.text('Haptics'), findsNothing);
+    expect(find.text('Feedback'), findsNothing);
+  });
+
+  testWidgets('Support no longer repeats rating and inviting', (tester) async {
+    final container = await createTestContainer();
+    await pumpSettings(
+      tester,
+      container: container,
+      section: SettingsSection.support,
+    );
+
+    expect(find.text('Feedback'), findsOneWidget);
+    expect(find.text('Rate Smaran'), findsNothing);
+    expect(find.text('Invite Family and Friends'), findsNothing);
+  });
+
+  testWidgets('the Jaap page no longer repeats Sadhana Goals', (tester) async {
+    final container = await createTestContainer();
+    await pumpSettings(
+      tester,
+      container: container,
+      section: SettingsSection.jaap,
+    );
+
+    expect(find.text('My Mantras'), findsOneWidget);
+    expect(find.text('Sadhana Goals'), findsNothing);
   });
 }

@@ -39,6 +39,7 @@ class SettingsService {
   static const _kAutoJaap = 'autoJaap.config';
   static const _kMeditationChant = 'meditation.chant';
   static const _kMeditationChantOn = 'meditation.chantOn';
+  static const _kUserMusic = 'meditation.userMusic';
   static const _kCounterHintSeen = 'counter.hintSeen';
   static const _kHideMantra = 'counter.hideMantra';
 
@@ -126,6 +127,12 @@ class SettingsService {
       _prefs.setStringList(_kFavouriteStories, ids);
 
   /// Automatic Jaap preferences, stored as `[intervalMs, _, stopAfter, ...]`.
+  /// The user's own recordings and uploads, as JSON objects.
+  List<String> userMusic() => _prefs.getStringList(_kUserMusic) ?? const [];
+
+  Future<void> setUserMusic(List<String> tracks) =>
+      _prefs.setStringList(_kUserMusic, tracks);
+
   /// Whether the chosen chant starts by itself when meditation opens: on
   /// until the user presses Stop.
   bool meditationChantOn() => _prefs.getBool(_kMeditationChantOn) ?? true;

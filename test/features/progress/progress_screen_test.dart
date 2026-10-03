@@ -146,11 +146,11 @@ void main() {
     container.read(ledgerRevisionProvider.notifier).bump();
 
     await pumpProgress(tester);
-    await tester.scrollUntilVisible(find.text('Radha'), 240);
+    await tester.scrollUntilVisible(find.text('Radha Radha'), 240);
 
     expect(find.text('By mantra'), findsOneWidget);
-    expect(find.text('Ram'), findsOneWidget);
-    expect(find.text('Radha'), findsOneWidget);
+    expect(find.text('Ram Ram'), findsOneWidget);
+    expect(find.text('Radha Radha'), findsOneWidget);
   });
 
   testWidgets('reflects a changed daily goal', (tester) async {
@@ -241,7 +241,7 @@ void main() {
 
     await tester.tap(find.text('All mantras'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Radha').last);
+    await tester.tap(find.text('Radha Radha').last);
     await tester.pumpAndSettle();
 
     final summary = await container.read(progressSummaryProvider.future);

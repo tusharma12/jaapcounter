@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../core/widgets/app_feedback.dart';
+import '../../../../core/services/ambient_chant_service.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../mantras/presentation/mantra_controllers.dart';
+import '../../../meditation/presentation/music_controllers.dart';
+import '../../../meditation/presentation/music_playback.dart';
+import '../../../meditation/presentation/music_sheet.dart';
 import '../auto_jaap_controller.dart';
 import '../jaap_controller.dart';
 
@@ -26,7 +29,38 @@ class _AutoJaapSheet extends ConsumerWidget {
     final jaap = ref.watch(jaapControllerProvider).value;
     final hasGoal = jaap != null && jaap.dailyGoal > 0 && !jaap.goalReached;
 
-    final hasRecording = ref.watch(activeMantraProvider)?.hasAudio ?? false;
+    final music = ref.watch(musicPlaybackProvider);
+    final mine = ref.watch(userMusicProvider).value ?? const [];
+    // What will play: the last sound chosen anywhere, or the first one.
+    String soundName() {
+      final id = music.selectedId ?? AmbientChantService.chants.first.id;
+      final bundled = AmbientChantService.byId(id);
+      if (bundled != null) return bundled.label;
+      for (final track in mine) {
+        if ('$userTrackPrefix${track.id}' == id) return track.name;
+      }
+      return AmbientChantService.chants.first.label;
+    }
+
+    /// Opens the full list. Anything the user hears while choosing is only a
+    /// preview, so it stops when the list closes unless it was already
+    /// playing or Auto Jaap is running.
+    Future<void> chooseSound() async {
+      final notifier = ref.read(musicPlaybackProvider.notifier);
+      final wasPlaying = ref.read(musicPlaybackProvider).playing;
+      await showAppSheet<void>(
+        context,
+        builder: (_) => MusicSheet(
+          selected: () => ref.read(musicPlaybackProvider).selectedId,
+          playing: () => ref.read(musicPlaybackProvider).playing,
+          onChoose: (id, {required play}) => notifier.choose(id, play: play),
+        ),
+      );
+      final stillPlaying = ref.read(musicPlaybackProvider).playing;
+      if (!wasPlaying && stillPlaying && !ref.read(autoJaapProvider).running) {
+        await notifier.stop();
+      }
+    }
 
     void update(AutoJaapConfig next) => controller.updateConfig(next);
 
@@ -93,17 +127,35 @@ class _AutoJaapSheet extends ConsumerWidget {
                 onSelectionChanged: (selection) =>
                     update(config.copyWith(stopAfter: selection.first)),
               ),
-              if (hasRecording) ...[
-                const SizedBox(height: Insets.md),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.autoJaapPlayChant),
-                  subtitle: Text(l10n.autoJaapPlayChantHint),
-                  value: config.playChant,
-                  onChanged: (on) => update(config.copyWith(playChant: on)),
+              const SizedBox(height: Insets.md),
+              ListTile(
+                key: const ValueKey('auto-jaap-sound'),
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  config.playMusic
+                      ? Icons.music_note_rounded
+                      : Icons.music_off_outlined,
                 ),
-              ],
-              const SizedBox(height: Insets.xl),
+                title: Text(l10n.music),
+                subtitle: Text(soundName()),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      key: const ValueKey('auto-jaap-choose-sound'),
+                      tooltip: l10n.chooseSound,
+                      icon: const Icon(Icons.library_music_outlined),
+                      onPressed: chooseSound,
+                    ),
+                    Switch(
+                      key: const ValueKey('auto-jaap-sound-switch'),
+                      value: config.playMusic,
+                      onChanged: (on) => update(config.copyWith(playMusic: on)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: Insets.lg),
               FilledButton.icon(
                 onPressed: () {
                   if (stopAfter != config.stopAfter) {

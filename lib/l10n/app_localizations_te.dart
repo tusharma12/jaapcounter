@@ -264,6 +264,13 @@ class AppL10nTe extends AppL10n {
   String get goalReached => 'నేటి లక్ష్యం పూర్తయింది';
 
   @override
+  String get goalReachedAutoBody =>
+      'ఆటో జపం పాజ్ చేయబడింది. కొనసాగించాలా లేదా ఇక్కడే ఆపాలా?';
+
+  @override
+  String get keepGoing => 'కొనసాగించు';
+
+  @override
   String get setDailyGoal => 'రోజువారీ లక్ష్యం నిర్ణయించండి';
 
   @override
@@ -583,6 +590,20 @@ class AppL10nTe extends AppL10n {
       'శుభ్రమైన, ప్రశాంతమైన కౌంటర్‌తో ధ్యాన మోడ్‌లోకి వెళ్లండి.';
 
   @override
+  String get onbFeaturesTitle => 'అంతా మీ చేతుల్లో';
+
+  @override
+  String get onbFeaturesBody =>
+      'ప్రారంభించే ముందు తెలుసుకోవాల్సిన కొన్ని విషయాలు.';
+
+  @override
+  String get soundsFeatureTitle => 'ప్రశాంతమైన ధ్వనులు';
+
+  @override
+  String get soundsFeatureBody =>
+      'ధ్యానం సమయంలో, మీరు కూర్చున్నంత సేపు మృదువైన నేపథ్య సంగీతాన్ని ప్లే చేయండి.';
+
+  @override
   String get startJap => 'జపం ప్రారంభించండి';
 
   @override
@@ -630,26 +651,52 @@ class AppL10nTe extends AppL10n {
   String get autoJaapStopNever => 'ఆపవద్దు';
 
   @override
-  String get autoJaapPlayChant => 'నా జపాన్ని ప్లే చేయండి';
-
-  @override
-  String get autoJaapPlayChantHint =>
-      'ప్రతి పూసపై మీ రికార్డింగ్ ప్లే అవుతుంది';
-
-  @override
   String get autoJaapStart => 'ఆటో జపం ప్రారంభించు';
 
   @override
   String get autoJaapStopAction => 'ఆటో జపం ఆపు';
 
   @override
-  String get chantSound => 'సంగీతం';
-
-  @override
   String get chantPlay => 'ప్లే చేయి';
 
   @override
   String get chantStop => 'ఆపు';
+
+  @override
+  String get music => 'సంగీతం';
+
+  @override
+  String get chooseSound => 'ధ్వనిని ఎంచుకోండి';
+
+  @override
+  String get musicRecord => 'రికార్డ్ చేయండి';
+
+  @override
+  String get musicUpload => 'అప్‌లోడ్ చేయండి';
+
+  @override
+  String get musicYours => 'నా సంగీతం';
+
+  @override
+  String musicRecordingName(int n) {
+    return 'రికార్డింగ్ $n';
+  }
+
+  @override
+  String get musicNameTitle => 'రికార్డింగ్‌కు పేరు పెట్టండి';
+
+  @override
+  String get musicRemove => 'తీసివేయి';
+
+  @override
+  String get musicAddFailed => 'ఈ ఫైల్‌ను జోడించలేకపోయాము';
+
+  @override
+  String get ownMusicTitle => 'మీ స్వంత సంగీతాన్ని తీసుకురండి';
+
+  @override
+  String get ownMusicBody =>
+      'మీ జపాన్ని రికార్డ్ చేయండి లేదా ధ్యాన ధ్వనిని అప్‌లోడ్ చేయండి; అది మీ ధ్యానం అంతా ప్లే అవుతుంది.';
 
   @override
   String counterCount(String count) {
@@ -848,30 +895,6 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get micPermissionDenied => 'దీనికి మైక్రోఫోన్ అనుమతి అవసరం';
-
-  @override
-  String get voiceNote => 'వాయిస్ నోట్';
-
-  @override
-  String get voiceNoteHint => 'మీరు జపిస్తుండగా రికార్డ్ చేసుకోండి';
-
-  @override
-  String get voiceNoteRecord => 'రికార్డ్ చేయి';
-
-  @override
-  String get voiceNoteRecording => 'రికార్డ్ అవుతోంది… ఆపడానికి తాకండి';
-
-  @override
-  String get voiceNotePlay => 'వాయిస్ నోట్ ప్లే చేయి';
-
-  @override
-  String get voiceNotePause => 'వాయిస్ నోట్ ఆపు';
-
-  @override
-  String get voiceNoteDelete => 'వాయిస్ నోట్ తొలగించు';
-
-  @override
-  String get voiceNoteMissing => 'ఈ వాయిస్ నోట్ ఇప్పుడు ఈ ఫోన్‌లో లేదు';
 
   @override
   String get fallingMantra => 'రాలే మంత్రం';

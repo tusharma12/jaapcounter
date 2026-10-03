@@ -31,14 +31,14 @@ void main() {
     expect(restored.stopAfter, AutoJaapStop.goal);
   });
 
-  test('the chant plays unless it was switched off', () {
-    expect(const AutoJaapConfig().playChant, isTrue);
+  test('the sound switch is off by default and survives a round trip', () {
+    expect(const AutoJaapConfig().playMusic, isFalse);
     expect(
-      AutoJaapConfig.fromPrefs(['2000', 'false', 'mala']).playChant,
-      isTrue,
+      AutoJaapConfig.fromPrefs(['2000', 'false', 'mala']).playMusic,
+      isFalse,
     );
 
-    final off = const AutoJaapConfig().copyWith(playChant: false);
-    expect(AutoJaapConfig.fromPrefs(off.toPrefs()).playChant, isFalse);
+    final on = const AutoJaapConfig().copyWith(playMusic: true);
+    expect(AutoJaapConfig.fromPrefs(on.toPrefs()).playMusic, isTrue);
   });
 }

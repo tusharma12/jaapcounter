@@ -10,7 +10,7 @@ import '../services/app_logger.dart';
 /// anywhere. [openTestDatabase] lets the same schema run in unit tests.
 abstract final class AppDatabase {
   static const String fileName = 'japmala.db';
-  static const int schemaVersion = 9;
+  static const int schemaVersion = 10;
 
   static Future<Database> open({DatabaseFactory? factory}) async {
     final f = factory ?? databaseFactory;
@@ -146,6 +146,43 @@ abstract final class AppDatabase {
       await _seedBuiltInMantras(db);
     }
     // v9's own column was added above, alongside description.
+    if (from < 10) {
+      // v10 retires the Durga mantra and chants the single-word mantras
+      // (Ram, Radha, Waheguru) twice.
+      await _retireBuiltInMantras(db);
+      await _applyShippedRenames(db);
+      await _renumberBuiltIns(db);
+    }
+  }
+
+  /// Brings built-ins whose shipped text changed up to date. Only a row still
+  /// holding the old shipped text is touched, so a user's own edit survives.
+  static Future<void> _applyShippedRenames(Database db) async {
+    for (final MapEntry(key: id, value: before)
+        in BuiltInMantras.renamedFrom.entries) {
+      final now = BuiltInMantras.shippedName(id);
+      if (now == null) continue;
+      await db.update(
+        'mantras',
+        {'name': now},
+        where: 'id = ? AND name = ? AND is_built_in = 1',
+        whereArgs: [id, before],
+      );
+    }
+  }
+
+  /// Built-ins are listed by sort order, so keep it matching what ships.
+  static Future<void> _renumberBuiltIns(Database db) async {
+    final batch = db.batch();
+    for (final mantra in BuiltInMantras.all) {
+      batch.update(
+        'mantras',
+        {'sort_order': mantra.sortOrder},
+        where: 'id = ? AND is_built_in = 1',
+        whereArgs: [mantra.id],
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
   /// Removes built-ins that are no longer shipped. One that was never used
@@ -272,8 +309,11 @@ abstract final class AppDatabase {
   /// so a backup made on an older version never leaves the library empty.
   static Future<void> ensureBuiltInMantras(Database db) async {
     await _seedBuiltInMantras(db);
-    // A backup from an older version may bring retired built-ins back.
+    // A backup from an older version may bring retired built-ins back, and
+    // text the built-ins have since changed.
     await _retireBuiltInMantras(db);
+    await _applyShippedRenames(db);
+    await _renumberBuiltIns(db);
   }
 
   /// Wipes every table and re-seeds. Behind explicit confirmation only.

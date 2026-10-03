@@ -14,7 +14,6 @@ import '../../../core/services/app_logger.dart';
 import '../../../core/utils/day_key.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_feedback.dart';
-import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../backup/presentation/backup_controllers.dart';
 import '../../diagnostics/presentation/diagnostics_sheet.dart';
@@ -32,8 +31,52 @@ import 'appearance_sheets.dart';
 import 'settings_controller.dart';
 import '../../../core/constants/app_languages.dart';
 
+/// The groups Settings is divided into. The main page lists them; each
+/// opens its own short page, so a person is never faced with every switch
+/// at once.
+enum SettingsSection {
+  jaap,
+  reminders,
+  counter,
+  appearance,
+  support,
+  about;
+
+  static SettingsSection? fromName(String? name) {
+    for (final section in values) {
+      if (section.name == name) return section;
+    }
+    return null;
+  }
+
+  String title(AppL10n l10n) {
+    // The strings are written for headers, in capitals.
+    final raw = switch (this) {
+      jaap => l10n.sectionJaap,
+      reminders => l10n.sectionReminders,
+      counter => l10n.sectionCounter,
+      appearance => l10n.sectionAppearance,
+      support => l10n.sectionSupport,
+      about => l10n.sectionAbout,
+    };
+    return raw.isEmpty ? raw : raw[0] + raw.substring(1).toLowerCase();
+  }
+
+  IconData get icon => switch (this) {
+    jaap => Icons.self_improvement_rounded,
+    reminders => Icons.notifications_none_rounded,
+    counter => Icons.touch_app_outlined,
+    appearance => Icons.palette_outlined,
+    support => Icons.favorite_border_rounded,
+    about => Icons.info_outline_rounded,
+  };
+}
+
+/// Settings. With no [section] it is a short menu; with one, that group.
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, this.section});
+
+  final SettingsSection? section;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,7 +86,7 @@ class SettingsScreen extends ConsumerWidget {
     final version = ref.watch(appVersionProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
+      appBar: AppBar(title: Text(section?.title(l10n) ?? l10n.settings)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           Insets.page,
@@ -52,255 +95,259 @@ class SettingsScreen extends ConsumerWidget {
           Insets.xxxl,
         ),
         children: [
-          SectionHeader(l10n.sectionJaap),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.myMantras,
-                icon: Icons.format_list_bulleted_rounded,
-                onTap: () => context.push('/mantras'),
-              ),
-              _NavRow(
-                label: l10n.sadhanaGoals,
-                icon: Icons.auto_awesome_outlined,
-                onTap: () => context.push('/sadhana'),
-              ),
-              _SwitchRow(
-                label: l10n.graceDays,
-                subtitle: l10n.graceDaysHint,
-                icon: Icons.healing_outlined,
-                value: settings.graceDaysEnabled,
-                onChanged: controller.setGraceDays,
-              ),
-              _NavRow(
-                label: l10n.resetCounts,
-                icon: Icons.restart_alt_rounded,
-                onTap: () => _showResetOptions(context, ref),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionReminders),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.jaapReminders,
-                icon: Icons.notifications_none_rounded,
-                onTap: () => context.push('/reminders'),
-              ),
-              _SingletonReminderRow(
-                kind: ReminderKind.streak,
-                label: l10n.streakReminder,
-                defaultMinutes: 20 * 60,
-              ),
-              _SingletonReminderRow(
-                kind: ReminderKind.goal,
-                label: l10n.goalReminder,
-                defaultMinutes: 19 * 60,
-              ),
-              _SwitchRow(
-                label: l10n.festivalReminders,
-                subtitle: l10n.festivalRemindersHint,
-                icon: Icons.nightlight_outlined,
-                value: settings.festivalReminders,
-                onChanged: (on) async {
-                  final reminders = ref.read(remindersProvider.notifier);
-                  if (on) await reminders.requestPermission();
-                  await controller.setFestivalReminders(on);
-                  if (context.mounted) {
-                    await reminders.reschedule(
-                      RemindersScreen.copyFrom(AppL10n.of(context)),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionCounter),
-          AppCardGroup(
-            children: [
-              _SwitchRow(
-                label: l10n.showMantraOnCounter,
-                icon: Icons.text_fields_rounded,
-                value: !ref.watch(hideMantraProvider),
-                onChanged: (show) =>
-                    ref.read(hideMantraProvider.notifier).set(!show),
-              ),
-              _NavRow(
-                label: l10n.counterBackground,
-                icon: Icons.wallpaper_rounded,
-                value: backgroundName(l10n, settings.background),
-                onTap: () => showBackgroundPicker(context),
-              ),
-              _NavRow(
-                label: l10n.malaStyle,
-                icon: Icons.blur_circular_rounded,
-                value: switch (settings.malaStyle) {
-                  MalaStyle.beads => l10n.malaStyleBeads,
-                  MalaStyle.ring => l10n.malaStyleRing,
-                },
-                onTap: () => _pickMalaStyle(context, ref),
-              ),
-              _SwitchRow(
-                label: l10n.countWithButtons,
-                subtitle: HardwareCountKeys.volumeButtonsSupported
-                    ? l10n.countWithButtonsHintAndroid
-                    : l10n.countWithButtonsHintIOS,
-                icon: Icons.touch_app_outlined,
-                value: settings.hardwareKeyCounting,
-                onChanged: controller.setHardwareKeyCounting,
-              ),
-              if (ref.watch(lockScreenSupportedProvider).value ?? false)
-                _SwitchRow(
-                  label: l10n.lockScreenCounter,
-                  subtitle: l10n.lockScreenCounterHint,
-                  icon: Icons.lock_clock_outlined,
-                  value: settings.lockScreenCounter,
-                  onChanged: controller.setLockScreenCounter,
+          if (section == null)
+            AppCardGroup(
+              children: [
+                for (final entry in SettingsSection.values)
+                  _NavRow(
+                    label: entry.title(l10n),
+                    icon: entry.icon,
+                    onTap: () => context.push('/settings/${entry.name}'),
+                  ),
+                _NavRow(
+                  label: l10n.backupRestore,
+                  icon: Icons.cloud_download_outlined,
+                  onTap: () => context.push('/backup'),
                 ),
-              _NavRow(
-                label: l10n.markerBead,
-                icon: Icons.adjust_rounded,
-                value: settings.beadMarkerInterval == 0
-                    ? l10n.markerBeadOff
-                    : l10n.markerBeadEvery(settings.beadMarkerInterval),
-                onTap: () => _pickMarkerBead(context, ref),
-              ),
-              _SwitchRow(
-                label: l10n.fallingMantra,
-                icon: Icons.auto_awesome_motion_outlined,
-                value: settings.fallingMantra,
-                onChanged: controller.setFallingMantra,
-              ),
-              _NavRow(
-                label: l10n.blackoutMode,
-                icon: Icons.dark_mode_outlined,
-                onTap: () => context.push('/blackout'),
-              ),
-              _NavRow(
-                label: l10n.homeScreenWidget,
-                icon: Icons.widgets_outlined,
-                onTap: () => _showWidgetInfo(context, ref),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionAppearance),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.theme,
-                icon: Icons.contrast_rounded,
-                value: themeName(l10n, settings.themeId),
-                onTap: () => showThemePicker(context),
-              ),
-              _SwitchRow(
-                label: l10n.haptics,
-                icon: Icons.vibration_rounded,
-                value: settings.hapticsEnabled,
-                onChanged: controller.setHaptics,
-              ),
-              _SwitchRow(
-                label: l10n.sound,
-                icon: Icons.volume_up_outlined,
-                value: settings.soundEnabled,
-                onChanged: controller.setSound,
-              ),
-              _NavRow(
-                label: l10n.language,
-                icon: Icons.translate_rounded,
-                value:
-                    AppLanguages.names[settings.localeCode] ??
-                    l10n.languageSystem,
-                onTap: () => _pickLanguage(context, ref),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionBackup),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.backupRestore,
-                icon: Icons.cloud_download_outlined,
-                onTap: () => context.push('/backup'),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionSupport),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.rateApp,
-                icon: Icons.star_border_rounded,
-                onTap: () => _open(
-                  Theme.of(context).platform == TargetPlatform.iOS
-                      ? AppConstants.iosReviewUrl
-                      : AppConstants.androidStoreUrl,
+              ],
+            ),
+          if (section == null) ...[
+            const SizedBox(height: Insets.lg),
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.sadhanaGoals,
+                  icon: Icons.auto_awesome_outlined,
+                  onTap: () => context.push('/sadhana'),
                 ),
-              ),
-              _NavRow(
-                label: l10n.shareApp,
-                icon: Icons.ios_share_rounded,
-                onTap: () => SharePlus.instance.share(
-                  ShareParams(
-                    text:
-                        '${l10n.appName} - ${l10n.tagline}\n'
-                        '${Theme.of(context).platform == TargetPlatform.iOS ? AppConstants.iosStoreUrl : AppConstants.androidStoreUrl}',
+                _NavRow(
+                  label: l10n.rateApp,
+                  icon: Icons.star_border_rounded,
+                  onTap: () => _open(
+                    Theme.of(context).platform == TargetPlatform.iOS
+                        ? AppConstants.iosReviewUrl
+                        : AppConstants.androidStoreUrl,
                   ),
                 ),
-              ),
-              _NavRow(
-                label: l10n.feedback,
-                icon: Icons.chat_bubble_outline_rounded,
-                onTap: () => _open(
-                  'mailto:${AppConstants.supportEmail}'
-                  '?subject=${Uri.encodeComponent(l10n.feedbackEmailSubject)}',
+                _NavRow(
+                  label: l10n.shareApp,
+                  icon: Icons.ios_share_rounded,
+                  onTap: () => SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          '${l10n.appName} - ${l10n.tagline}\n'
+                          '${Theme.of(context).platform == TargetPlatform.iOS ? AppConstants.iosStoreUrl : AppConstants.androidStoreUrl}',
+                    ),
+                  ),
                 ),
-              ),
-              _NavRow(
-                label: l10n.sendDiagnostics,
-                icon: Icons.bug_report_outlined,
-                onTap: () => showDiagnosticsSheet(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xxl),
-
-          SectionHeader(l10n.sectionAbout),
-          AppCardGroup(
-            children: [
-              _NavRow(
-                label: l10n.privacyPolicy,
-                icon: Icons.lock_outline_rounded,
-                onTap: () => _open(AppConstants.privacyPolicyUrl),
-              ),
-              _NavRow(
-                label: l10n.terms,
-                icon: Icons.description_outlined,
-                onTap: () => _open(AppConstants.termsUrl),
-              ),
-              _NavRow(
-                label: l10n.aboutApp,
-                icon: Icons.info_outline_rounded,
-                onTap: () => context.push('/about'),
-              ),
-            ],
-          ),
-          const SizedBox(height: Insets.xl),
-          Center(
-            child: Text(
-              version == null ? '' : l10n.version(version),
-              style: Theme.of(context).textTheme.bodySmall,
+              ],
             ),
-          ),
+          ],
+          if (section == SettingsSection.jaap)
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.myMantras,
+                  icon: Icons.format_list_bulleted_rounded,
+                  onTap: () => context.push('/mantras'),
+                ),
+                _SwitchRow(
+                  label: l10n.graceDays,
+                  subtitle: l10n.graceDaysHint,
+                  icon: Icons.healing_outlined,
+                  value: settings.graceDaysEnabled,
+                  onChanged: controller.setGraceDays,
+                ),
+                _NavRow(
+                  label: l10n.resetCounts,
+                  icon: Icons.restart_alt_rounded,
+                  onTap: () => _showResetOptions(context, ref),
+                ),
+              ],
+            ),
+          if (section == SettingsSection.reminders)
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.jaapReminders,
+                  icon: Icons.notifications_none_rounded,
+                  onTap: () => context.push('/reminders'),
+                ),
+                _SingletonReminderRow(
+                  kind: ReminderKind.streak,
+                  label: l10n.streakReminder,
+                  defaultMinutes: 20 * 60,
+                ),
+                _SingletonReminderRow(
+                  kind: ReminderKind.goal,
+                  label: l10n.goalReminder,
+                  defaultMinutes: 19 * 60,
+                ),
+                _SwitchRow(
+                  label: l10n.festivalReminders,
+                  subtitle: l10n.festivalRemindersHint,
+                  icon: Icons.nightlight_outlined,
+                  value: settings.festivalReminders,
+                  onChanged: (on) async {
+                    final reminders = ref.read(remindersProvider.notifier);
+                    if (on) await reminders.requestPermission();
+                    await controller.setFestivalReminders(on);
+                    if (context.mounted) {
+                      await reminders.reschedule(
+                        RemindersScreen.copyFrom(AppL10n.of(context)),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          if (section == SettingsSection.counter)
+            AppCardGroup(
+              children: [
+                _SwitchRow(
+                  label: l10n.showMantraOnCounter,
+                  icon: Icons.text_fields_rounded,
+                  value: !ref.watch(hideMantraProvider),
+                  onChanged: (show) =>
+                      ref.read(hideMantraProvider.notifier).set(!show),
+                ),
+                _NavRow(
+                  label: l10n.counterBackground,
+                  icon: Icons.wallpaper_rounded,
+                  value: backgroundName(l10n, settings.background),
+                  onTap: () => showBackgroundPicker(context),
+                ),
+                _NavRow(
+                  label: l10n.malaStyle,
+                  icon: Icons.blur_circular_rounded,
+                  value: switch (settings.malaStyle) {
+                    MalaStyle.beads => l10n.malaStyleBeads,
+                    MalaStyle.ring => l10n.malaStyleRing,
+                  },
+                  onTap: () => _pickMalaStyle(context, ref),
+                ),
+                _SwitchRow(
+                  label: l10n.countWithButtons,
+                  subtitle: HardwareCountKeys.volumeButtonsSupported
+                      ? l10n.countWithButtonsHintAndroid
+                      : l10n.countWithButtonsHintIOS,
+                  icon: Icons.touch_app_outlined,
+                  value: settings.hardwareKeyCounting,
+                  onChanged: controller.setHardwareKeyCounting,
+                ),
+                if (ref.watch(lockScreenSupportedProvider).value ?? false)
+                  _SwitchRow(
+                    label: l10n.lockScreenCounter,
+                    subtitle: l10n.lockScreenCounterHint,
+                    icon: Icons.lock_clock_outlined,
+                    value: settings.lockScreenCounter,
+                    onChanged: controller.setLockScreenCounter,
+                  ),
+                _NavRow(
+                  label: l10n.markerBead,
+                  icon: Icons.adjust_rounded,
+                  value: settings.beadMarkerInterval == 0
+                      ? l10n.markerBeadOff
+                      : l10n.markerBeadEvery(settings.beadMarkerInterval),
+                  onTap: () => _pickMarkerBead(context, ref),
+                ),
+                _SwitchRow(
+                  label: l10n.fallingMantra,
+                  icon: Icons.auto_awesome_motion_outlined,
+                  value: settings.fallingMantra,
+                  onChanged: controller.setFallingMantra,
+                ),
+                _NavRow(
+                  label: l10n.blackoutMode,
+                  icon: Icons.dark_mode_outlined,
+                  onTap: () => context.push('/blackout'),
+                ),
+                _NavRow(
+                  label: l10n.homeScreenWidget,
+                  icon: Icons.widgets_outlined,
+                  onTap: () => _showWidgetInfo(context, ref),
+                ),
+              ],
+            ),
+          if (section == SettingsSection.appearance)
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.theme,
+                  icon: Icons.contrast_rounded,
+                  value: themeName(l10n, settings.themeId),
+                  onTap: () => showThemePicker(context),
+                ),
+                _SwitchRow(
+                  label: l10n.haptics,
+                  icon: Icons.vibration_rounded,
+                  value: settings.hapticsEnabled,
+                  onChanged: controller.setHaptics,
+                ),
+                _SwitchRow(
+                  label: l10n.sound,
+                  icon: Icons.volume_up_outlined,
+                  value: settings.soundEnabled,
+                  onChanged: controller.setSound,
+                ),
+                _NavRow(
+                  label: l10n.language,
+                  icon: Icons.translate_rounded,
+                  value:
+                      AppLanguages.names[settings.localeCode] ??
+                      l10n.languageSystem,
+                  onTap: () => _pickLanguage(context, ref),
+                ),
+              ],
+            ),
+
+          if (section == SettingsSection.support)
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.feedback,
+                  icon: Icons.chat_bubble_outline_rounded,
+                  onTap: () => _open(
+                    'mailto:${AppConstants.supportEmail}'
+                    '?subject=${Uri.encodeComponent(l10n.feedbackEmailSubject)}',
+                  ),
+                ),
+                _NavRow(
+                  label: l10n.sendDiagnostics,
+                  icon: Icons.bug_report_outlined,
+                  onTap: () => showDiagnosticsSheet(context),
+                ),
+              ],
+            ),
+          if (section == SettingsSection.about)
+            AppCardGroup(
+              children: [
+                _NavRow(
+                  label: l10n.privacyPolicy,
+                  icon: Icons.lock_outline_rounded,
+                  onTap: () => _open(AppConstants.privacyPolicyUrl),
+                ),
+                _NavRow(
+                  label: l10n.terms,
+                  icon: Icons.description_outlined,
+                  onTap: () => _open(AppConstants.termsUrl),
+                ),
+                _NavRow(
+                  label: l10n.aboutApp,
+                  icon: Icons.info_outline_rounded,
+                  onTap: () => context.push('/about'),
+                ),
+              ],
+            ),
+          if (section == null) ...[
+            const SizedBox(height: Insets.xl),
+            Center(
+              child: Text(
+                version == null ? '' : l10n.version(version),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -484,7 +531,6 @@ class SettingsScreen extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
-              const SizedBox(height: Insets.xxl),
               if (canPin)
                 FilledButton(
                   onPressed: () {

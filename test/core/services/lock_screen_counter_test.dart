@@ -225,7 +225,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(lockScreen.shown.last, {
-        'mantra': 'Ram',
+        'mantra': 'Ram Ram',
         'beads': 12,
         'malaSize': 108,
         'todayTotal': 12,

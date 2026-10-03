@@ -126,6 +126,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/settings',
                 builder: (context, state) => const SettingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':section',
+                    builder: (context, state) => SettingsScreen(
+                      section: SettingsSection.fromName(
+                        state.pathParameters['section'],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

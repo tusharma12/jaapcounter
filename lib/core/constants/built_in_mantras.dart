@@ -10,14 +10,14 @@ abstract final class BuiltInMantras {
   static const List<Mantra> all = [
     Mantra(
       id: 'builtin.ram',
-      name: 'राम',
+      name: 'राम राम',
       malaSize: 108,
       isBuiltIn: true,
       sortOrder: 0,
     ),
     Mantra(
       id: 'builtin.radha',
-      name: 'राधा',
+      name: 'राधा राधा',
       malaSize: 108,
       isBuiltIn: true,
       sortOrder: 1,
@@ -78,7 +78,7 @@ abstract final class BuiltInMantras {
     // Sikh
     Mantra(
       id: 'builtin.waheguru',
-      name: 'वाहेगुरु',
+      name: 'वाहेगुरु वाहेगुरु',
       malaSize: 108,
       isBuiltIn: true,
       sortOrder: 9,
@@ -153,20 +153,13 @@ abstract final class BuiltInMantras {
       isBuiltIn: true,
       sortOrder: 19,
     ),
-    Mantra(
-      id: 'builtin.om-dum-durgayei-namah',
-      name: 'ॐ दुं दुर्गायै नमः',
-      malaSize: 108,
-      isBuiltIn: true,
-      sortOrder: 20,
-    ),
     // The Hare Rama half of the Maha Mantra, chanted on its own.
     Mantra(
       id: 'builtin.hare-rama',
       name: 'हरे राम हरे राम राम राम हरे हरे',
       malaSize: 108,
       isBuiltIn: true,
-      sortOrder: 21,
+      sortOrder: 20,
     ),
   ];
 
@@ -174,8 +167,8 @@ abstract final class BuiltInMantras {
   /// out of the database: the stored text stays the Devanagari one, and
   /// only what the screen shows changes with the language.
   static const Map<String, String> english = {
-    'builtin.ram': 'Ram',
-    'builtin.radha': 'Radha',
+    'builtin.ram': 'Ram Ram',
+    'builtin.radha': 'Radha Radha',
     'builtin.om-namah-shivaya': 'Om Namah Shivaya',
     'builtin.om-hanumate-namah': 'Om Hanumate Namah',
     'builtin.hare-krishna': 'Hare Krishna',
@@ -189,7 +182,7 @@ abstract final class BuiltInMantras {
     'builtin.mahamrityunjaya':
         'Om Tryambakam Yajamahe Sugandhim Pushtivardhanam\n'
         'Urvarukamiva Bandhanan Mrityor Mukshiya Maamritat',
-    'builtin.waheguru': 'Waheguru',
+    'builtin.waheguru': 'Waheguru Waheguru',
     'builtin.satnam-waheguru': 'Satnam Waheguru',
     'builtin.sita-ram': 'Sita Ram',
     'builtin.shri-ram-jai-ram': 'Shri Ram Jai Ram Jai Jai Ram',
@@ -200,7 +193,6 @@ abstract final class BuiltInMantras {
     'builtin.radhe-krishna': 'Radhe Krishna',
     'builtin.om-namo-narayanaya': 'Om Namo Narayanaya',
     'builtin.om-sai-ram': 'Om Sai Ram',
-    'builtin.om-dum-durgayei-namah': 'Om Dum Durgayei Namah',
     'builtin.hare-rama': 'Hare Rama Hare Rama Rama Rama Hare Hare',
   };
 
@@ -216,7 +208,18 @@ abstract final class BuiltInMantras {
     'builtin.mool-mantar',
     'builtin.navkar',
     'builtin.om-hreem-arham-namah',
+    'builtin.om-dum-durgayei-namah',
   ];
+
+  /// Built-ins whose shipped text changed: the single-word mantras are now
+  /// chanted twice, as they usually are. The old text is listed so a row the
+  /// user has not edited can be brought up to date, while one they rewrote
+  /// is left as they wrote it.
+  static const Map<String, String> renamedFrom = {
+    'builtin.ram': 'राम',
+    'builtin.radha': 'राधा',
+    'builtin.waheguru': 'वाहेगुरु',
+  };
 
   static Mantra get fallback => all.first;
 }

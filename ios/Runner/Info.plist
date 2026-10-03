@@ -68,7 +68,7 @@
 	<false/>
 	<!-- Recording a mantra's voice note, and transcribing speech typed by voice. -->
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Used to record your own voice chanting a mantra, and to fill in the mantra text by speaking it.</string>
+	<string>Used to record your own chant as meditation music, and to fill in the mantra text by speaking it.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Used to turn your spoken words into the mantra text. Recognition happens on this iPhone; your voice is never sent anywhere.</string>
 	<!-- Hindi is a first-class language, not a fallback. -->

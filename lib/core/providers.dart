@@ -10,12 +10,13 @@ import '../features/stories/data/story_repository.dart';
 import 'services/dictation_service.dart';
 import 'services/lock_screen_counter_service.dart';
 import 'services/ambient_chant_service.dart';
-import 'services/mantra_audio_service.dart';
+import 'services/music_recorder_service.dart';
+import 'services/review_prompt_service.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
 import 'services/shortcut_service.dart';
 import 'services/speech_service.dart';
-import 'services/voice_note_store.dart';
+import 'services/user_music_store.dart';
 import 'services/widget_service.dart';
 import 'utils/day_key.dart';
 
@@ -41,15 +42,13 @@ final settingsServiceProvider = Provider<SettingsService>(
 );
 
 final mantraRepositoryProvider = Provider<MantraRepository>(
-  (ref) => MantraRepository(
-    ref.watch(databaseProvider),
-    voiceNotes: ref.watch(voiceNoteStoreProvider),
-  ),
+  (ref) => MantraRepository(ref.watch(databaseProvider)),
 );
 
-/// Where voice notes live on disk. Overridden in tests with a temp directory.
-final voiceNoteStoreProvider = Provider<VoiceNoteStore>(
-  (ref) => VoiceNoteStore(),
+/// Where the user's own meditation sounds live on disk. Overridden in tests
+/// with a temp directory.
+final userMusicStoreProvider = Provider<UserMusicStore>(
+  (ref) => UserMusicStore(),
 );
 
 final jaapRepositoryProvider = Provider<JaapRepository>(
@@ -87,13 +86,21 @@ final speechServiceProvider = Provider<SpeechService>((ref) {
 
 final widgetServiceProvider = Provider<WidgetService>((ref) => WidgetService());
 
-/// A mantra's voice note: recording and playback. One instance, so the mantra
-/// editor never has two microphones or two players fighting each other.
-final mantraAudioServiceProvider = Provider<MantraAudioService>((ref) {
-  final service = MantraAudioService();
+/// Records the user's own chant for the Music list.
+final musicRecorderProvider = Provider<MusicRecorderService>((ref) {
+  final service = MusicRecorderService();
   ref.onDispose(service.dispose);
   return service;
 });
+
+/// Asks for a store rating once, after a few days or a couple of thousand
+/// beads. Overridden in tests.
+final reviewPromptProvider = Provider<ReviewPromptService>(
+  (ref) => ReviewPromptService(
+    prefs: ref.watch(sharedPreferencesProvider),
+    repository: ref.watch(jaapRepositoryProvider),
+  ),
+);
 
 /// Looping background sound for meditation. Overridden in tests.
 final ambientChantProvider = Provider<AmbientChantService>((ref) {
