@@ -185,6 +185,12 @@ abstract class AppL10n {
   /// **'Skip'**
   String get skip;
 
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
@@ -1112,7 +1118,7 @@ abstract class AppL10n {
   /// No description provided for @onbLookBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose how the counter looks and sounds. You can change these any time in Settings.'**
+  /// **'Choose how the counter looks and sounds. Theme, mantra display, falling mantra and music can all be changed any time in Settings.'**
   String get onbLookBody;
 
   /// No description provided for @onbFeaturesTitle.

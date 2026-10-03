@@ -48,6 +48,9 @@ class AppL10nHi extends AppL10n {
   String get skip => 'छोड़ें';
 
   @override
+  String get back => 'वापस';
+
+  @override
   String get retry => 'फिर कोशिश करें';
 
   @override
@@ -585,7 +588,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'चुनें कि काउंटर कैसा दिखे और कैसा सुनाई दे। इन्हें कभी भी सेटिंग्स में बदल सकते हैं।';
+      'चुनें कि काउंटर कैसा दिखे और कैसा सुनाई दे। थीम, मंत्र दिखाना, गिरता मंत्र और संगीत कभी भी सेटिंग्स में बदले जा सकते हैं।';
 
   @override
   String get onbFeaturesTitle => 'सब कुछ आपके हाथ में';

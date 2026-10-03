@@ -48,6 +48,9 @@ class AppL10nGu extends AppL10n {
   String get skip => 'છોડો';
 
   @override
+  String get back => 'પાછળ';
+
+  @override
   String get retry => 'ફરી પ્રયાસ કરો';
 
   @override
@@ -586,7 +589,7 @@ class AppL10nGu extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'કાઉન્ટર કેવું દેખાય અને કેવું સંભળાય તે પસંદ કરો. આ ગમે ત્યારે સેટિંગ્સમાં બદલી શકાય છે.';
+      'કાઉન્ટર કેવું દેખાય અને કેવું સંભળાય તે પસંદ કરો. થીમ, મંત્ર બતાવવો, પડતો મંત્ર અને સંગીત ગમે ત્યારે સેટિંગ્સમાં બદલી શકાય છે.';
 
   @override
   String get onbFeaturesTitle => 'બધું તમારા હાથમાં';

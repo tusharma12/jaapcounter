@@ -9,6 +9,7 @@ import '../../../app/theme/app_dimens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/mantra_text.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../app/theme/app_themes.dart';
 import '../../../core/services/ambient_chant_service.dart';
 import '../../../core/widgets/app_feedback.dart';
@@ -24,7 +25,7 @@ import '../../sadhana/presentation/daily_goal_picker.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../../../core/constants/app_languages.dart';
 
-/// Three screens of welcome, one tour of the features, then three that make the app the user's own:
+/// One welcome, one tour of the features, then three that make the app the user's own:
 /// which mantra they chant and how much each day. Then out of the way.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -66,6 +67,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (mounted) context.go('/jaap');
   }
 
+  /// The first pages are only an introduction; the pages from here on make
+  /// the app the user's own.
+  static const int _firstPersonalPage = 2;
+
+  /// Skipping the introduction lands on the personal steps, not out of
+  /// onboarding, so a skipped tour does not also skip choosing a mantra.
+  void _skip() {
+    if (_page < _firstPersonalPage) {
+      _controller.animateToPage(
+        _firstPersonalPage,
+        duration: Motion.medium,
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+    _finish();
+  }
+
+  void _back() {
+    _controller.previousPage(
+      duration: Motion.medium,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   void _next(int total) {
     if (_page >= total - 1) {
       _finish();
@@ -82,9 +108,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     final mantra = ref.watch(activeMantraProvider);
     final pages = <Widget>[
-      _OnboardingPage(title: l10n.onb1Title, body: l10n.onb1Body),
-      _OnboardingPage(title: l10n.onb2Title, body: l10n.onb2Body),
-      _OnboardingPage(title: l10n.onb3Title, body: l10n.onb3Body),
+      const _WelcomePage(),
       const _FeaturesPage(),
       const _MantraPage(),
       const _LookPage(),
@@ -101,17 +125,40 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: _finish,
-                child: Text(
-                  l10n.skip,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: palette.secondaryText,
+            Row(
+              children: [
+                // Keeps the Skip button where it is when Back is not shown.
+                SizedBox(
+                  width: 96,
+                  child: _page > 0
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            key: const ValueKey('onboarding-back'),
+                            onPressed: _back,
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 16,
+                            ),
+                            label: Text(l10n.back),
+                            style: TextButton.styleFrom(
+                              foregroundColor: palette.secondaryText,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: _skip,
+                  child: Text(
+                    l10n.skip,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: palette.secondaryText,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
             Expanded(
               child: PageView(
@@ -171,16 +218,44 @@ class _AppIconMark extends StatelessWidget {
   }
 }
 
-class _OnboardingPage extends StatelessWidget {
-  const _OnboardingPage({required this.title, required this.body});
-
-  final String title;
-  final String body;
+/// One welcome page in place of three: what the app is, then the two things
+/// it does for you.
+class _WelcomePage extends StatelessWidget {
+  const _WelcomePage();
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
     final theme = Theme.of(context);
     final palette = context.palette;
+
+    Widget point(IconData icon, String title, String body) => Padding(
+      padding: const EdgeInsets.only(top: Insets.xl),
+      child: MergeSemantics(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: palette.saffron, size: 28),
+            const SizedBox(width: Insets.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 2),
+                  Text(
+                    body,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: palette.secondaryText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
@@ -190,20 +265,30 @@ class _OnboardingPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const _AppIconMark(size: 132),
-              const SizedBox(height: Insets.xxxl),
+              const _AppIconMark(size: 112),
+              const SizedBox(height: Insets.xxl),
               Text(
-                title,
+                l10n.onb1Title,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineLarge,
               ),
               const SizedBox(height: Insets.md),
               Text(
-                body,
+                l10n.onb1Body,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: palette.secondaryText,
                 ),
+              ),
+              point(
+                Icons.local_fire_department_outlined,
+                l10n.onb2Title,
+                l10n.onb2Body,
+              ),
+              point(
+                Icons.self_improvement_rounded,
+                l10n.onb3Title,
+                l10n.onb3Body,
               ),
             ],
           ),
@@ -229,7 +314,6 @@ class _FeaturesPage extends StatelessWidget {
         l10n.soundsFeatureTitle,
         l10n.soundsFeatureBody,
       ),
-      (Icons.dark_mode_outlined, l10n.onb3Title, l10n.onb3Body),
       (
         Icons.local_fire_department_outlined,
         l10n.graceDays,
@@ -351,6 +435,7 @@ class _LookPage extends ConsumerWidget {
           children: [
             for (final id in AppThemeId.values)
               ChoiceChip(
+                avatar: _ThemeSwatch(id),
                 label: Text(themeName(l10n, id)),
                 selected: id == settings.themeId,
                 onSelected: (_) =>
@@ -556,6 +641,42 @@ class _GoalPage extends StatelessWidget {
             onChanged: onChanged,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A small preview of a theme: its background with its accent on top.
+class _ThemeSwatch extends StatelessWidget {
+  const _ThemeSwatch(this.id);
+
+  final AppThemeId id;
+
+  @override
+  Widget build(BuildContext context) {
+    // "Auto" follows the device, so it shows the light theme.
+    final theme = id == AppThemeId.system
+        ? AppTheme.light()
+        : AppTheme.forId(id);
+    return ExcludeSemantics(
+      child: Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: theme.scaffoldBackgroundColor,
+          border: Border.all(color: theme.colorScheme.outline, width: 1),
+        ),
+        child: Center(
+          child: Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
       ),
     );
   }

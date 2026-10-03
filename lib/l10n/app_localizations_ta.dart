@@ -49,6 +49,9 @@ class AppL10nTa extends AppL10n {
   String get skip => 'தவிர்';
 
   @override
+  String get back => 'பின்';
+
+  @override
   String get retry => 'மீண்டும் முயல்க';
 
   @override
@@ -590,7 +593,7 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'கவுண்டர் எப்படித் தோன்றவும் ஒலிக்கவும் வேண்டும் என்பதைத் தேர்ந்தெடுங்கள். இவற்றை எப்போது வேண்டுமானாலும் அமைப்புகளில் மாற்றலாம்.';
+      'கவுண்டர் எப்படித் தோன்றவும் ஒலிக்கவும் வேண்டும் என்பதைத் தேர்ந்தெடுங்கள். தீம், மந்திரம் காட்டுதல், விழும் மந்திரம், இசை ஆகியவற்றை எப்போது வேண்டுமானாலும் அமைப்புகளில் மாற்றலாம்.';
 
   @override
   String get onbFeaturesTitle => 'எல்லாம் உங்கள் கையில்';

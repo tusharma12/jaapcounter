@@ -48,6 +48,9 @@ class AppL10nPa extends AppL10n {
   String get skip => 'ਛੱਡੋ';
 
   @override
+  String get back => 'ਪਿੱਛੇ';
+
+  @override
   String get retry => 'ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ';
 
   @override
@@ -586,7 +589,7 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'ਚੁਣੋ ਕਿ ਕਾਊਂਟਰ ਕਿਹੋ ਜਿਹਾ ਦਿਸੇ ਅਤੇ ਸੁਣਾਈ ਦੇਵੇ। ਇਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲਿਆ ਜਾ ਸਕਦਾ ਹੈ।';
+      'ਚੁਣੋ ਕਿ ਕਾਊਂਟਰ ਕਿਹੋ ਜਿਹਾ ਦਿਸੇ ਅਤੇ ਸੁਣਾਈ ਦੇਵੇ। ਥੀਮ, ਮੰਤਰ ਦਿਖਾਉਣਾ, ਡਿੱਗਦਾ ਮੰਤਰ ਅਤੇ ਸੰਗੀਤ ਕਦੇ ਵੀ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲੇ ਜਾ ਸਕਦੇ ਹਨ।';
 
   @override
   String get onbFeaturesTitle => 'ਸਭ ਕੁਝ ਤੁਹਾਡੇ ਹੱਥ ਵਿੱਚ';

@@ -18,7 +18,7 @@ enum AutoJaapStop { mala, goal, never }
 @immutable
 class AutoJaapConfig {
   const AutoJaapConfig({
-    this.interval = const Duration(seconds: 2),
+    this.interval = const Duration(seconds: 1),
     this.stopAfter = AutoJaapStop.mala,
     this.playMusic = false,
   });

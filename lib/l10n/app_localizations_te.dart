@@ -48,6 +48,9 @@ class AppL10nTe extends AppL10n {
   String get skip => 'దాటవేయి';
 
   @override
+  String get back => 'వెనుకకు';
+
+  @override
   String get retry => 'మళ్లీ ప్రయత్నించు';
 
   @override
@@ -588,7 +591,7 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'కౌంటర్ ఎలా కనిపించాలో, వినిపించాలో ఎంచుకోండి. వీటిని ఎప్పుడైనా సెట్టింగ్స్‌లో మార్చుకోవచ్చు.';
+      'కౌంటర్ ఎలా కనిపించాలో, వినిపించాలో ఎంచుకోండి. థీమ్, మంత్రం చూపడం, పడే మంత్రం, సంగీతం వీటిని ఎప్పుడైనా సెట్టింగ్స్‌లో మార్చుకోవచ్చు.';
 
   @override
   String get onbFeaturesTitle => 'అంతా మీ చేతుల్లో';

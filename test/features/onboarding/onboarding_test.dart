@@ -49,10 +49,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    for (var i = 0; i < 3; i++) {
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-    }
+    // One welcome page, with the two things the app does for you.
+    expect(find.text('Your Digital Jap Mala'), findsOneWidget);
+    expect(find.text('Make Your Sadhana a Habit'), findsOneWidget);
+    expect(find.text('Chant Without Distractions'), findsOneWidget);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
     // The tour of features sits between the welcome and the personal steps.
     expect(find.text('Everything in your hands'), findsOneWidget);
     expect(find.text('Auto Jaap'), findsOneWidget);
@@ -78,15 +80,14 @@ void main() {
 
     // How the counter looks and sounds is chosen before the goal.
     expect(find.text('Make it yours'), findsOneWidget);
+    await tester.ensureVisible(find.text('Ocean'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Ocean'));
     await tester.pumpAndSettle();
     expect(container.read(settingsProvider).themeId, AppThemeId.ocean);
     for (final key in ['onb-show-mantra', 'onb-falling-mantra', 'onb-music']) {
-      await tester.scrollUntilVisible(
-        find.byKey(ValueKey(key)),
-        200,
-        scrollable: find.byType(Scrollable).last,
-      );
+      await tester.ensureVisible(find.byKey(ValueKey(key)));
+      await tester.pumpAndSettle();
     }
     await tester.tap(find.byKey(const ValueKey('onb-falling-mantra')));
     await tester.pumpAndSettle();
@@ -145,7 +146,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      for (var i = 0; i < 4; i++) {
+      for (var i = 0; i < 2; i++) {
         await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
       }
@@ -199,6 +200,85 @@ void main() {
         find.text('Hare Rama Hare Rama Rama Rama Hare Hare'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('moving around', () {
+    Future<ProviderContainer> pumpOnboarding(WidgetTester tester) async {
+      await usePhoneSurface(tester);
+      final container = await createTestContainer();
+      final router = GoRouter(
+        initialLocation: '/onboarding',
+        routes: [
+          GoRoute(
+            path: '/onboarding',
+            builder: (_, _) => const OnboardingScreen(),
+          ),
+          GoRoute(path: '/jaap', builder: (_, _) => const Text('counter')),
+        ],
+      );
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            theme: AppTheme.light(),
+            routerConfig: router,
+            localizationsDelegates: const [
+              AppL10n.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppL10n.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return container;
+    }
+
+    testWidgets('Skip on the introduction lands on the personal steps', (
+      tester,
+    ) async {
+      final container = await pumpOnboarding(tester);
+
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Which mantra do you chant?'), findsOneWidget);
+      expect(
+        container.read(settingsProvider).onboardingComplete,
+        isFalse,
+        reason: 'a skipped tour is not a skipped setup',
+      );
+    });
+
+    testWidgets('Skip on a personal step finishes', (tester) async {
+      final container = await pumpOnboarding(tester);
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(settingsProvider).onboardingComplete, isTrue);
+      expect(find.text('counter'), findsOneWidget);
+    });
+
+    testWidgets('Back returns, and is absent on the first page', (
+      tester,
+    ) async {
+      await pumpOnboarding(tester);
+      expect(find.byKey(const ValueKey('onboarding-back')), findsNothing);
+
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      expect(find.text('Everything in your hands'), findsOneWidget);
+      expect(find.byKey(const ValueKey('onboarding-back')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('onboarding-back')));
+      await tester.pumpAndSettle();
+      expect(find.text('Your Digital Jap Mala'), findsOneWidget);
     });
   });
 }

@@ -48,6 +48,9 @@ class AppL10nEn extends AppL10n {
   String get skip => 'Skip';
 
   @override
+  String get back => 'Back';
+
+  @override
   String get retry => 'Retry';
 
   @override
@@ -587,7 +590,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get onbLookBody =>
-      'Choose how the counter looks and sounds. You can change these any time in Settings.';
+      'Choose how the counter looks and sounds. Theme, mantra display, falling mantra and music can all be changed any time in Settings.';
 
   @override
   String get onbFeaturesTitle => 'Everything in your hands';
