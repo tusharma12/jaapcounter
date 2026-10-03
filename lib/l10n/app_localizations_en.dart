@@ -9,10 +9,10 @@ class AppL10nEn extends AppL10n {
   AppL10nEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Naam Jap Counter – Smaran';
+  String get appName => 'Naam Jaap Counter: JaapMitra';
 
   @override
-  String get tagline => 'Your peaceful digital mala for daily Naam Jap';
+  String get tagline => 'Bhakti Ka Sathi, Har Din';
 
   @override
   String get navJaap => 'Jaap';
@@ -436,7 +436,7 @@ class AppL10nEn extends AppL10n {
   String get exportMyData => 'Export My Data';
 
   @override
-  String get rateApp => 'Rate Smaran';
+  String get rateApp => 'Rate JaapMitra';
 
   @override
   String get shareApp => 'Invite Family and Friends';
@@ -451,7 +451,7 @@ class AppL10nEn extends AppL10n {
   String get terms => 'Terms';
 
   @override
-  String get aboutApp => 'About Smaran';
+  String get aboutApp => 'About JaapMitra';
 
   @override
   String version(String version) {
@@ -483,7 +483,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get aboutBody =>
-      'Smaran is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.';
+      'JaapMitra is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.';
 
   @override
   String get madeWith => 'Made with devotion';
@@ -506,7 +506,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'Notifications are turned off for Smaran. Enable them in your device settings.';
+      'Notifications are turned off for JaapMitra. Enable them in your device settings.';
 
   @override
   String get reminderNotificationTitle => 'Time for your Jaap';
@@ -540,7 +540,7 @@ class AppL10nEn extends AppL10n {
   String get restoreBackup => 'Restore from backup';
 
   @override
-  String get restoreBackupBody => 'Choose a Smaran backup file to restore.';
+  String get restoreBackupBody => 'Choose a JaapMitra backup file to restore.';
 
   @override
   String get backupCreated => 'Backup created';
@@ -550,7 +550,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'Restoring will replace everything currently in Smaran with the contents of the backup file.';
+      'Restoring will replace everything currently in JaapMitra with the contents of the backup file.';
 
   @override
   String get restore => 'Restore';
@@ -561,10 +561,10 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'This file is not a valid Smaran backup';
+  String get importInvalid => 'This file is not a valid JaapMitra backup';
 
   @override
-  String get exportShareText => 'My Smaran backup';
+  String get exportShareText => 'My JaapMitra backup';
 
   @override
   String get onb1Title => 'Your Digital Jap Mala';
@@ -984,7 +984,7 @@ class AppL10nEn extends AppL10n {
       other: '$count days',
       one: '1 day',
     );
-    return '$_temp0 of Naam Jap in a row, with Smaran 🙏';
+    return '$_temp0 of Naam Jap in a row, with JaapMitra 🙏';
   }
 
   @override
@@ -994,7 +994,7 @@ class AppL10nEn extends AppL10n {
   String get exitBlackout => 'Exit blackout';
 
   @override
-  String get feedbackEmailSubject => 'Smaran feedback';
+  String get feedbackEmailSubject => 'JaapMitra feedback';
 
   @override
   String get homeScreenWidget => 'Home screen widget';
@@ -1005,11 +1005,11 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get homeScreenWidgetStepsAndroid =>
-      'Long-press an empty spot on your Home Screen, tap Widgets, then find Smaran.';
+      'Long-press an empty spot on your Home Screen, tap Widgets, then find JaapMitra.';
 
   @override
   String get homeScreenWidgetStepsIOS =>
-      'Long-press an empty spot on your Home Screen, tap the + in the corner, search for Smaran, then choose a size and tap Add Widget.';
+      'Long-press an empty spot on your Home Screen, tap the + in the corner, search for JaapMitra, then choose a size and tap Add Widget.';
 
   @override
   String get addToHomeScreen => 'Add to Home Screen';
@@ -1295,7 +1295,7 @@ class AppL10nEn extends AppL10n {
   String get diagnosticsShare => 'Share as a file';
 
   @override
-  String get diagnosticsEmailSubject => 'Smaran diagnostics';
+  String get diagnosticsEmailSubject => 'JaapMitra diagnostics';
 
   @override
   String get diagnosticsNoMail =>

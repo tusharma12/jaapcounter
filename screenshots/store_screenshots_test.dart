@@ -1170,7 +1170,7 @@ class _FeatureGraphic extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Naam Jap Counter',
+                      'JaapMitra',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 58,
@@ -1181,7 +1181,7 @@ class _FeatureGraphic extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Smaran',
+                      'Bhakti Ka Sathi,\nHar Din',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 58,

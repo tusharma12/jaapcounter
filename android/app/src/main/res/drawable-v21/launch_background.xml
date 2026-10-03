@@ -3,4 +3,7 @@
      frame does not flash white before the counter appears. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/japmala_background" />
+    <item android:width="120dp" android:height="120dp" android:gravity="center">
+        <bitmap android:src="@mipmap/ic_launcher" android:gravity="fill" />
+    </item>
 </layer-list>

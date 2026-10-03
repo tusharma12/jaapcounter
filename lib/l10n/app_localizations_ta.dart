@@ -9,11 +9,10 @@ class AppL10nTa extends AppL10n {
   AppL10nTa([String locale = 'ta']) : super(locale);
 
   @override
-  String get appName => 'நாம ஜப கவுன்ட்டர் – ஸ்மரண்';
+  String get appName => 'நாம ஜப கவுன்ட்டர்: ஜாப்மித்ரா';
 
   @override
-  String get tagline =>
-      'தினசரி நாம ஜபத்திற்கான உங்கள் அமைதியான டிஜிட்டல் ஜப மாலை';
+  String get tagline => 'பக்தியின் துணை, ஒவ்வொரு நாளும்';
 
   @override
   String get navJaap => 'ஜபம்';
@@ -437,7 +436,7 @@ class AppL10nTa extends AppL10n {
   String get exportMyData => 'என் தரவை ஏற்றுமதி செய்';
 
   @override
-  String get rateApp => 'ஸ்மரண் செயலியை மதிப்பிடுங்கள்';
+  String get rateApp => 'ஜாப்மித்ரா செயலியை மதிப்பிடுங்கள்';
 
   @override
   String get shareApp => 'குடும்பத்தினரையும் நண்பர்களையும் அழையுங்கள்';
@@ -452,7 +451,7 @@ class AppL10nTa extends AppL10n {
   String get terms => 'விதிமுறைகள்';
 
   @override
-  String get aboutApp => 'ஸ்மரண் பற்றி';
+  String get aboutApp => 'ஜாப்மித்ரா பற்றி';
 
   @override
   String version(String version) {
@@ -484,7 +483,7 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get aboutBody =>
-      'ஸ்மரண் உங்கள் தினசரி நாம ஜபத்திற்கான அமைதியான, தனிப்பட்ட இடம். நீங்கள் செய்யும் ஜபம் அனைத்தும் இந்தச் சாதனத்தில் மட்டுமே சேமிக்கப்படுகிறது.';
+      'ஜாப்மித்ரா உங்கள் தினசரி நாம ஜபத்திற்கான அமைதியான, தனிப்பட்ட இடம். நீங்கள் செய்யும் ஜபம் அனைத்தும் இந்தச் சாதனத்தில் மட்டுமே சேமிக்கப்படுகிறது.';
 
   @override
   String get madeWith => 'பக்தியுடன் உருவாக்கப்பட்டது';
@@ -507,7 +506,7 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'ஸ்மரண் செயலிக்கு அறிவிப்புகள் முடக்கப்பட்டுள்ளன. சாதன அமைப்புகளில் அவற்றை இயக்கவும்.';
+      'ஜாப்மித்ரா செயலிக்கு அறிவிப்புகள் முடக்கப்பட்டுள்ளன. சாதன அமைப்புகளில் அவற்றை இயக்கவும்.';
 
   @override
   String get reminderNotificationTitle => 'ஜபம் செய்யும் நேரம்';
@@ -542,7 +541,7 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get restoreBackupBody =>
-      'மீட்டெடுக்க ஒரு ஸ்மரண் காப்புப் பிரதிக் கோப்பைத் தேர்ந்தெடுக்கவும்.';
+      'மீட்டெடுக்க ஒரு ஜாப்மித்ரா காப்புப் பிரதிக் கோப்பைத் தேர்ந்தெடுக்கவும்.';
 
   @override
   String get backupCreated => 'காப்புப் பிரதி உருவாக்கப்பட்டது';
@@ -552,7 +551,7 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'மீட்டெடுத்தால், ஸ்மரணில் இப்போது உள்ள அனைத்தும் காப்புப் பிரதிக் கோப்பில் உள்ளவற்றால் மாற்றப்படும்.';
+      'மீட்டெடுத்தால், ஜாப்மித்ராில் இப்போது உள்ள அனைத்தும் காப்புப் பிரதிக் கோப்பில் உள்ளவற்றால் மாற்றப்படும்.';
 
   @override
   String get restore => 'மீட்டெடு';
@@ -563,10 +562,11 @@ class AppL10nTa extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'இது சரியான ஸ்மரண் காப்புப் பிரதிக் கோப்பு அல்ல';
+  String get importInvalid =>
+      'இது சரியான ஜாப்மித்ரா காப்புப் பிரதிக் கோப்பு அல்ல';
 
   @override
-  String get exportShareText => 'என் ஸ்மரண் காப்புப் பிரதி';
+  String get exportShareText => 'என் ஜாப்மித்ரா காப்புப் பிரதி';
 
   @override
   String get onb1Title => 'உங்கள் டிஜிட்டல் ஜப மாலை';
@@ -990,7 +990,7 @@ class AppL10nTa extends AppL10n {
       other: '$count நாட்கள்',
       one: '1 நாள்',
     );
-    return 'ஸ்மரணுடன் தொடர்ந்து $_temp0 நாம ஜபம் 🙏';
+    return 'ஜாப்மித்ராுடன் தொடர்ந்து $_temp0 நாம ஜபம் 🙏';
   }
 
   @override
@@ -1000,7 +1000,7 @@ class AppL10nTa extends AppL10n {
   String get exitBlackout => 'இருள் முறையிலிருந்து வெளியேறு';
 
   @override
-  String get feedbackEmailSubject => 'ஸ்மரண் பற்றிய கருத்து';
+  String get feedbackEmailSubject => 'ஜாப்மித்ரா பற்றிய கருத்து';
 
   @override
   String get homeScreenWidget => 'முகப்புத் திரை விட்ஜெட்';
@@ -1011,11 +1011,11 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get homeScreenWidgetStepsAndroid =>
-      'முகப்புத் திரையில் ஒரு காலி இடத்தை நீண்ட நேரம் அழுத்தி, விட்ஜெட்கள் என்பதைத் தட்டி, பிறகு ஸ்மரணைத் தேடுங்கள்.';
+      'முகப்புத் திரையில் ஒரு காலி இடத்தை நீண்ட நேரம் அழுத்தி, விட்ஜெட்கள் என்பதைத் தட்டி, பிறகு ஜாப்மித்ராைத் தேடுங்கள்.';
 
   @override
   String get homeScreenWidgetStepsIOS =>
-      'முகப்புத் திரையில் ஒரு காலி இடத்தை நீண்ட நேரம் அழுத்தி, மூலையில் உள்ள + ஐத் தட்டி, ஸ்மரணைத் தேடி, ஒரு அளவைத் தேர்ந்தெடுத்து, விட்ஜெட்டைச் சேர் என்பதைத் தட்டுங்கள்.';
+      'முகப்புத் திரையில் ஒரு காலி இடத்தை நீண்ட நேரம் அழுத்தி, மூலையில் உள்ள + ஐத் தட்டி, ஜாப்மித்ராைத் தேடி, ஒரு அளவைத் தேர்ந்தெடுத்து, விட்ஜெட்டைச் சேர் என்பதைத் தட்டுங்கள்.';
 
   @override
   String get addToHomeScreen => 'முகப்புத் திரையில் சேர்';
@@ -1301,7 +1301,7 @@ class AppL10nTa extends AppL10n {
   String get diagnosticsShare => 'கோப்பாகப் பகிர்';
 
   @override
-  String get diagnosticsEmailSubject => 'Smaran கண்டறிதல் அறிக்கை';
+  String get diagnosticsEmailSubject => 'ஜாப்மித்ரா கண்டறிதல் அறிக்கை';
 
   @override
   String get diagnosticsNoMail =>

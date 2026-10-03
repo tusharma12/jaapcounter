@@ -9,10 +9,10 @@ class AppL10nHi extends AppL10n {
   AppL10nHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get appName => 'नाम जप काउंटर – स्मरण';
+  String get appName => 'नाम जप काउंटर: जापमित्र';
 
   @override
-  String get tagline => 'आपके दैनिक नाम जप के लिए शांत डिजिटल माला';
+  String get tagline => 'भक्ति का साथी, हर दिन';
 
   @override
   String get navJaap => 'जाप';
@@ -435,7 +435,7 @@ class AppL10nHi extends AppL10n {
   String get exportMyData => 'मेरा डेटा निर्यात करें';
 
   @override
-  String get rateApp => 'स्मरण को रेट करें';
+  String get rateApp => 'जापमित्र को रेट करें';
 
   @override
   String get shareApp => 'घरवालों और दोस्तों के साथ साझा करें';
@@ -450,7 +450,7 @@ class AppL10nHi extends AppL10n {
   String get terms => 'शर्तें';
 
   @override
-  String get aboutApp => 'स्मरण के बारे में';
+  String get aboutApp => 'जापमित्र के बारे में';
 
   @override
   String version(String version) {
@@ -482,7 +482,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get aboutBody =>
-      'स्मरण आपके दैनिक नाम जप के लिए एक शांत, निजी स्थान है। आपका सारा जाप केवल इसी उपकरण में सुरक्षित रहता है।';
+      'जापमित्र आपके दैनिक नाम जप के लिए एक शांत, निजी स्थान है। आपका सारा जाप केवल इसी उपकरण में सुरक्षित रहता है।';
 
   @override
   String get madeWith => 'श्रद्धा से निर्मित';
@@ -505,7 +505,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'स्मरण के लिए सूचनाएँ बंद हैं। उपकरण की सेटिंग में इन्हें चालू करें।';
+      'जापमित्र के लिए सूचनाएँ बंद हैं। उपकरण की सेटिंग में इन्हें चालू करें।';
 
   @override
   String get reminderNotificationTitle => 'जाप का समय';
@@ -539,7 +539,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get restoreBackupBody =>
-      'पुनर्स्थापित करने के लिए स्मरण बैकअप फ़ाइल चुनें।';
+      'पुनर्स्थापित करने के लिए जापमित्र बैकअप फ़ाइल चुनें।';
 
   @override
   String get backupCreated => 'बैकअप बन गया';
@@ -549,7 +549,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'पुनर्स्थापना स्मरण के वर्तमान सारे डेटा को बैकअप फ़ाइल के डेटा से बदल देगी।';
+      'पुनर्स्थापना जापमित्र के वर्तमान सारे डेटा को बैकअप फ़ाइल के डेटा से बदल देगी।';
 
   @override
   String get restore => 'पुनर्स्थापित करें';
@@ -560,10 +560,10 @@ class AppL10nHi extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'यह फ़ाइल मान्य स्मरण बैकअप नहीं है';
+  String get importInvalid => 'यह फ़ाइल मान्य जापमित्र बैकअप नहीं है';
 
   @override
-  String get exportShareText => 'मेरा स्मरण बैकअप';
+  String get exportShareText => 'मेरा जापमित्र बैकअप';
 
   @override
   String get onb1Title => 'आपकी डिजिटल जप माला';
@@ -965,7 +965,7 @@ class AppL10nHi extends AppL10n {
 
   @override
   String shareCardText(int count) {
-    return 'स्मरण के साथ लगातार $count दिन नाम जाप 🙏';
+    return 'जापमित्र के साथ लगातार $count दिन नाम जाप 🙏';
   }
 
   @override
@@ -975,7 +975,7 @@ class AppL10nHi extends AppL10n {
   String get exitBlackout => 'अंधकार मोड से बाहर';
 
   @override
-  String get feedbackEmailSubject => 'स्मरण पर प्रतिक्रिया';
+  String get feedbackEmailSubject => 'जापमित्र पर प्रतिक्रिया';
 
   @override
   String get homeScreenWidget => 'होम स्क्रीन विजेट';
@@ -986,11 +986,11 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get homeScreenWidgetStepsAndroid =>
-      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, विजेट्स पर टैप करें, फिर स्मरण खोजें।';
+      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, विजेट्स पर टैप करें, फिर जापमित्र खोजें।';
 
   @override
   String get homeScreenWidgetStepsIOS =>
-      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, कोने में + पर टैप करें, स्मरण खोजें, फिर आकार चुनकर विजेट जोड़ें पर टैप करें।';
+      'होम स्क्रीन पर किसी खाली जगह को दबाकर रखें, कोने में + पर टैप करें, जापमित्र खोजें, फिर आकार चुनकर विजेट जोड़ें पर टैप करें।';
 
   @override
   String get addToHomeScreen => 'होम स्क्रीन पर जोड़ें';
@@ -1276,7 +1276,7 @@ class AppL10nHi extends AppL10n {
   String get diagnosticsShare => 'फ़ाइल के रूप में साझा करें';
 
   @override
-  String get diagnosticsEmailSubject => 'Smaran निदान';
+  String get diagnosticsEmailSubject => 'जापमित्र निदान';
 
   @override
   String get diagnosticsNoMail =>

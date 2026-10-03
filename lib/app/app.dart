@@ -23,7 +23,7 @@ class JapMalaApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return MaterialApp.router(
-      title: 'Naam Jap Counter – Smaran',
+      title: 'Naam Jaap Counter: JaapMitra',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
       // A fixed colour theme is handed in as both, so the device's light/dark
@@ -243,7 +243,7 @@ class _AppSplashState extends State<_AppSplash>
                         Opacity(
                           opacity: name,
                           child: const Text(
-                            'Smaran',
+                            'JaapMitra',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w600,

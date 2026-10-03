@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// The Smaran palette.
+/// The JaapMitra palette.
 ///
 /// Saffron is an accent, never a wash: it is reserved for progress, calls to
 /// action, the streak and selected state. Everything else stays quiet.

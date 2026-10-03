@@ -78,7 +78,7 @@ void main() {
     final uri = Uri.parse(urlLauncher.lastLaunched!);
     expect(uri.scheme, 'mailto');
     expect(uri.path, 'codivolabs@gmail.com');
-    expect(uri.queryParameters['subject'], 'Smaran feedback');
+    expect(uri.queryParameters['subject'], 'JaapMitra feedback');
   });
 
   testWidgets('a launcher that can place the widget gets an Add button', (
@@ -146,31 +146,22 @@ void main() {
     expect(find.text('Home screen widget'), findsOneWidget, reason: 'closed');
   });
 
-  testWidgets('the main page is a short menu of groups', (tester) async {
+  testWidgets('the main page lists every group with its settings', (
+    tester,
+  ) async {
     final container = await createTestContainer();
     await pumpSettings(tester, container: container);
 
-    for (final label in [
-      'Jaap',
-      'Reminders',
-      'Counter',
-      'Appearance',
-      'Support',
-      'About',
-      'Backup & Restore',
-    ]) {
+    // Group headers, in capitals.
+    for (final label in ['JAAP', 'REMINDERS']) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
-    // Rating and inviting are on the main page itself, not a page deeper.
+    // The settings themselves are right there, nothing a page deeper.
+    expect(find.text('My Mantras'), findsOneWidget);
     expect(find.text('Sadhana Goals'), findsOneWidget);
-    expect(find.text('Rate Smaran'), findsOneWidget);
-    expect(find.text('Invite Family and Friends'), findsOneWidget);
-    // The switches themselves live one page deeper.
-    expect(find.text('Haptics'), findsNothing);
-    expect(find.text('Feedback'), findsNothing);
   });
 
-  testWidgets('Support no longer repeats rating and inviting', (tester) async {
+  testWidgets('Support holds backup, rating and inviting', (tester) async {
     final container = await createTestContainer();
     await pumpSettings(
       tester,
@@ -179,11 +170,12 @@ void main() {
     );
 
     expect(find.text('Feedback'), findsOneWidget);
-    expect(find.text('Rate Smaran'), findsNothing);
-    expect(find.text('Invite Family and Friends'), findsNothing);
+    expect(find.text('Backup & Restore'), findsOneWidget);
+    expect(find.text('Rate JaapMitra'), findsOneWidget);
+    expect(find.text('Invite Family and Friends'), findsOneWidget);
   });
 
-  testWidgets('the Jaap page no longer repeats Sadhana Goals', (tester) async {
+  testWidgets('the Jaap page holds Sadhana Goals', (tester) async {
     final container = await createTestContainer();
     await pumpSettings(
       tester,
@@ -192,6 +184,6 @@ void main() {
     );
 
     expect(find.text('My Mantras'), findsOneWidget);
-    expect(find.text('Sadhana Goals'), findsNothing);
+    expect(find.text('Sadhana Goals'), findsOneWidget);
   });
 }

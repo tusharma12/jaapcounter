@@ -1,7 +1,7 @@
 import SwiftUI
 import WidgetKit
 
-// The Smaran home screen widget.
+// The JaapMitra home screen widget.
 //
 // Values are written by the app into the shared app group (see
 // WidgetService in lib/core/services/widget_service.dart), so the widget
@@ -89,7 +89,7 @@ struct JapMalaProvider: TimelineProvider {
         let store = UserDefaults(suiteName: appGroupId)
         return JapMalaEntry(
             date: Date(),
-            mantra: store?.string(forKey: "mantra") ?? "Smaran",
+            mantra: store?.string(forKey: "mantra") ?? "JaapMitra",
             beads: store?.integer(forKey: "beads") ?? 0,
             malaSize: max(store?.integer(forKey: "malaSize") ?? 108, 1),
             todayTotal: store?.integer(forKey: "todayTotal") ?? 0,
@@ -163,7 +163,7 @@ struct JapMalaWidget: Widget {
         StaticConfiguration(kind: "JapMalaWidget", provider: JapMalaProvider()) { entry in
             JapMalaWidgetView(entry: entry)
         }
-        .configurationDisplayName("NaamJapCounter")
+        .configurationDisplayName("JaapMitra")
         .description("Today's Jaap and the mala in progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }

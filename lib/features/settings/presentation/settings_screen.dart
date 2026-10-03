@@ -62,6 +62,9 @@ enum SettingsSection {
     return raw.isEmpty ? raw : raw[0] + raw.substring(1).toLowerCase();
   }
 
+  /// The section title as a header, in capitals.
+  String header(AppL10n l10n) => title(l10n).toUpperCase();
+
   IconData get icon => switch (this) {
     jaap => Icons.self_improvement_rounded,
     reminders => Icons.notifications_none_rounded,
@@ -95,24 +98,9 @@ class SettingsScreen extends ConsumerWidget {
           Insets.xxxl,
         ),
         children: [
-          if (section == null)
-            AppCardGroup(
-              children: [
-                for (final entry in SettingsSection.values)
-                  _NavRow(
-                    label: entry.title(l10n),
-                    icon: entry.icon,
-                    onTap: () => context.push('/settings/${entry.name}'),
-                  ),
-                _NavRow(
-                  label: l10n.backupRestore,
-                  icon: Icons.cloud_download_outlined,
-                  onTap: () => context.push('/backup'),
-                ),
-              ],
-            ),
-          if (section == null) ...[
-            const SizedBox(height: Insets.lg),
+          if (section == null || section == SettingsSection.jaap) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.jaap.header(l10n)),
             AppCardGroup(
               children: [
                 _NavRow(
@@ -120,32 +108,6 @@ class SettingsScreen extends ConsumerWidget {
                   icon: Icons.auto_awesome_outlined,
                   onTap: () => context.push('/sadhana'),
                 ),
-                _NavRow(
-                  label: l10n.rateApp,
-                  icon: Icons.star_border_rounded,
-                  onTap: () => _open(
-                    Theme.of(context).platform == TargetPlatform.iOS
-                        ? AppConstants.iosReviewUrl
-                        : AppConstants.androidStoreUrl,
-                  ),
-                ),
-                _NavRow(
-                  label: l10n.shareApp,
-                  icon: Icons.ios_share_rounded,
-                  onTap: () => SharePlus.instance.share(
-                    ShareParams(
-                      text:
-                          '${l10n.appName} - ${l10n.tagline}\n'
-                          '${Theme.of(context).platform == TargetPlatform.iOS ? AppConstants.iosStoreUrl : AppConstants.androidStoreUrl}',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-          if (section == SettingsSection.jaap)
-            AppCardGroup(
-              children: [
                 _NavRow(
                   label: l10n.myMantras,
                   icon: Icons.format_list_bulleted_rounded,
@@ -165,7 +127,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          if (section == SettingsSection.reminders)
+            const SizedBox(height: Insets.lg),
+          ],
+          if (section == null || section == SettingsSection.reminders) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.reminders.header(l10n)),
             AppCardGroup(
               children: [
                 _NavRow(
@@ -201,7 +167,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          if (section == SettingsSection.counter)
+            const SizedBox(height: Insets.lg),
+          ],
+          if (section == null || section == SettingsSection.counter) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.counter.header(l10n)),
             AppCardGroup(
               children: [
                 _SwitchRow(
@@ -269,7 +239,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          if (section == SettingsSection.appearance)
+            const SizedBox(height: Insets.lg),
+          ],
+          if (section == null || section == SettingsSection.appearance) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.appearance.header(l10n)),
             AppCardGroup(
               children: [
                 _NavRow(
@@ -300,8 +274,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-
-          if (section == SettingsSection.support)
+            const SizedBox(height: Insets.lg),
+          ],
+          if (section == null || section == SettingsSection.support) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.support.header(l10n)),
             AppCardGroup(
               children: [
                 _NavRow(
@@ -313,13 +290,42 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 _NavRow(
+                  label: l10n.backupRestore,
+                  icon: Icons.cloud_download_outlined,
+                  onTap: () => context.push('/backup'),
+                ),
+                _NavRow(
+                  label: l10n.rateApp,
+                  icon: Icons.star_border_rounded,
+                  onTap: () => _open(
+                    Theme.of(context).platform == TargetPlatform.iOS
+                        ? AppConstants.iosReviewUrl
+                        : AppConstants.androidStoreUrl,
+                  ),
+                ),
+                _NavRow(
+                  label: l10n.shareApp,
+                  icon: Icons.ios_share_rounded,
+                  onTap: () => SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          '${l10n.appName} - ${l10n.tagline}\n'
+                          '${Theme.of(context).platform == TargetPlatform.iOS ? AppConstants.iosStoreUrl : AppConstants.androidStoreUrl}',
+                    ),
+                  ),
+                ),
+                _NavRow(
                   label: l10n.sendDiagnostics,
                   icon: Icons.bug_report_outlined,
                   onTap: () => showDiagnosticsSheet(context),
                 ),
               ],
             ),
-          if (section == SettingsSection.about)
+            const SizedBox(height: Insets.lg),
+          ],
+          if (section == null || section == SettingsSection.about) ...[
+            if (section == null)
+              _SectionHeader(SettingsSection.about.header(l10n)),
             AppCardGroup(
               children: [
                 _NavRow(
@@ -339,6 +345,8 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: Insets.lg),
+          ],
           if (section == null) ...[
             const SizedBox(height: Insets.xl),
             Center(
@@ -779,6 +787,26 @@ class _SingletonReminderRow extends ConsumerWidget {
                 color: palette.tertiaryText,
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(Insets.md, Insets.sm, 0, Insets.sm),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: context.palette.secondaryText,
+          letterSpacing: 1,
         ),
       ),
     );

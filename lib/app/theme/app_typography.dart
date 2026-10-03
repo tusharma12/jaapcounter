@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Typography for Smaran.
+/// Typography for JaapMitra.
 ///
 /// UI text is Inter; Devanagari falls back to Noto Sans Devanagari so a mantra
 /// written in Devanagari renders correctly inside otherwise-Latin UI text.

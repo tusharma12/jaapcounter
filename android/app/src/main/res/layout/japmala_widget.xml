@@ -79,6 +79,5 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:textSize="13sp"
-        android:textColor="@color/japmala_secondary"
-        android:text="@string/widget_open" />
+        android:textColor="@color/japmala_secondary" />
 </LinearLayout>

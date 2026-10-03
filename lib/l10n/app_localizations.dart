@@ -110,13 +110,13 @@ abstract class AppL10n {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'Naam Jap Counter – Smaran'**
+  /// **'Naam Jaap Counter: JaapMitra'**
   String get appName;
 
   /// No description provided for @tagline.
   ///
   /// In en, this message translates to:
-  /// **'Your peaceful digital mala for daily Naam Jap'**
+  /// **'Bhakti Ka Sathi, Har Din'**
   String get tagline;
 
   /// No description provided for @navJaap.
@@ -842,7 +842,7 @@ abstract class AppL10n {
   /// No description provided for @rateApp.
   ///
   /// In en, this message translates to:
-  /// **'Rate Smaran'**
+  /// **'Rate JaapMitra'**
   String get rateApp;
 
   /// No description provided for @shareApp.
@@ -872,7 +872,7 @@ abstract class AppL10n {
   /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'About Smaran'**
+  /// **'About JaapMitra'**
   String get aboutApp;
 
   /// No description provided for @version.
@@ -926,7 +926,7 @@ abstract class AppL10n {
   /// No description provided for @aboutBody.
   ///
   /// In en, this message translates to:
-  /// **'Smaran is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.'**
+  /// **'JaapMitra is a quiet, private space for your daily Naam Jap. Everything you chant is stored only on this device.'**
   String get aboutBody;
 
   /// No description provided for @madeWith.
@@ -968,7 +968,7 @@ abstract class AppL10n {
   /// No description provided for @notificationsBlocked.
   ///
   /// In en, this message translates to:
-  /// **'Notifications are turned off for Smaran. Enable them in your device settings.'**
+  /// **'Notifications are turned off for JaapMitra. Enable them in your device settings.'**
   String get notificationsBlocked;
 
   /// No description provided for @reminderNotificationTitle.
@@ -1028,7 +1028,7 @@ abstract class AppL10n {
   /// No description provided for @restoreBackupBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose a Smaran backup file to restore.'**
+  /// **'Choose a JaapMitra backup file to restore.'**
   String get restoreBackupBody;
 
   /// No description provided for @backupCreated.
@@ -1046,7 +1046,7 @@ abstract class AppL10n {
   /// No description provided for @restoreWarningBody.
   ///
   /// In en, this message translates to:
-  /// **'Restoring will replace everything currently in Smaran with the contents of the backup file.'**
+  /// **'Restoring will replace everything currently in JaapMitra with the contents of the backup file.'**
   String get restoreWarningBody;
 
   /// No description provided for @restore.
@@ -1064,13 +1064,13 @@ abstract class AppL10n {
   /// No description provided for @importInvalid.
   ///
   /// In en, this message translates to:
-  /// **'This file is not a valid Smaran backup'**
+  /// **'This file is not a valid JaapMitra backup'**
   String get importInvalid;
 
   /// No description provided for @exportShareText.
   ///
   /// In en, this message translates to:
-  /// **'My Smaran backup'**
+  /// **'My JaapMitra backup'**
   String get exportShareText;
 
   /// No description provided for @onb1Title.
@@ -1796,7 +1796,7 @@ abstract class AppL10n {
   /// No description provided for @shareCardText.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 day} other{{count} days}} of Naam Jap in a row, with Smaran 🙏'**
+  /// **'{count, plural, =1{1 day} other{{count} days}} of Naam Jap in a row, with JaapMitra 🙏'**
   String shareCardText(int count);
 
   /// No description provided for @blackoutMode.
@@ -1814,7 +1814,7 @@ abstract class AppL10n {
   /// No description provided for @feedbackEmailSubject.
   ///
   /// In en, this message translates to:
-  /// **'Smaran feedback'**
+  /// **'JaapMitra feedback'**
   String get feedbackEmailSubject;
 
   /// No description provided for @homeScreenWidget.
@@ -1832,13 +1832,13 @@ abstract class AppL10n {
   /// No description provided for @homeScreenWidgetStepsAndroid.
   ///
   /// In en, this message translates to:
-  /// **'Long-press an empty spot on your Home Screen, tap Widgets, then find Smaran.'**
+  /// **'Long-press an empty spot on your Home Screen, tap Widgets, then find JaapMitra.'**
   String get homeScreenWidgetStepsAndroid;
 
   /// No description provided for @homeScreenWidgetStepsIOS.
   ///
   /// In en, this message translates to:
-  /// **'Long-press an empty spot on your Home Screen, tap the + in the corner, search for Smaran, then choose a size and tap Add Widget.'**
+  /// **'Long-press an empty spot on your Home Screen, tap the + in the corner, search for JaapMitra, then choose a size and tap Add Widget.'**
   String get homeScreenWidgetStepsIOS;
 
   /// No description provided for @addToHomeScreen.
@@ -2174,7 +2174,7 @@ abstract class AppL10n {
   /// No description provided for @diagnosticsEmailSubject.
   ///
   /// In en, this message translates to:
-  /// **'Smaran diagnostics'**
+  /// **'JaapMitra diagnostics'**
   String get diagnosticsEmailSubject;
 
   /// No description provided for @diagnosticsNoMail.

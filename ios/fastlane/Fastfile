@@ -1,4 +1,4 @@
-# iOS release lanes for Naam Jap Counter – Smaran.
+# iOS release lanes for JaapMitra.
 #
 # Run from ios/:  bundle exec fastlane <lane>
 #
@@ -56,7 +56,7 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       output_directory: "#{PROJECT_ROOT}/build/fastlane",
-      output_name: "Smaran.ipa",
+      output_name: "JaapMitra.ipa",
       clean: false,
       xcargs: [
         "-allowProvisioningUpdates",

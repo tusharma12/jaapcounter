@@ -30,7 +30,7 @@ cd ios && bundle install      # and the same in android/
 ### iOS: App Store Connect API key
 
 1. Create the app record in App Store Connect with bundle id
-   `com.naamjapcounter.smaran` (the name is `Naam Jap Counter – Smaran`).
+   `com.naamjapcounter.smaran` (the name is `JaapMitra`).
 2. Users and Access → Integrations → App Store Connect API → generate a key
    with the **App Manager** role. Download the `.p8` (only offered once).
 3. Export, e.g. in your shell profile:

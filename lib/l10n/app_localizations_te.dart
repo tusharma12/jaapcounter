@@ -9,10 +9,10 @@ class AppL10nTe extends AppL10n {
   AppL10nTe([String locale = 'te']) : super(locale);
 
   @override
-  String get appName => 'నామ జప కౌంటర్ – స్మరణ';
+  String get appName => 'నామ జప కౌంటర్: జాపమిత్ర';
 
   @override
-  String get tagline => 'మీ రోజువారీ నామ జపానికి ప్రశాంతమైన డిజిటల్ జపమాల';
+  String get tagline => 'భక్తికి తోడు, ప్రతిరోజూ';
 
   @override
   String get navJaap => 'జపం';
@@ -436,7 +436,7 @@ class AppL10nTe extends AppL10n {
   String get exportMyData => 'నా డేటాను ఎగుమతి చేయండి';
 
   @override
-  String get rateApp => 'స్మరణకు రేటింగ్ ఇవ్వండి';
+  String get rateApp => 'జాపమిత్రకు రేటింగ్ ఇవ్వండి';
 
   @override
   String get shareApp => 'కుటుంబాన్ని, స్నేహితులను ఆహ్వానించండి';
@@ -451,7 +451,7 @@ class AppL10nTe extends AppL10n {
   String get terms => 'నిబంధనలు';
 
   @override
-  String get aboutApp => 'స్మరణ గురించి';
+  String get aboutApp => 'జాపమిత్ర గురించి';
 
   @override
   String version(String version) {
@@ -483,7 +483,7 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get aboutBody =>
-      'స్మరణ మీ రోజువారీ నామ జపానికి ఒక ప్రశాంతమైన, వ్యక్తిగత స్థలం. మీరు చేసే జపం అంతా ఈ పరికరంలో మాత్రమే భద్రంగా ఉంటుంది.';
+      'జాపమిత్ర మీ రోజువారీ నామ జపానికి ఒక ప్రశాంతమైన, వ్యక్తిగత స్థలం. మీరు చేసే జపం అంతా ఈ పరికరంలో మాత్రమే భద్రంగా ఉంటుంది.';
 
   @override
   String get madeWith => 'భక్తితో రూపొందించబడింది';
@@ -506,7 +506,7 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'స్మరణకు నోటిఫికేషన్‌లు ఆఫ్‌లో ఉన్నాయి. మీ పరికర సెట్టింగ్‌లలో వాటిని ఆన్ చేయండి.';
+      'జాపమిత్రకు నోటిఫికేషన్‌లు ఆఫ్‌లో ఉన్నాయి. మీ పరికర సెట్టింగ్‌లలో వాటిని ఆన్ చేయండి.';
 
   @override
   String get reminderNotificationTitle => 'జపానికి సమయమైంది';
@@ -540,7 +540,7 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get restoreBackupBody =>
-      'పునరుద్ధరించడానికి స్మరణ బ్యాకప్ ఫైల్‌ను ఎంచుకోండి.';
+      'పునరుద్ధరించడానికి జాపమిత్ర బ్యాకప్ ఫైల్‌ను ఎంచుకోండి.';
 
   @override
   String get backupCreated => 'బ్యాకప్ సృష్టించబడింది';
@@ -550,7 +550,7 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'పునరుద్ధరిస్తే, స్మరణలో ఇప్పుడు ఉన్న డేటా అంతా బ్యాకప్ ఫైల్‌లోని డేటాతో మారిపోతుంది.';
+      'పునరుద్ధరిస్తే, జాపమిత్రలో ఇప్పుడు ఉన్న డేటా అంతా బ్యాకప్ ఫైల్‌లోని డేటాతో మారిపోతుంది.';
 
   @override
   String get restore => 'పునరుద్ధరించు';
@@ -561,10 +561,10 @@ class AppL10nTe extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'ఈ ఫైల్ సరైన స్మరణ బ్యాకప్ కాదు';
+  String get importInvalid => 'ఈ ఫైల్ సరైన జాపమిత్ర బ్యాకప్ కాదు';
 
   @override
-  String get exportShareText => 'నా స్మరణ బ్యాకప్';
+  String get exportShareText => 'నా జాపమిత్ర బ్యాకప్';
 
   @override
   String get onb1Title => 'మీ డిజిటల్ జపమాల';
@@ -983,8 +983,8 @@ class AppL10nTe extends AppL10n {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'స్మరణతో వరుసగా $count రోజులు నామ జపం 🙏',
-      one: 'స్మరణతో 1 రోజు నామ జపం 🙏',
+      other: 'జాపమిత్రతో వరుసగా $count రోజులు నామ జపం 🙏',
+      one: 'జాపమిత్రతో 1 రోజు నామ జపం 🙏',
     );
     return '$_temp0';
   }
@@ -996,7 +996,7 @@ class AppL10nTe extends AppL10n {
   String get exitBlackout => 'చీకటి మోడ్ నుండి బయటకు';
 
   @override
-  String get feedbackEmailSubject => 'స్మరణపై అభిప్రాయం';
+  String get feedbackEmailSubject => 'జాపమిత్రపై అభిప్రాయం';
 
   @override
   String get homeScreenWidget => 'హోమ్ స్క్రీన్ విడ్జెట్';
@@ -1007,11 +1007,11 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get homeScreenWidgetStepsAndroid =>
-      'హోమ్ స్క్రీన్‌పై ఖాళీ చోట నొక్కి పట్టుకోండి, విడ్జెట్‌లు తాకండి, తర్వాత స్మరణను వెతకండి.';
+      'హోమ్ స్క్రీన్‌పై ఖాళీ చోట నొక్కి పట్టుకోండి, విడ్జెట్‌లు తాకండి, తర్వాత జాపమిత్రను వెతకండి.';
 
   @override
   String get homeScreenWidgetStepsIOS =>
-      'హోమ్ స్క్రీన్‌పై ఖాళీ చోట నొక్కి పట్టుకోండి, మూలలో ఉన్న + తాకండి, స్మరణను వెతకండి, తర్వాత పరిమాణం ఎంచుకుని విడ్జెట్ జోడించు తాకండి.';
+      'హోమ్ స్క్రీన్‌పై ఖాళీ చోట నొక్కి పట్టుకోండి, మూలలో ఉన్న + తాకండి, జాపమిత్రను వెతకండి, తర్వాత పరిమాణం ఎంచుకుని విడ్జెట్ జోడించు తాకండి.';
 
   @override
   String get addToHomeScreen => 'హోమ్ స్క్రీన్‌కు జోడించు';
@@ -1297,7 +1297,7 @@ class AppL10nTe extends AppL10n {
   String get diagnosticsShare => 'ఫైల్‌గా పంచుకోండి';
 
   @override
-  String get diagnosticsEmailSubject => 'స్మరణ డయాగ్నస్టిక్స్';
+  String get diagnosticsEmailSubject => 'జాపమిత్ర డయాగ్నస్టిక్స్';
 
   @override
   String get diagnosticsNoMail =>

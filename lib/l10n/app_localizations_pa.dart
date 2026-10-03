@@ -9,10 +9,10 @@ class AppL10nPa extends AppL10n {
   AppL10nPa([String locale = 'pa']) : super(locale);
 
   @override
-  String get appName => 'ਨਾਮ ਜਪ ਕਾਊਂਟਰ – ਸਿਮਰਨ';
+  String get appName => 'ਨਾਮ ਜਪ ਕਾਊਂਟਰ: ਜਾਪਮਿੱਤਰ';
 
   @override
-  String get tagline => 'ਰੋਜ਼ਾਨਾ ਨਾਮ ਜਪ ਲਈ ਤੁਹਾਡੀ ਸ਼ਾਂਤ ਡਿਜੀਟਲ ਮਾਲਾ';
+  String get tagline => 'ਭਗਤੀ ਦਾ ਸਾਥੀ, ਹਰ ਦਿਨ';
 
   @override
   String get navJaap => 'ਜਾਪ';
@@ -437,7 +437,7 @@ class AppL10nPa extends AppL10n {
   String get exportMyData => 'ਮੇਰਾ ਡਾਟਾ ਐਕਸਪੋਰਟ ਕਰੋ';
 
   @override
-  String get rateApp => 'ਸਿਮਰਨ ਨੂੰ ਰੇਟ ਕਰੋ';
+  String get rateApp => 'ਜਾਪਮਿੱਤਰ ਨੂੰ ਰੇਟ ਕਰੋ';
 
   @override
   String get shareApp => 'ਪਰਿਵਾਰ ਅਤੇ ਦੋਸਤਾਂ ਨੂੰ ਸੱਦਾ ਦਿਓ';
@@ -452,7 +452,7 @@ class AppL10nPa extends AppL10n {
   String get terms => 'ਸ਼ਰਤਾਂ';
 
   @override
-  String get aboutApp => 'ਸਿਮਰਨ ਬਾਰੇ';
+  String get aboutApp => 'ਜਾਪਮਿੱਤਰ ਬਾਰੇ';
 
   @override
   String version(String version) {
@@ -484,7 +484,7 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get aboutBody =>
-      'ਸਿਮਰਨ ਤੁਹਾਡੇ ਰੋਜ਼ਾਨਾ ਨਾਮ ਜਪ ਲਈ ਇੱਕ ਸ਼ਾਂਤ, ਨਿੱਜੀ ਥਾਂ ਹੈ। ਤੁਸੀਂ ਜੋ ਵੀ ਜਪਦੇ ਹੋ, ਉਹ ਸਿਰਫ਼ ਇਸੇ ਡਿਵਾਈਸ ਵਿੱਚ ਸੰਭਾਲਿਆ ਜਾਂਦਾ ਹੈ।';
+      'ਜਾਪਮਿੱਤਰ ਤੁਹਾਡੇ ਰੋਜ਼ਾਨਾ ਨਾਮ ਜਪ ਲਈ ਇੱਕ ਸ਼ਾਂਤ, ਨਿੱਜੀ ਥਾਂ ਹੈ। ਤੁਸੀਂ ਜੋ ਵੀ ਜਪਦੇ ਹੋ, ਉਹ ਸਿਰਫ਼ ਇਸੇ ਡਿਵਾਈਸ ਵਿੱਚ ਸੰਭਾਲਿਆ ਜਾਂਦਾ ਹੈ।';
 
   @override
   String get madeWith => 'ਸ਼ਰਧਾ ਨਾਲ ਬਣਾਇਆ';
@@ -507,7 +507,7 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get notificationsBlocked =>
-      'ਸਿਮਰਨ ਲਈ ਸੂਚਨਾਵਾਂ ਬੰਦ ਹਨ। ਆਪਣੇ ਡਿਵਾਈਸ ਦੀਆਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਇਨ੍ਹਾਂ ਨੂੰ ਚਾਲੂ ਕਰੋ।';
+      'ਜਾਪਮਿੱਤਰ ਲਈ ਸੂਚਨਾਵਾਂ ਬੰਦ ਹਨ। ਆਪਣੇ ਡਿਵਾਈਸ ਦੀਆਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਇਨ੍ਹਾਂ ਨੂੰ ਚਾਲੂ ਕਰੋ।';
 
   @override
   String get reminderNotificationTitle => 'ਜਾਪ ਦਾ ਸਮਾਂ';
@@ -540,7 +540,7 @@ class AppL10nPa extends AppL10n {
   String get restoreBackup => 'ਬੈਕਅੱਪ ਤੋਂ ਬਹਾਲ ਕਰੋ';
 
   @override
-  String get restoreBackupBody => 'ਬਹਾਲ ਕਰਨ ਲਈ ਸਿਮਰਨ ਦੀ ਬੈਕਅੱਪ ਫ਼ਾਈਲ ਚੁਣੋ।';
+  String get restoreBackupBody => 'ਬਹਾਲ ਕਰਨ ਲਈ ਜਾਪਮਿੱਤਰ ਦੀ ਬੈਕਅੱਪ ਫ਼ਾਈਲ ਚੁਣੋ।';
 
   @override
   String get backupCreated => 'ਬੈਕਅੱਪ ਬਣ ਗਿਆ';
@@ -550,7 +550,7 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get restoreWarningBody =>
-      'ਬਹਾਲ ਕਰਨ ਨਾਲ ਸਿਮਰਨ ਵਿੱਚ ਹੁਣ ਮੌਜੂਦ ਸਭ ਕੁਝ ਬੈਕਅੱਪ ਫ਼ਾਈਲ ਦੀ ਸਮੱਗਰੀ ਨਾਲ ਬਦਲ ਜਾਵੇਗਾ।';
+      'ਬਹਾਲ ਕਰਨ ਨਾਲ ਜਾਪਮਿੱਤਰ ਵਿੱਚ ਹੁਣ ਮੌਜੂਦ ਸਭ ਕੁਝ ਬੈਕਅੱਪ ਫ਼ਾਈਲ ਦੀ ਸਮੱਗਰੀ ਨਾਲ ਬਦਲ ਜਾਵੇਗਾ।';
 
   @override
   String get restore => 'ਬਹਾਲ ਕਰੋ';
@@ -561,10 +561,10 @@ class AppL10nPa extends AppL10n {
   }
 
   @override
-  String get importInvalid => 'ਇਹ ਫ਼ਾਈਲ ਸਿਮਰਨ ਦਾ ਸਹੀ ਬੈਕਅੱਪ ਨਹੀਂ ਹੈ';
+  String get importInvalid => 'ਇਹ ਫ਼ਾਈਲ ਜਾਪਮਿੱਤਰ ਦਾ ਸਹੀ ਬੈਕਅੱਪ ਨਹੀਂ ਹੈ';
 
   @override
-  String get exportShareText => 'ਮੇਰਾ ਸਿਮਰਨ ਬੈਕਅੱਪ';
+  String get exportShareText => 'ਮੇਰਾ ਜਾਪਮਿੱਤਰ ਬੈਕਅੱਪ';
 
   @override
   String get onb1Title => 'ਤੁਹਾਡੀ ਡਿਜੀਟਲ ਜਪ ਮਾਲਾ';
@@ -977,7 +977,7 @@ class AppL10nPa extends AppL10n {
 
   @override
   String shareCardText(int count) {
-    return 'ਸਿਮਰਨ ਨਾਲ ਲਗਾਤਾਰ $count ਦਿਨ ਨਾਮ ਜਪ 🙏';
+    return 'ਜਾਪਮਿੱਤਰ ਨਾਲ ਲਗਾਤਾਰ $count ਦਿਨ ਨਾਮ ਜਪ 🙏';
   }
 
   @override
@@ -987,7 +987,7 @@ class AppL10nPa extends AppL10n {
   String get exitBlackout => 'ਹਨੇਰਾ ਮੋਡ ਤੋਂ ਬਾਹਰ';
 
   @override
-  String get feedbackEmailSubject => 'ਸਿਮਰਨ ਬਾਰੇ ਸੁਝਾਅ';
+  String get feedbackEmailSubject => 'ਜਾਪਮਿੱਤਰ ਬਾਰੇ ਸੁਝਾਅ';
 
   @override
   String get homeScreenWidget => 'ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਜੇਟ';
@@ -998,11 +998,11 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get homeScreenWidgetStepsAndroid =>
-      'ਹੋਮ ਸਕ੍ਰੀਨ \'ਤੇ ਕਿਸੇ ਖ਼ਾਲੀ ਥਾਂ ਨੂੰ ਦਬਾ ਕੇ ਰੱਖੋ, ਵਿਜੇਟ \'ਤੇ ਟੈਪ ਕਰੋ, ਫਿਰ ਸਿਮਰਨ ਲੱਭੋ।';
+      'ਹੋਮ ਸਕ੍ਰੀਨ \'ਤੇ ਕਿਸੇ ਖ਼ਾਲੀ ਥਾਂ ਨੂੰ ਦਬਾ ਕੇ ਰੱਖੋ, ਵਿਜੇਟ \'ਤੇ ਟੈਪ ਕਰੋ, ਫਿਰ ਜਾਪਮਿੱਤਰ ਲੱਭੋ।';
 
   @override
   String get homeScreenWidgetStepsIOS =>
-      'ਹੋਮ ਸਕ੍ਰੀਨ \'ਤੇ ਕਿਸੇ ਖ਼ਾਲੀ ਥਾਂ ਨੂੰ ਦਬਾ ਕੇ ਰੱਖੋ, ਕੋਨੇ ਵਿੱਚ + \'ਤੇ ਟੈਪ ਕਰੋ, ਸਿਮਰਨ ਲੱਭੋ, ਫਿਰ ਆਕਾਰ ਚੁਣ ਕੇ Add Widget \'ਤੇ ਟੈਪ ਕਰੋ।';
+      'ਹੋਮ ਸਕ੍ਰੀਨ \'ਤੇ ਕਿਸੇ ਖ਼ਾਲੀ ਥਾਂ ਨੂੰ ਦਬਾ ਕੇ ਰੱਖੋ, ਕੋਨੇ ਵਿੱਚ + \'ਤੇ ਟੈਪ ਕਰੋ, ਜਾਪਮਿੱਤਰ ਲੱਭੋ, ਫਿਰ ਆਕਾਰ ਚੁਣ ਕੇ Add Widget \'ਤੇ ਟੈਪ ਕਰੋ।';
 
   @override
   String get addToHomeScreen => 'ਹੋਮ ਸਕ੍ਰੀਨ \'ਤੇ ਜੋੜੋ';
@@ -1288,7 +1288,7 @@ class AppL10nPa extends AppL10n {
   String get diagnosticsShare => 'ਫ਼ਾਈਲ ਵਜੋਂ ਸਾਂਝਾ ਕਰੋ';
 
   @override
-  String get diagnosticsEmailSubject => 'Smaran ਜਾਂਚ ਰਿਪੋਰਟ';
+  String get diagnosticsEmailSubject => 'ਜਾਪਮਿੱਤਰ ਜਾਂਚ ਰਿਪੋਰਟ';
 
   @override
   String get diagnosticsNoMail =>

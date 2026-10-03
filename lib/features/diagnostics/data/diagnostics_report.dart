@@ -49,7 +49,7 @@ class DiagnosticsReport {
     final recent = AppLogger.recent();
 
     return [
-      'Smaran diagnostics',
+      'JaapMitra diagnostics',
       'Generated: ${_now().toIso8601String()}',
       'App: $_version${_build == null ? '' : ' ($_build)'}',
       'Platform: $_platform',
