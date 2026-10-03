@@ -38,8 +38,9 @@ class JapMalaApp extends ConsumerWidget {
       locale: settings.locale,
       localizationsDelegates: AppL10n.localizationsDelegates,
       supportedLocales: AppL10n.supportedLocales,
-      builder: (context, child) =>
-          _AppLifecycle(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => _AppSplash(
+        child: _AppLifecycle(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }
@@ -179,5 +180,88 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
       });
     }
     return widget.child;
+  }
+}
+
+/// A short branded splash over the first screen, matching the native launch
+/// screen so the hand-over from it is seamless. It fades out on its own.
+class _AppSplash extends StatefulWidget {
+  const _AppSplash({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_AppSplash> createState() => _AppSplashState();
+}
+
+class _AppSplashState extends State<_AppSplash>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1500),
+  )..forward();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        widget.child,
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) {
+            final t = _controller.value;
+            if (t >= 1) return const SizedBox.shrink();
+            // Name fades in over the first third; the whole splash fades out
+            // over the last third.
+            final name = Curves.easeOut.transform((t / 0.35).clamp(0.0, 1.0));
+            final out =
+                1 -
+                Curves.easeIn.transform(((t - 0.65) / 0.35).clamp(0.0, 1.0));
+            return IgnorePointer(
+              child: Opacity(
+                opacity: out,
+                child: ColoredBox(
+                  color: const Color(0xFFF8F7F4),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/branding/app_icon.png',
+                          width: 112,
+                          height: 112,
+                          excludeFromSemantics: true,
+                        ),
+                        const SizedBox(height: 20),
+                        Opacity(
+                          opacity: name,
+                          child: const Text(
+                            'Smaran',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.2,
+                              color: Color(0xFF2B2623),
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }
