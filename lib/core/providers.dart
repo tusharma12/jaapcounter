@@ -9,6 +9,7 @@ import '../features/sadhana/data/sadhana_repository.dart';
 import '../features/stories/data/story_repository.dart';
 import 'services/dictation_service.dart';
 import 'services/lock_screen_counter_service.dart';
+import 'services/ambient_chant_service.dart';
 import 'services/mantra_audio_service.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
@@ -90,6 +91,13 @@ final widgetServiceProvider = Provider<WidgetService>((ref) => WidgetService());
 /// editor never has two microphones or two players fighting each other.
 final mantraAudioServiceProvider = Provider<MantraAudioService>((ref) {
   final service = MantraAudioService();
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+/// Looping background sound for meditation. Overridden in tests.
+final ambientChantProvider = Provider<AmbientChantService>((ref) {
+  final service = AmbientChantService();
   ref.onDispose(service.dispose);
   return service;
 });

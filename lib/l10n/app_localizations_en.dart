@@ -629,10 +629,25 @@ class AppL10nEn extends AppL10n {
   String get autoJaapStopNever => 'Don\'t stop';
 
   @override
+  String get autoJaapPlayChant => 'Play my chant';
+
+  @override
+  String get autoJaapPlayChantHint => 'Plays your recording with each bead';
+
+  @override
   String get autoJaapStart => 'Start Auto Jaap';
 
   @override
   String get autoJaapStopAction => 'Stop Auto Jaap';
+
+  @override
+  String get chantSound => 'Chant';
+
+  @override
+  String get chantPlay => 'Play';
+
+  @override
+  String get chantStop => 'Stop';
 
   @override
   String counterCount(String count) {

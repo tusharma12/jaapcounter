@@ -19,6 +19,7 @@ class AutoJaapConfig {
   const AutoJaapConfig({
     this.interval = const Duration(seconds: 2),
     this.stopAfter = AutoJaapStop.mala,
+    this.playChant = true,
   });
 
   /// Paces offered in the sheet, in seconds per bead.
@@ -28,10 +29,18 @@ class AutoJaapConfig {
   final Duration interval;
   final AutoJaapStop stopAfter;
 
-  AutoJaapConfig copyWith({Duration? interval, AutoJaapStop? stopAfter}) {
+  /// Whether the mantra's own recording plays with each bead, when it has one.
+  final bool playChant;
+
+  AutoJaapConfig copyWith({
+    Duration? interval,
+    AutoJaapStop? stopAfter,
+    bool? playChant,
+  }) {
     return AutoJaapConfig(
       interval: interval ?? this.interval,
       stopAfter: stopAfter ?? this.stopAfter,
+      playChant: playChant ?? this.playChant,
     );
   }
 
@@ -41,6 +50,7 @@ class AutoJaapConfig {
     '${interval.inMilliseconds}',
     'false',
     stopAfter.name,
+    '$playChant',
   ];
 
   /// Reads what [toPrefs] wrote, and also the longer lists older versions
@@ -57,6 +67,8 @@ class AutoJaapConfig {
         (s) => s.name == values[2],
         orElse: () => fallback.stopAfter,
       ),
+      // Older versions stored only three values; the chant plays for them.
+      playChant: values.length > 3 ? values[3] != 'false' : true,
     );
   }
 }
@@ -141,6 +153,7 @@ class AutoJaapController extends Notifier<AutoJaapState> {
   /// when a recording is longer than the chosen interval.
   Future<void> _playVoice() async {
     try {
+      if (!state.config.playChant) return;
       final mantra = ref.read(activeMantraProvider);
       if (mantra == null || !mantra.hasAudio) return;
       final store = ref.read(voiceNoteStoreProvider);

@@ -1187,6 +1187,18 @@ abstract class AppL10n {
   /// **'Don\'t stop'**
   String get autoJaapStopNever;
 
+  /// No description provided for @autoJaapPlayChant.
+  ///
+  /// In en, this message translates to:
+  /// **'Play my chant'**
+  String get autoJaapPlayChant;
+
+  /// No description provided for @autoJaapPlayChantHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Plays your recording with each bead'**
+  String get autoJaapPlayChantHint;
+
   /// No description provided for @autoJaapStart.
   ///
   /// In en, this message translates to:
@@ -1198,6 +1210,24 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Stop Auto Jaap'**
   String get autoJaapStopAction;
+
+  /// No description provided for @chantSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Chant'**
+  String get chantSound;
+
+  /// No description provided for @chantPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get chantPlay;
+
+  /// No description provided for @chantStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get chantStop;
 
   /// No description provided for @counterCount.
   ///

@@ -630,10 +630,26 @@ class AppL10nTe extends AppL10n {
   String get autoJaapStopNever => 'ఆపవద్దు';
 
   @override
+  String get autoJaapPlayChant => 'నా జపాన్ని ప్లే చేయండి';
+
+  @override
+  String get autoJaapPlayChantHint =>
+      'ప్రతి పూసపై మీ రికార్డింగ్ ప్లే అవుతుంది';
+
+  @override
   String get autoJaapStart => 'ఆటో జపం ప్రారంభించు';
 
   @override
   String get autoJaapStopAction => 'ఆటో జపం ఆపు';
+
+  @override
+  String get chantSound => 'సంగీతం';
+
+  @override
+  String get chantPlay => 'ప్లే చేయి';
+
+  @override
+  String get chantStop => 'ఆపు';
 
   @override
   String counterCount(String count) {

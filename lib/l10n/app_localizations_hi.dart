@@ -627,10 +627,25 @@ class AppL10nHi extends AppL10n {
   String get autoJaapStopNever => 'न रुकें';
 
   @override
+  String get autoJaapPlayChant => 'मेरा जाप सुनाएँ';
+
+  @override
+  String get autoJaapPlayChantHint => 'हर मनके पर आपकी रिकॉर्डिंग बजेगी';
+
+  @override
   String get autoJaapStart => 'स्वतः जाप शुरू करें';
 
   @override
   String get autoJaapStopAction => 'स्वतः जाप रोकें';
+
+  @override
+  String get chantSound => 'धुन';
+
+  @override
+  String get chantPlay => 'चलाएँ';
+
+  @override
+  String get chantStop => 'रोकें';
 
   @override
   String counterCount(String count) {

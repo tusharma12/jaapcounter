@@ -37,6 +37,8 @@ class SettingsService {
   static const _kLockScreenCounter = 'settings.lockScreenCounter';
   static const _kFavouriteStories = 'stories.favourites';
   static const _kAutoJaap = 'autoJaap.config';
+  static const _kMeditationChant = 'meditation.chant';
+  static const _kMeditationChantOn = 'meditation.chantOn';
   static const _kCounterHintSeen = 'counter.hintSeen';
   static const _kHideMantra = 'counter.hideMantra';
 
@@ -124,6 +126,20 @@ class SettingsService {
       _prefs.setStringList(_kFavouriteStories, ids);
 
   /// Automatic Jaap preferences, stored as `[intervalMs, _, stopAfter, ...]`.
+  /// Whether the chosen chant starts by itself when meditation opens: on
+  /// until the user presses Stop.
+  bool meditationChantOn() => _prefs.getBool(_kMeditationChantOn) ?? true;
+
+  Future<void> setMeditationChantOn(bool on) =>
+      _prefs.setBool(_kMeditationChantOn, on);
+
+  /// The background chant last chosen for meditation, or null if none yet.
+  String? meditationChant() => _prefs.getString(_kMeditationChant);
+
+  Future<void> setMeditationChant(String? id) => id == null
+      ? _prefs.remove(_kMeditationChant)
+      : _prefs.setString(_kMeditationChant, id);
+
   List<String> autoJaapConfig() => _prefs.getStringList(_kAutoJaap) ?? const [];
 
   Future<void> setAutoJaapConfig(List<String> values) =>

@@ -66,6 +66,7 @@ flutter:
   assets:
     - assets/stories/
     - assets/branding/
+    - assets/chants/loops/
 
   fonts:
     - family: Inter

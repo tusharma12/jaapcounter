@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:japmala/core/providers.dart';
+import 'package:japmala/core/services/ambient_chant_service.dart';
 import 'package:japmala/features/jaap/presentation/auto_jaap_controller.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
 import 'package:japmala/features/meditation/presentation/meditation_screen.dart';
@@ -7,10 +10,36 @@ import 'package:japmala/features/settings/presentation/settings_controller.dart'
 
 import '../../support/test_harness.dart';
 
+/// Records what it is asked to play instead of making a sound.
+class _FakeChants implements AmbientChantService {
+  final List<String> played = [];
+  int stops = 0;
+
+  @override
+  String? get playing => played.isEmpty ? null : played.last;
+
+  @override
+  Future<void> play(String id) async => played.add(id);
+
+  @override
+  Future<void> stop() async => stops++;
+
+  @override
+  Future<void> fadeOutAndStop({Duration fade = const Duration(seconds: 4)}) =>
+      stop();
+
+  @override
+  Future<void> dispose() async {}
+}
+
 void main() {
+  final chants = _FakeChants();
+
   Future<ProviderContainer> pumpMeditation(WidgetTester tester) async {
     await usePhoneSurface(tester);
-    final container = await createTestContainer();
+    final container = await createTestContainer(
+      overrides: [ambientChantProvider.overrideWithValue(chants)],
+    );
     await container.read(settingsProvider.notifier).setHaptics(false);
     await container.read(jaapControllerProvider.future);
     await pumpScreen(tester, container, const MeditationScreen());
@@ -90,5 +119,34 @@ void main() {
     expect(beads(container), 1);
     await container.read(jaapControllerProvider.notifier).flushPendingWrites();
     await tester.pump(const Duration(seconds: 3));
+  });
+
+  testWidgets('the Chant sheet plays and stops the background sound', (
+    tester,
+  ) async {
+    chants.played.clear();
+    await pumpMeditation(tester);
+
+    await tester.tap(find.text('Chant'));
+    await pumpFrames(tester);
+    expect(find.text('Play'), findsOneWidget);
+    expect(chants.played, isEmpty, reason: 'opening the sheet is silent');
+
+    await tester.tap(find.byKey(const ValueKey('chant-play-stop')));
+    await pumpFrames(tester);
+    expect(chants.played, ['ram_ram']);
+    expect(find.text('Stop'), findsOneWidget);
+
+    final stopsBefore = chants.stops;
+    await tester.tap(find.byKey(const ValueKey('chant-play-stop')));
+    await pumpFrames(tester);
+    expect(chants.stops, stopsBefore + 1);
+    expect(find.text('Play'), findsOneWidget);
+
+    // Choosing a sound plays that one.
+    await tester.tap(find.text('Sitar and Flute'));
+    await pumpFrames(tester);
+    expect(chants.played.last, 'sitar_flute');
+    expect(find.text('Stop'), findsOneWidget);
   });
 }

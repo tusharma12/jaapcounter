@@ -60,12 +60,16 @@ void main() {
 
   // Real timers and real files: the check for the recording touches disk,
   // which a fake clock would never let finish.
-  Future<void> runBriefly(ProviderContainer container) async {
+  Future<void> runBriefly(
+    ProviderContainer container, {
+    bool playChant = true,
+  }) async {
     final auto = container.read(autoJaapProvider.notifier);
     await auto.updateConfig(
-      const AutoJaapConfig(
-        interval: Duration(milliseconds: 40),
+      AutoJaapConfig(
+        interval: const Duration(milliseconds: 40),
         stopAfter: AutoJaapStop.never,
+        playChant: playChant,
       ),
     );
     auto.start();
@@ -91,5 +95,18 @@ void main() {
     await runBriefly(container);
 
     expect(audio.played, isEmpty);
+  });
+
+  test('switching the chant off keeps a recorded mantra silent', () async {
+    final container = await containerWith(recorded: true);
+
+    await runBriefly(container, playChant: false);
+
+    expect(audio.played, isEmpty);
+    expect(
+      container.read(jaapControllerProvider).value!.position.beadsInCurrentMala,
+      greaterThan(0),
+      reason: 'the beads still count',
+    );
   });
 }

@@ -194,8 +194,13 @@
   "autoJaapStopMala": "एक माळ",
   "autoJaapStopGoal": "दैनंदिन लक्ष्य",
   "autoJaapStopNever": "थांबू नका",
+  "autoJaapPlayChant": "माझा जप ऐकवा",
+  "autoJaapPlayChantHint": "प्रत्येक मण्यावर तुमचे रेकॉर्डिंग वाजेल",
   "autoJaapStart": "स्वयं जप सुरू करा",
   "autoJaapStopAction": "स्वयं जप थांबवा",
+  "chantSound": "धून",
+  "chantPlay": "सुरू करा",
+  "chantStop": "थांबवा",
 
   "counterCount": "मोजणी: {count}",
   "counterMalas": "माळा: {count}",

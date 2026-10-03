@@ -213,8 +213,13 @@
   "autoJaapStopMala": "एक माला",
   "autoJaapStopGoal": "दैनिक लक्ष्य",
   "autoJaapStopNever": "न रुकें",
+  "autoJaapPlayChant": "मेरा जाप सुनाएँ",
+  "autoJaapPlayChantHint": "हर मनके पर आपकी रिकॉर्डिंग बजेगी",
   "autoJaapStart": "स्वतः जाप शुरू करें",
   "autoJaapStopAction": "स्वतः जाप रोकें",
+  "chantSound": "धुन",
+  "chantPlay": "चलाएँ",
+  "chantStop": "रोकें",
 
   "counterCount": "गिनती: {count}",
   "counterMalas": "मालाएँ: {count}",

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_dimens.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../mantras/presentation/mantra_controllers.dart';
 import '../auto_jaap_controller.dart';
 import '../jaap_controller.dart';
 
@@ -24,6 +25,8 @@ class _AutoJaapSheet extends ConsumerWidget {
     final controller = ref.read(autoJaapProvider.notifier);
     final jaap = ref.watch(jaapControllerProvider).value;
     final hasGoal = jaap != null && jaap.dailyGoal > 0 && !jaap.goalReached;
+
+    final hasRecording = ref.watch(activeMantraProvider)?.hasAudio ?? false;
 
     void update(AutoJaapConfig next) => controller.updateConfig(next);
 
@@ -90,6 +93,16 @@ class _AutoJaapSheet extends ConsumerWidget {
                 onSelectionChanged: (selection) =>
                     update(config.copyWith(stopAfter: selection.first)),
               ),
+              if (hasRecording) ...[
+                const SizedBox(height: Insets.md),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.autoJaapPlayChant),
+                  subtitle: Text(l10n.autoJaapPlayChantHint),
+                  value: config.playChant,
+                  onChanged: (on) => update(config.copyWith(playChant: on)),
+                ),
+              ],
               const SizedBox(height: Insets.xl),
               FilledButton.icon(
                 onPressed: () {

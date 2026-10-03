@@ -30,4 +30,15 @@ void main() {
     expect(restored.interval, const Duration(seconds: 3));
     expect(restored.stopAfter, AutoJaapStop.goal);
   });
+
+  test('the chant plays unless it was switched off', () {
+    expect(const AutoJaapConfig().playChant, isTrue);
+    expect(
+      AutoJaapConfig.fromPrefs(['2000', 'false', 'mala']).playChant,
+      isTrue,
+    );
+
+    final off = const AutoJaapConfig().copyWith(playChant: false);
+    expect(AutoJaapConfig.fromPrefs(off.toPrefs()).playChant, isFalse);
+  });
 }

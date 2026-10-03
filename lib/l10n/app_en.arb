@@ -213,8 +213,13 @@
   "autoJaapStopMala": "One mala",
   "autoJaapStopGoal": "Daily goal",
   "autoJaapStopNever": "Don't stop",
+  "autoJaapPlayChant": "Play my chant",
+  "autoJaapPlayChantHint": "Plays your recording with each bead",
   "autoJaapStart": "Start Auto Jaap",
   "autoJaapStopAction": "Stop Auto Jaap",
+  "chantSound": "Chant",
+  "chantPlay": "Play",
+  "chantStop": "Stop",
 
   "counterCount": "Count: {count}",
   "@counterCount": { "placeholders": { "count": { "type": "String" } } },

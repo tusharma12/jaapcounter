@@ -194,8 +194,13 @@
   "autoJaapStopMala": "એક માળા",
   "autoJaapStopGoal": "રોજનું લક્ષ્ય",
   "autoJaapStopNever": "રોકાવું નહીં",
+  "autoJaapPlayChant": "મારો જાપ સંભળાવો",
+  "autoJaapPlayChantHint": "દરેક મણકા પર તમારું રેકોર્ડિંગ વાગશે",
   "autoJaapStart": "ઓટો જાપ શરૂ કરો",
   "autoJaapStopAction": "ઓટો જાપ રોકો",
+  "chantSound": "ધૂન",
+  "chantPlay": "ચલાવો",
+  "chantStop": "રોકો",
 
   "counterCount": "ગણતરી: {count}",
   "counterMalas": "માળા: {count}",

@@ -8,6 +8,8 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
 import '../../../app/theme/app_typography.dart';
+import '../../../core/providers.dart';
+import '../../../core/services/ambient_chant_service.dart';
 import '../../../core/services/app_logger.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
@@ -46,10 +48,20 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   Duration? _timerTarget;
   Timer? _ticker;
   bool _timerFinished = false;
+  String? _chant;
+  bool _chantPlaying = false;
+  late final AmbientChantService _ambient;
 
   @override
   void initState() {
     super.initState();
+    _ambient = ref.read(ambientChantProvider);
+    final settings = ref.read(settingsServiceProvider);
+    _chant = settings.meditationChant();
+    if (_chant != null && settings.meditationChantOn()) {
+      _chantPlaying = true;
+      unawaited(_ambient.play(_chant!));
+    }
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() {});
@@ -61,6 +73,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   @override
   void dispose() {
     _ticker?.cancel();
+    unawaited(_ambient.stop());
     _applyWakelock(false);
     super.dispose();
   }
@@ -78,6 +91,9 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     if (target == null || _timerFinished) return;
     if (DateTime.now().difference(_enteredAt) >= target) {
       _timerFinished = true;
+      // The loop has run for exactly the sitting; let it fade away.
+      _chantPlaying = false;
+      unawaited(_ambient.fadeOutAndStop());
       ref.read(feedbackProvider).malaComplete();
     }
   }
@@ -87,6 +103,90 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     // Blackout releases the wakelock as it closes; this screen still wants it.
     if (mounted) {
       _applyWakelock(ref.read(settingsProvider).keepScreenOnInMeditation);
+    }
+  }
+
+  Future<void> _pickChant() async {
+    final l10n = AppL10n.of(context);
+    await showAppSheet<void>(
+      context,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheet) {
+          void choose(String? id, {required bool play}) {
+            _setChant(id, play: play);
+            setSheet(() {});
+          }
+
+          return SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      Insets.page,
+                      Insets.lg,
+                      Insets.page,
+                      Insets.sm,
+                    ),
+                    child: FilledButton.icon(
+                      key: const ValueKey('chant-play-stop'),
+                      onPressed: () => choose(
+                        _chant ?? AmbientChantService.chants.first.id,
+                        play: !_chantPlaying,
+                      ),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                      ),
+                      icon: Icon(
+                        _chantPlaying
+                            ? Icons.stop_rounded
+                            : Icons.play_arrow_rounded,
+                      ),
+                      label: Text(
+                        _chantPlaying ? l10n.chantStop : l10n.chantPlay,
+                      ),
+                    ),
+                  ),
+                  for (final chant in AmbientChantService.chants)
+                    ListTile(
+                      title: Text(chant.label),
+                      leading: _chant == chant.id && _chantPlaying
+                          ? const Icon(Icons.graphic_eq_rounded)
+                          : const Icon(Icons.music_note_outlined),
+                      trailing: _chant == chant.id
+                          ? const Icon(Icons.check_rounded)
+                          : null,
+                      onTap: () => choose(chant.id, play: true),
+                    ),
+                  const SizedBox(height: Insets.lg),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Chooses [id] and starts or stops it. A stopped chant stays chosen, so
+  /// Play brings back the same one.
+  void _setChant(String? id, {required bool play}) {
+    setState(() {
+      _chant = id;
+      _chantPlaying = play && id != null;
+      // Starting a chant after the timer ran out begins a fresh sitting.
+      if (_chantPlaying) _timerFinished = false;
+    });
+    final settings = ref.read(settingsServiceProvider);
+    unawaited(settings.setMeditationChant(id));
+    unawaited(settings.setMeditationChantOn(_chantPlaying));
+    if (_chantPlaying) {
+      unawaited(_ambient.play(id!));
+    } else {
+      unawaited(_ambient.stop());
     }
   }
 
@@ -165,6 +265,8 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                 timerTarget: _timerTarget,
                 onBlackout: _openBlackout,
                 onTimer: _pickTimer,
+                chantOn: _chantPlaying,
+                onChant: _pickChant,
               ),
             ),
           ),
@@ -181,6 +283,8 @@ class _MeditationView extends ConsumerWidget {
     required this.timerTarget,
     required this.onBlackout,
     required this.onTimer,
+    required this.chantOn,
+    required this.onChant,
   });
 
   final JaapState state;
@@ -188,6 +292,8 @@ class _MeditationView extends ConsumerWidget {
   final Duration? timerTarget;
   final VoidCallback onBlackout;
   final VoidCallback onTimer;
+  final bool chantOn;
+  final VoidCallback onChant;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -274,6 +380,12 @@ class _MeditationView extends ConsumerWidget {
                     .setSound(!settings.soundEnabled),
               ),
               _Control(
+                icon: Icons.music_note_rounded,
+                label: l10n.chantSound,
+                active: chantOn,
+                onTap: onChant,
+              ),
+              _Control(
                 icon: Icons.timer_outlined,
                 label: l10n.timer,
                 active: timerTarget != null,
@@ -322,13 +434,13 @@ class _Control extends StatelessWidget {
 
     return Flexible(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Insets.xs),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(Radii.md),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: Insets.lg,
+              horizontal: Insets.sm,
               vertical: Insets.md,
             ),
             child: Column(

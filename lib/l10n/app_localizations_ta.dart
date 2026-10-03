@@ -632,10 +632,26 @@ class AppL10nTa extends AppL10n {
   String get autoJaapStopNever => 'நிறுத்த வேண்டாம்';
 
   @override
+  String get autoJaapPlayChant => 'என் ஜபத்தை ஒலிக்கவும்';
+
+  @override
+  String get autoJaapPlayChantHint =>
+      'ஒவ்வொரு மணியிலும் உங்கள் பதிவு ஒலிக்கும்';
+
+  @override
   String get autoJaapStart => 'தானியங்கி ஜபம் தொடங்கு';
 
   @override
   String get autoJaapStopAction => 'தானியங்கி ஜபத்தை நிறுத்து';
+
+  @override
+  String get chantSound => 'இசை';
+
+  @override
+  String get chantPlay => 'இயக்கு';
+
+  @override
+  String get chantStop => 'நிறுத்து';
 
   @override
   String counterCount(String count) {
