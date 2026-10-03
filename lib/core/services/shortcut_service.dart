@@ -10,16 +10,32 @@ class ShortcutService {
   final QuickActions _actions;
 
   static const String blackout = 'blackout';
+  static const String music = 'music';
 
-  /// Listens for a chosen shortcut, including the one that launched the app,
-  /// then publishes the list in the current language.
-  Future<void> register({
-    required String blackoutLabel,
-    required void Function(String type) onSelected,
-  }) async {
+  /// Starts listening for a chosen shortcut, including the one that launched
+  /// the app. Once per launch.
+  Future<void> initialize(void Function(String type) onSelected) async {
     try {
       await _actions.initialize(onSelected);
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not listen for home screen shortcuts', error, stack);
+    }
+  }
+
+  /// Publishes the list in the current language. [musicLabel] says what
+  /// choosing it will do ("Play music" or "Stop music"), so it is published
+  /// again whenever the music starts or stops.
+  Future<void> publish({
+    required String blackoutLabel,
+    required String musicLabel,
+  }) async {
+    try {
       await _actions.setShortcutItems([
+        ShortcutItem(
+          type: music,
+          localizedTitle: musicLabel,
+          icon: 'shortcut_music',
+        ),
         ShortcutItem(
           type: blackout,
           localizedTitle: blackoutLabel,

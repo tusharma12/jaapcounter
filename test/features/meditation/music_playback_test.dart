@@ -78,23 +78,46 @@ void main() {
     await c.read(jaapControllerProvider.notifier).flushPendingWrites();
   });
 
-  test('music the user started is not stopped by Auto Jaap', () async {
-    final c = await containerWith(selected: 'white_noise', on: false);
-    await c
-        .read(musicPlaybackProvider.notifier)
-        .choose('meditation_2', play: true);
+  test(
+    'music already playing ends with an Auto Jaap run that has sound on',
+    () async {
+      final c = await containerWith(selected: 'white_noise', on: false);
+      await c
+          .read(musicPlaybackProvider.notifier)
+          .choose('meditation_2', play: true);
 
-    final auto = c.read(autoJaapProvider.notifier);
-    await auto.updateConfig(const AutoJaapConfig(playMusic: true));
-    auto.start();
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    auto.stop();
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+      final auto = c.read(autoJaapProvider.notifier);
+      await auto.updateConfig(const AutoJaapConfig(playMusic: true));
+      auto.start();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(ambient.played, ['meditation_2'], reason: 'not restarted');
 
-    expect(c.read(musicPlaybackProvider).playing, isTrue);
-    expect(ambient.played, ['meditation_2'], reason: 'not restarted either');
-    await c.read(jaapControllerProvider.notifier).flushPendingWrites();
-  });
+      auto.stop();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(c.read(musicPlaybackProvider).playing, isFalse);
+      await c.read(jaapControllerProvider.notifier).flushPendingWrites();
+    },
+  );
+
+  test(
+    'with the sound switch off, Auto Jaap leaves your music alone',
+    () async {
+      final c = await containerWith(selected: 'white_noise', on: false);
+      await c
+          .read(musicPlaybackProvider.notifier)
+          .choose('meditation_2', play: true);
+
+      final auto = c.read(autoJaapProvider.notifier);
+      auto.start();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      auto.stop();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(c.read(musicPlaybackProvider).playing, isTrue);
+      await c.read(jaapControllerProvider.notifier).flushPendingWrites();
+    },
+  );
 
   test('choosing and stopping is remembered across launches', () async {
     final c = await containerWith();

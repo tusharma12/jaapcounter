@@ -96,12 +96,6 @@ class AppL10nTa extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'செயல்தவிர்க்க எதுவும் இல்லை';
-
-  @override
-  String get countRemoved => 'எண்ணிக்கை நீக்கப்பட்டது';
-
-  @override
   String get resetCurrentMala => 'நடப்பு மாலையை மீட்டமை';
 
   @override
@@ -592,6 +586,13 @@ class AppL10nTa extends AppL10n {
       'தெளிவான, அமைதியான கவுன்ட்டருடன் தியான முறைக்குள் செல்லுங்கள்.';
 
   @override
+  String get onbLookTitle => 'உங்களுக்கேற்றதாக மாற்றுங்கள்';
+
+  @override
+  String get onbLookBody =>
+      'கவுண்டர் எப்படித் தோன்றவும் ஒலிக்கவும் வேண்டும் என்பதைத் தேர்ந்தெடுங்கள். இவற்றை எப்போது வேண்டுமானாலும் அமைப்புகளில் மாற்றலாம்.';
+
+  @override
   String get onbFeaturesTitle => 'எல்லாம் உங்கள் கையில்';
 
   @override
@@ -666,6 +667,12 @@ class AppL10nTa extends AppL10n {
 
   @override
   String get music => 'இசை';
+
+  @override
+  String get playMusic => 'இசையை இயக்கு';
+
+  @override
+  String get stopMusic => 'இசையை நிறுத்து';
 
   @override
   String get chooseSound => 'ஒலியைத் தேர்ந்தெடுக்கவும்';

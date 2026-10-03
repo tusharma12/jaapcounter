@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:japmala/app/theme/app_theme.dart';
+import 'package:japmala/app/theme/app_themes.dart';
+import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
 import 'package:japmala/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:japmala/features/settings/presentation/settings_controller.dart';
 import 'package:japmala/l10n/app_localizations.dart';
@@ -71,6 +73,28 @@ void main() {
 
     await tester.tap(find.text('Radha Radha'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    // How the counter looks and sounds is chosen before the goal.
+    expect(find.text('Make it yours'), findsOneWidget);
+    await tester.tap(find.text('Ocean'));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).themeId, AppThemeId.ocean);
+    for (final key in ['onb-show-mantra', 'onb-falling-mantra', 'onb-music']) {
+      await tester.scrollUntilVisible(
+        find.byKey(ValueKey(key)),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+    }
+    await tester.tap(find.byKey(const ValueKey('onb-falling-mantra')));
+    await tester.pumpAndSettle();
+    expect(container.read(settingsProvider).fallingMantra, isTrue);
+    await tester.tap(find.byKey(const ValueKey('onb-show-mantra')));
+    await tester.pumpAndSettle();
+    expect(container.read(hideMantraProvider), isTrue);
+    expect(find.text('Music'), findsOneWidget);
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
 

@@ -95,12 +95,6 @@ class AppL10nGu extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'પાછું લેવા માટે કંઈ નથી';
-
-  @override
-  String get countRemoved => 'ગણતરી દૂર કરી';
-
-  @override
   String get resetCurrentMala => 'ચાલુ માળા રીસેટ કરો';
 
   @override
@@ -588,6 +582,13 @@ class AppL10nGu extends AppL10n {
   String get onb3Body => 'સ્વચ્છ, શાંત કાઉન્ટર સાથે ધ્યાન મોડમાં પ્રવેશ કરો.';
 
   @override
+  String get onbLookTitle => 'તેને તમારું બનાવો';
+
+  @override
+  String get onbLookBody =>
+      'કાઉન્ટર કેવું દેખાય અને કેવું સંભળાય તે પસંદ કરો. આ ગમે ત્યારે સેટિંગ્સમાં બદલી શકાય છે.';
+
+  @override
   String get onbFeaturesTitle => 'બધું તમારા હાથમાં';
 
   @override
@@ -661,6 +662,12 @@ class AppL10nGu extends AppL10n {
 
   @override
   String get music => 'સંગીત';
+
+  @override
+  String get playMusic => 'સંગીત ચલાવો';
+
+  @override
+  String get stopMusic => 'સંગીત રોકો';
 
   @override
   String get chooseSound => 'અવાજ પસંદ કરો';

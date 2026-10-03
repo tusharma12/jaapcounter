@@ -9,14 +9,22 @@ import '../../../app/theme/app_dimens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/mantra_text.dart';
+import '../../../app/theme/app_themes.dart';
+import '../../../core/services/ambient_chant_service.dart';
+import '../../../core/widgets/app_feedback.dart';
+import '../../jaap/presentation/counter_prefs.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
+import '../../meditation/presentation/music_controllers.dart';
+import '../../meditation/presentation/music_playback.dart';
+import '../../meditation/presentation/music_sheet.dart';
+import '../../settings/presentation/appearance_sheets.dart';
 import '../../mantras/presentation/mantra_editor_sheet.dart';
 import '../../mantras/presentation/mantra_tile.dart';
 import '../../sadhana/presentation/daily_goal_picker.dart';
 import '../../settings/presentation/settings_controller.dart';
 import '../../../core/constants/app_languages.dart';
 
-/// Three screens of welcome, one tour of the features, then two that make the app the user's own:
+/// Three screens of welcome, one tour of the features, then three that make the app the user's own:
 /// which mantra they chant and how much each day. Then out of the way.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -79,6 +87,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _OnboardingPage(title: l10n.onb3Title, body: l10n.onb3Body),
       const _FeaturesPage(),
       const _MantraPage(),
+      const _LookPage(),
       _GoalPage(
         goal: _goal ?? ref.watch(settingsProvider).fallbackDailyGoal,
         malaSize: mantra?.malaSize ?? AppConstants.defaultMalaSize,
@@ -282,6 +291,96 @@ class _FeaturesPage extends StatelessWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// How the counter looks and sounds, chosen up front so these are not
+/// switches to hunt for later. Each is saved as it is picked.
+class _LookPage extends ConsumerWidget {
+  const _LookPage();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppL10n.of(context);
+    final settings = ref.watch(settingsProvider);
+    final hideMantra = ref.watch(hideMantraProvider);
+    final music = ref.watch(musicPlaybackProvider);
+    final mine = ref.watch(userMusicProvider).value ?? const [];
+
+    String musicName() {
+      final id = music.selectedId;
+      if (id == null) return l10n.off[0] + l10n.off.substring(1).toLowerCase();
+      final bundled = AmbientChantService.byId(id);
+      if (bundled != null) return bundled.label;
+      for (final track in mine) {
+        if ('$userTrackPrefix${track.id}' == id) return track.name;
+      }
+      return l10n.off[0] + l10n.off.substring(1).toLowerCase();
+    }
+
+    /// Picking music here is a preview: it plays while the list is open and
+    /// stops when it closes, but the choice stays for everywhere else.
+    Future<void> chooseMusic() async {
+      final notifier = ref.read(musicPlaybackProvider.notifier);
+      await showAppSheet<void>(
+        context,
+        builder: (_) => MusicSheet(
+          selected: () => ref.read(musicPlaybackProvider).selectedId,
+          playing: () => ref.read(musicPlaybackProvider).playing,
+          onChoose: (id, {required play}) => notifier.choose(id, play: play),
+        ),
+      );
+      if (ref.read(musicPlaybackProvider).playing) await notifier.stop();
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Insets.page,
+        vertical: Insets.md,
+      ),
+      children: [
+        _StepHeader(title: l10n.onbLookTitle, body: l10n.onbLookBody),
+        const SizedBox(height: Insets.xl),
+        Text(l10n.theme, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: Insets.sm),
+        Wrap(
+          spacing: Insets.sm,
+          runSpacing: Insets.sm,
+          children: [
+            for (final id in AppThemeId.values)
+              ChoiceChip(
+                label: Text(themeName(l10n, id)),
+                selected: id == settings.themeId,
+                onSelected: (_) =>
+                    ref.read(settingsProvider.notifier).setTheme(id),
+              ),
+          ],
+        ),
+        const SizedBox(height: Insets.lg),
+        SwitchListTile(
+          key: const ValueKey('onb-show-mantra'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.showMantraOnCounter),
+          value: !hideMantra,
+          onChanged: (show) => ref.read(hideMantraProvider.notifier).set(!show),
+        ),
+        SwitchListTile(
+          key: const ValueKey('onb-falling-mantra'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.fallingMantra),
+          value: settings.fallingMantra,
+          onChanged: ref.read(settingsProvider.notifier).setFallingMantra,
+        ),
+        ListTile(
+          key: const ValueKey('onb-music'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.music),
+          subtitle: Text(musicName()),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: chooseMusic,
+        ),
       ],
     );
   }

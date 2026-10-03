@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
 import '../../../core/providers.dart';
+import '../../../core/services/app_logger.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../../core/widgets/async_view.dart';
@@ -20,6 +22,8 @@ import '../../sadhana/presentation/sadhana_controllers.dart';
 import '../../settings/domain/mala_style.dart';
 import '../../settings/presentation/appearance_sheets.dart';
 import '../../settings/presentation/settings_controller.dart';
+import '../../meditation/presentation/music_playback.dart';
+import 'auto_jaap_actions.dart';
 import 'auto_jaap_controller.dart';
 import 'counter_prefs.dart';
 import 'jaap_controller.dart';
@@ -47,6 +51,7 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
   int? _seenMilestones;
   bool _celebrating = false;
   Timer? _celebrationTimer;
+  bool _awakeForMusic = false;
 
   @override
   void dispose() {
@@ -87,11 +92,11 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
       );
   }
 
+  /// Silent: the count on screen changing is the answer, and a message
+  /// would only cover it. The button is disabled when there is nothing to
+  /// undo, so there is no "nothing to undo" to report either.
   Future<void> _undo() async {
-    final l10n = AppL10n.of(context);
-    final removed = await ref.read(jaapControllerProvider.notifier).undo();
-    if (!mounted) return;
-    showAppSnack(context, removed ? l10n.countRemoved : l10n.nothingToUndo);
+    await ref.read(jaapControllerProvider.notifier).undo();
   }
 
   Future<void> _toggleSession(JaapState state) async {
@@ -118,6 +123,16 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
       auto.stop();
     } else {
       showAutoJaapSheet(context);
+    }
+  }
+
+  /// iOS stops audio when the phone locks, so while music plays and the
+  /// counter is what the user is looking at, the screen stays on.
+  Future<void> _setAwake(bool enable) async {
+    try {
+      await WakelockPlus.toggle(enable: enable);
+    } on Object catch (error, stack) {
+      AppLogger.e('Could not change the screen wakelock', error, stack);
     }
   }
 
@@ -167,21 +182,16 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
         await _undo();
       case _MenuAction.autoJaap:
         _toggleAutoJaap();
+      case _MenuAction.music:
+        await ref.read(musicPlaybackProvider.notifier).toggle();
+      case _MenuAction.sadhana:
+        await context.push('/sadhana');
       case _MenuAction.session:
         await _toggleSession(state);
       case _MenuAction.meditation:
         await context.push('/meditation');
       case _MenuAction.blackout:
         await context.push('/blackout');
-      case _MenuAction.hideMantra:
-        ref.read(hideMantraProvider.notifier).toggle();
-      case _MenuAction.fallingMantra:
-        final current = ref.read(settingsProvider).fallingMantra;
-        await ref.read(settingsProvider.notifier).setFallingMantra(!current);
-      case _MenuAction.theme:
-        await showThemePicker(context);
-      case _MenuAction.background:
-        await showBackgroundPicker(context);
       case _MenuAction.addCount:
         await _addManualCount(state);
       case _MenuAction.resetMala:
@@ -195,6 +205,26 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(jaapControllerProvider);
     final autoRunning = ref.watch(autoJaapProvider.select((s) => s.running));
+
+    final visible =
+        TickerMode.valuesOf(context).enabled &&
+        (ModalRoute.of(context)?.isCurrent ?? true);
+    final wantAwake =
+        ref.watch(musicPlaybackProvider.select((m) => m.playing)) && visible;
+    if (wantAwake != _awakeForMusic) {
+      _awakeForMusic = wantAwake;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _setAwake(wantAwake || ref.read(autoJaapProvider).running);
+        }
+      });
+    }
+    // Auto Jaap releases the wakelock as it stops; music still needs it.
+    reapplyWakelockWhenAutoStops(
+      ref,
+      mounted: () => mounted,
+      reapply: () => _setAwake(_awakeForMusic),
+    );
 
     // A finished mala is acknowledged once, from the state's own counter, so
     // the animation cannot be triggered twice by an unrelated rebuild.
@@ -256,16 +286,14 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
 enum _MenuAction {
   undo,
   autoJaap,
+  music,
   session,
   meditation,
   blackout,
-  hideMantra,
-  fallingMantra,
-  theme,
-  background,
   addCount,
   resetMala,
   mantras,
+  sadhana,
 }
 
 class _CounterBody extends StatelessWidget {
@@ -313,12 +341,7 @@ class _CounterBody extends StatelessWidget {
           ),
         Column(
           children: [
-            _TopBar(
-              state: state,
-              autoRunning: autoRunning,
-              hideMantra: hideMantra,
-              onMenu: onMenu,
-            ),
+            _TopBar(state: state, autoRunning: autoRunning, onMenu: onMenu),
             Expanded(
               child: Semantics(
                 button: true,
@@ -425,6 +448,22 @@ class _CounterBody extends StatelessWidget {
                 ),
               ),
             ),
+            // Outside the counting area, so pressing it never counts a bead.
+            Padding(
+              padding: const EdgeInsets.only(bottom: Insets.sm),
+              child: TextButton.icon(
+                key: const ValueKey('counter-undo'),
+                onPressed: state.undoAvailable
+                    ? () => onMenu(_MenuAction.undo)
+                    : null,
+                icon: const Icon(Icons.undo_rounded),
+                label: Text(l10n.undo),
+                style: TextButton.styleFrom(
+                  foregroundColor: palette.secondaryText,
+                  minimumSize: const Size(48, 48),
+                ),
+              ),
+            ),
           ],
         ),
         Positioned(
@@ -463,13 +502,11 @@ class _TopBar extends ConsumerWidget {
   const _TopBar({
     required this.state,
     required this.autoRunning,
-    required this.hideMantra,
     required this.onMenu,
   });
 
   final JaapState state;
   final bool autoRunning;
-  final bool hideMantra;
   final ValueChanged<_MenuAction> onMenu;
 
   @override
@@ -477,8 +514,8 @@ class _TopBar extends ConsumerWidget {
     final l10n = AppL10n.of(context);
     final palette = context.palette;
     final streak = ref.watch(streakProvider).value?.current ?? 0;
-    final fallingMantra = ref.watch(
-      settingsProvider.select((s) => s.fallingMantra),
+    final musicPlaying = ref.watch(
+      musicPlaybackProvider.select((m) => m.playing),
     );
 
     return Padding(
@@ -509,18 +546,21 @@ class _TopBar extends ConsumerWidget {
             color: autoRunning ? palette.saffron : palette.secondaryText,
           ),
           IconButton(
+            key: const ValueKey('counter-music'),
+            onPressed: () => onMenu(_MenuAction.music),
+            tooltip: musicPlaying ? l10n.stopMusic : l10n.playMusic,
+            icon: Icon(
+              musicPlaying
+                  ? Icons.music_note_rounded
+                  : Icons.music_off_outlined,
+            ),
+            color: musicPlaying ? palette.saffron : palette.secondaryText,
+          ),
+          IconButton(
             key: const ValueKey('counter-meditation'),
             onPressed: () => onMenu(_MenuAction.meditation),
             tooltip: l10n.meditationMode,
             icon: const Icon(Icons.self_improvement_rounded),
-            color: palette.secondaryText,
-          ),
-          IconButton(
-            onPressed: state.undoAvailable
-                ? () => onMenu(_MenuAction.undo)
-                : null,
-            tooltip: l10n.undo,
-            icon: const Icon(Icons.undo_rounded),
             color: palette.secondaryText,
           ),
           PopupMenuButton<_MenuAction>(
@@ -540,6 +580,13 @@ class _TopBar extends ConsumerWidget {
                 autoRunning ? l10n.autoJaapStopAction : l10n.autoJaap,
               ),
               _item(
+                _MenuAction.music,
+                musicPlaying
+                    ? Icons.music_off_outlined
+                    : Icons.music_note_rounded,
+                musicPlaying ? l10n.stopMusic : l10n.playMusic,
+              ),
+              _item(
                 _MenuAction.session,
                 state.sessionRunning
                     ? Icons.stop_circle_outlined
@@ -557,30 +604,6 @@ class _TopBar extends ConsumerWidget {
                 l10n.blackoutMode,
               ),
               _item(
-                _MenuAction.hideMantra,
-                hideMantra
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                hideMantra ? l10n.showMantra : l10n.hideMantra,
-              ),
-              _item(
-                _MenuAction.fallingMantra,
-                fallingMantra
-                    ? Icons.auto_awesome_motion_outlined
-                    : Icons.auto_awesome_motion_rounded,
-                fallingMantra ? l10n.stopFallingMantra : l10n.fallingMantra,
-              ),
-              _item(
-                _MenuAction.theme,
-                Icons.palette_outlined,
-                l10n.changeTheme,
-              ),
-              _item(
-                _MenuAction.background,
-                Icons.wallpaper_rounded,
-                l10n.counterBackground,
-              ),
-              _item(
                 _MenuAction.addCount,
                 Icons.add_box_outlined,
                 l10n.addCountManually,
@@ -595,6 +618,11 @@ class _TopBar extends ConsumerWidget {
                 _MenuAction.mantras,
                 Icons.format_list_bulleted_rounded,
                 l10n.myMantras,
+              ),
+              _item(
+                _MenuAction.sadhana,
+                Icons.auto_awesome_outlined,
+                l10n.mySadhana,
               ),
             ],
           ),

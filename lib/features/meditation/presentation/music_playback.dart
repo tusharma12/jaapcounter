@@ -30,8 +30,9 @@ final musicPlaybackProvider =
 /// The background music, shared by Meditation and Auto Jaap so there is one
 /// choice and one player however the user got to it.
 class MusicPlaybackController extends Notifier<MusicPlaybackState> {
-  // True when Auto Jaap, not the user, started the music, so that Auto Jaap
-  // stopping stops it again but never cuts off music the user started.
+  // True when the music goes with an Auto Jaap run (its sound switch was on),
+  // so that run ending ends it too. Music the user plays on their own, with
+  // the switch off, is never cut off by Auto Jaap stopping.
   bool _startedByAuto = false;
 
   @override
@@ -71,6 +72,19 @@ class MusicPlaybackController extends Notifier<MusicPlaybackState> {
     }
   }
 
+  /// Play the last chosen sound (the first one if none was ever chosen), or
+  /// stop it if it is playing. What a menu item or a shortcut does.
+  Future<void> toggle() async {
+    if (state.playing) {
+      await choose(state.selectedId, play: false);
+    } else {
+      await choose(
+        state.selectedId ?? AmbientChantService.chants.first.id,
+        play: true,
+      );
+    }
+  }
+
   /// Starts what was playing last time, if the user left it on.
   Future<void> resume() async {
     final id = state.selectedId;
@@ -98,10 +112,15 @@ class MusicPlaybackController extends Notifier<MusicPlaybackState> {
   }
 
   /// Auto Jaap began with its sound switched on: play the last chosen sound,
-  /// or the first one if none was ever chosen. Nothing is saved, so this
-  /// does not change whether Meditation starts music by itself.
+  /// or the first one if none was ever chosen. Music already playing is not
+  /// restarted, but from now on it belongs to this run and ends with it.
+  /// Nothing is saved, so this does not change whether Meditation starts
+  /// music by itself.
   Future<void> startForAuto() async {
-    if (state.playing) return;
+    if (state.playing) {
+      _startedByAuto = true;
+      return;
+    }
     final id = state.selectedId ?? AmbientChantService.chants.first.id;
     final chant = await ref.read(userMusicProvider.notifier).resolve(id);
     if (chant == null) return;
@@ -111,7 +130,7 @@ class MusicPlaybackController extends Notifier<MusicPlaybackState> {
     unawaited(_ambient.play(chant));
   }
 
-  /// Auto Jaap ended: stop the sound only if Auto Jaap started it.
+  /// Auto Jaap ended: stop the sound that went with it.
   Future<void> stopForAuto() async {
     if (!_startedByAuto) return;
     await stop();

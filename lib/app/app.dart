@@ -6,6 +6,7 @@ import '../core/services/shortcut_service.dart';
 import '../features/jaap/presentation/auto_jaap_actions.dart';
 import '../features/jaap/presentation/auto_jaap_controller.dart';
 import '../features/jaap/presentation/jaap_controller.dart';
+import '../features/meditation/presentation/music_playback.dart';
 import '../features/reminders/presentation/reminder_controllers.dart';
 import '../features/reminders/presentation/reminders_screen.dart';
 import '../features/settings/presentation/settings_controller.dart';
@@ -89,10 +90,24 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
     }
   }
 
+  void _publishShortcuts(AppL10n l10n) {
+    final playing = ref.read(musicPlaybackProvider).playing;
+    ref
+        .read(shortcutServiceProvider)
+        .publish(
+          blackoutLabel: l10n.blackoutMode,
+          musicLabel: playing ? l10n.stopMusic : l10n.playMusic,
+        );
+  }
+
   /// A home screen shortcut, whether it launched the app or woke it. The
   /// router's own redirect still sends a user who has not finished
   /// onboarding there first.
   void _openShortcut(String type) {
+    if (type == ShortcutService.music) {
+      ref.read(musicPlaybackProvider.notifier).toggle();
+      return;
+    }
     if (type != ShortcutService.blackout) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final router = ref.read(routerProvider);
@@ -128,6 +143,10 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
 
   @override
   Widget build(BuildContext context) {
+    // The music shortcut says what it will do, so it follows the music.
+    ref.listen(musicPlaybackProvider.select((m) => m.playing), (_, _) {
+      if (_remindersSynced) _publishShortcuts(AppL10n.of(context));
+    });
     ref.listen(autoJaapProvider.select((s) => s.awaitingGoalChoice), (
       was,
       now,
@@ -154,12 +173,9 @@ class _AppLifecycleState extends ConsumerState<_AppLifecycle>
         ref
             .read(remindersProvider.notifier)
             .reschedule(RemindersScreen.copyFrom(l10n));
-        ref
-            .read(shortcutServiceProvider)
-            .register(
-              blackoutLabel: l10n.blackoutMode,
-              onSelected: _openShortcut,
-            );
+        final shortcuts = ref.read(shortcutServiceProvider);
+        shortcuts.initialize(_openShortcut);
+        _publishShortcuts(l10n);
       });
     }
     return widget.child;

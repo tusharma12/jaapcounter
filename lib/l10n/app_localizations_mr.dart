@@ -95,12 +95,6 @@ class AppL10nMr extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'पूर्ववत करण्यासारखे काही नाही';
-
-  @override
-  String get countRemoved => 'मोजणी काढली';
-
-  @override
   String get resetCurrentMala => 'चालू माळ रीसेट करा';
 
   @override
@@ -575,6 +569,13 @@ class AppL10nMr extends AppL10n {
   String get onb3Body => 'स्वच्छ, शांत काउंटरसह ध्यान मोडमध्ये जा.';
 
   @override
+  String get onbLookTitle => 'हे तुमचे करा';
+
+  @override
+  String get onbLookBody =>
+      'काउंटर कसा दिसावा आणि कसा ऐकू यावा ते निवडा. हे केव्हाही सेटिंग्जमध्ये बदलता येईल.';
+
+  @override
   String get onbFeaturesTitle => 'सर्व काही तुमच्या हातात';
 
   @override
@@ -649,6 +650,12 @@ class AppL10nMr extends AppL10n {
 
   @override
   String get music => 'संगीत';
+
+  @override
+  String get playMusic => 'संगीत सुरू करा';
+
+  @override
+  String get stopMusic => 'संगीत थांबवा';
 
   @override
   String get chooseSound => 'ध्वनी निवडा';

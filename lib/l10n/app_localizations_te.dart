@@ -95,12 +95,6 @@ class AppL10nTe extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'రద్దు చేయడానికి ఏమీ లేదు';
-
-  @override
-  String get countRemoved => 'లెక్క తొలగించబడింది';
-
-  @override
   String get resetCurrentMala => 'ప్రస్తుత మాలను రీసెట్ చేయండి';
 
   @override
@@ -590,6 +584,13 @@ class AppL10nTe extends AppL10n {
       'శుభ్రమైన, ప్రశాంతమైన కౌంటర్‌తో ధ్యాన మోడ్‌లోకి వెళ్లండి.';
 
   @override
+  String get onbLookTitle => 'దీన్ని మీదిగా చేసుకోండి';
+
+  @override
+  String get onbLookBody =>
+      'కౌంటర్ ఎలా కనిపించాలో, వినిపించాలో ఎంచుకోండి. వీటిని ఎప్పుడైనా సెట్టింగ్స్‌లో మార్చుకోవచ్చు.';
+
+  @override
   String get onbFeaturesTitle => 'అంతా మీ చేతుల్లో';
 
   @override
@@ -664,6 +665,12 @@ class AppL10nTe extends AppL10n {
 
   @override
   String get music => 'సంగీతం';
+
+  @override
+  String get playMusic => 'సంగీతం ప్లే చేయండి';
+
+  @override
+  String get stopMusic => 'సంగీతం ఆపండి';
 
   @override
   String get chooseSound => 'ధ్వనిని ఎంచుకోండి';

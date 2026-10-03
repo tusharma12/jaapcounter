@@ -95,12 +95,6 @@ class AppL10nPa extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'ਵਾਪਸ ਲੈਣ ਲਈ ਕੁਝ ਨਹੀਂ';
-
-  @override
-  String get countRemoved => 'ਗਿਣਤੀ ਹਟਾਈ ਗਈ';
-
-  @override
   String get resetCurrentMala => 'ਮੌਜੂਦਾ ਮਾਲਾ ਰੀਸੈੱਟ ਕਰੋ';
 
   @override
@@ -588,6 +582,13 @@ class AppL10nPa extends AppL10n {
   String get onb3Body => 'ਸਾਫ਼, ਸ਼ਾਂਤ ਕਾਊਂਟਰ ਨਾਲ ਧਿਆਨ ਮੋਡ ਵਿੱਚ ਜਾਓ।';
 
   @override
+  String get onbLookTitle => 'ਇਸਨੂੰ ਆਪਣਾ ਬਣਾਓ';
+
+  @override
+  String get onbLookBody =>
+      'ਚੁਣੋ ਕਿ ਕਾਊਂਟਰ ਕਿਹੋ ਜਿਹਾ ਦਿਸੇ ਅਤੇ ਸੁਣਾਈ ਦੇਵੇ। ਇਹਨਾਂ ਨੂੰ ਕਦੇ ਵੀ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਦਲਿਆ ਜਾ ਸਕਦਾ ਹੈ।';
+
+  @override
   String get onbFeaturesTitle => 'ਸਭ ਕੁਝ ਤੁਹਾਡੇ ਹੱਥ ਵਿੱਚ';
 
   @override
@@ -661,6 +662,12 @@ class AppL10nPa extends AppL10n {
 
   @override
   String get music => 'ਸੰਗੀਤ';
+
+  @override
+  String get playMusic => 'ਸੰਗੀਤ ਚਲਾਓ';
+
+  @override
+  String get stopMusic => 'ਸੰਗੀਤ ਰੋਕੋ';
 
   @override
   String get chooseSound => 'ਆਵਾਜ਼ ਚੁਣੋ';

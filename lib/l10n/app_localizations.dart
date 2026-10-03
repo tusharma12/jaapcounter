@@ -251,18 +251,6 @@ abstract class AppL10n {
   /// **'{count} Jaap'**
   String jaapCount(int count);
 
-  /// No description provided for @nothingToUndo.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing to undo'**
-  String get nothingToUndo;
-
-  /// No description provided for @countRemoved.
-  ///
-  /// In en, this message translates to:
-  /// **'Count removed'**
-  String get countRemoved;
-
   /// No description provided for @resetCurrentMala.
   ///
   /// In en, this message translates to:
@@ -1115,6 +1103,18 @@ abstract class AppL10n {
   /// **'Enter meditation mode with a clean, peaceful counter.'**
   String get onb3Body;
 
+  /// No description provided for @onbLookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it yours'**
+  String get onbLookTitle;
+
+  /// No description provided for @onbLookBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how the counter looks and sounds. You can change these any time in Settings.'**
+  String get onbLookBody;
+
   /// No description provided for @onbFeaturesTitle.
   ///
   /// In en, this message translates to:
@@ -1252,6 +1252,18 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Music'**
   String get music;
+
+  /// No description provided for @playMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'Play music'**
+  String get playMusic;
+
+  /// No description provided for @stopMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop music'**
+  String get stopMusic;
 
   /// No description provided for @chooseSound.
   ///

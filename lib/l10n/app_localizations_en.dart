@@ -95,12 +95,6 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'Nothing to undo';
-
-  @override
-  String get countRemoved => 'Count removed';
-
-  @override
   String get resetCurrentMala => 'Reset current mala';
 
   @override
@@ -589,6 +583,13 @@ class AppL10nEn extends AppL10n {
       'Enter meditation mode with a clean, peaceful counter.';
 
   @override
+  String get onbLookTitle => 'Make it yours';
+
+  @override
+  String get onbLookBody =>
+      'Choose how the counter looks and sounds. You can change these any time in Settings.';
+
+  @override
   String get onbFeaturesTitle => 'Everything in your hands';
 
   @override
@@ -662,6 +663,12 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get music => 'Music';
+
+  @override
+  String get playMusic => 'Play music';
+
+  @override
+  String get stopMusic => 'Stop music';
 
   @override
   String get chooseSound => 'Choose sound';

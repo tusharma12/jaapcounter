@@ -95,12 +95,6 @@ class AppL10nHi extends AppL10n {
   }
 
   @override
-  String get nothingToUndo => 'पूर्ववत करने के लिए कुछ नहीं';
-
-  @override
-  String get countRemoved => 'गिनती हटाई गई';
-
-  @override
   String get resetCurrentMala => 'वर्तमान माला रीसेट करें';
 
   @override
@@ -587,6 +581,13 @@ class AppL10nHi extends AppL10n {
   String get onb3Body => 'स्वच्छ, शांत काउंटर के साथ ध्यान मोड में जाएँ।';
 
   @override
+  String get onbLookTitle => 'इसे अपना बनाएँ';
+
+  @override
+  String get onbLookBody =>
+      'चुनें कि काउंटर कैसा दिखे और कैसा सुनाई दे। इन्हें कभी भी सेटिंग्स में बदल सकते हैं।';
+
+  @override
   String get onbFeaturesTitle => 'सब कुछ आपके हाथ में';
 
   @override
@@ -661,6 +662,12 @@ class AppL10nHi extends AppL10n {
 
   @override
   String get music => 'संगीत';
+
+  @override
+  String get playMusic => 'संगीत चलाएँ';
+
+  @override
+  String get stopMusic => 'संगीत रोकें';
 
   @override
   String get chooseSound => 'ध्वनि चुनें';

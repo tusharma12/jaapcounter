@@ -6,6 +6,7 @@ import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
 import 'package:japmala/features/jaap/presentation/widgets/falling_mantra.dart';
 import 'package:japmala/features/settings/domain/mala_style.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
+import 'package:japmala/features/meditation/presentation/music_playback.dart';
 import 'package:japmala/features/jaap/presentation/jaap_screen.dart';
 import 'package:japmala/features/jaap/presentation/widgets/mala_complete_overlay.dart';
 import 'package:japmala/features/jaap/presentation/widgets/mala_ring.dart';
@@ -87,12 +88,12 @@ void main() {
 
     expect(container.read(jaapControllerProvider).value!.undoAvailable, isTrue);
 
-    await tester.tap(find.byTooltip('Undo'));
+    await tester.tap(find.byKey(const ValueKey('counter-undo')));
     await tester.pump(const Duration(seconds: 1));
 
     expect(container.read(jaapControllerProvider).value!.todayTotal, 0);
-    expect(find.text('Count removed'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 3));
+    expect(find.text('Count removed'), findsNothing, reason: 'no popup');
+    expect(find.byType(SnackBar), findsNothing);
   });
 
   testWidgets('finishing a mala acknowledges it without blocking', (
@@ -199,8 +200,9 @@ void main() {
     expect(find.text('Ram Ram'), findsNWidgets(2));
   });
 
-  testWidgets('the header opens meditation mode, the menu toggles falling '
-      'mantra', (tester) async {
+  testWidgets('the header opens meditation mode, and the menu is short', (
+    tester,
+  ) async {
     await pumpJaap(tester);
 
     expect(find.byIcon(Icons.self_improvement_rounded), findsOneWidget);
@@ -208,18 +210,71 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.menu_rounded));
     await tester.pumpAndSettle();
-    expect(container.read(settingsProvider).fallingMantra, isFalse);
 
-    // Off by default, so the menu offers to start it.
-    await tester.tap(find.text('Falling mantra'));
+    // What is used while chanting stays; looks that are set once are in
+    // onboarding and Settings.
+    for (final label in [
+      'Auto Jaap',
+      'Play music',
+      'Start session',
+      'Meditation mode',
+      'Blackout mode',
+      'Add count manually',
+      'Reset current mala',
+      'My Mantras',
+      'My Sadhana',
+    ]) {
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+    for (final label in [
+      'Falling mantra',
+      'Hide mantra',
+      'Change theme',
+      'Counter background',
+    ]) {
+      expect(find.text(label), findsNothing, reason: '$label moved');
+    }
+  });
+
+  testWidgets('the counter has its own music button', (tester) async {
+    await pumpJaap(tester);
+
+    await tester.tap(find.byKey(const ValueKey('counter-music')));
     await tester.pumpAndSettle();
-    expect(container.read(settingsProvider).fallingMantra, isTrue);
+    expect(container.read(musicPlaybackProvider).playing, isTrue);
+    expect(find.byTooltip('Stop music'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('counter-music')));
+    await tester.pumpAndSettle();
+    expect(container.read(musicPlaybackProvider).playing, isFalse);
+    expect(find.byTooltip('Play music'), findsOneWidget);
+  });
+
+  testWidgets('the menu plays and stops music directly', (tester) async {
+    await pumpJaap(tester);
+    final music = container.read(musicPlaybackProvider.notifier);
 
     await tester.tap(find.byIcon(Icons.menu_rounded));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Stop falling mantra'));
+    await tester.tap(find.text('Play music'));
     await tester.pumpAndSettle();
-    expect(container.read(settingsProvider).fallingMantra, isFalse);
+    expect(container.read(musicPlaybackProvider).playing, isTrue);
+    expect(
+      container.read(musicPlaybackProvider).selectedId,
+      isNotNull,
+      reason: 'the first sound plays when none was chosen yet',
+    );
+
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('Stop music'), findsOneWidget);
+    expect(find.text('Play music'), findsNothing);
+    await tester.tap(find.text('Stop music'));
+    await tester.pumpAndSettle();
+    expect(container.read(musicPlaybackProvider).playing, isFalse);
+    // The sound stays chosen, so Play brings it back.
+    expect(container.read(musicPlaybackProvider).selectedId, isNotNull);
+    await music.stop();
   });
 
   group('counting with buttons', () {
