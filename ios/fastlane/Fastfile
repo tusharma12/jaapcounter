@@ -100,10 +100,11 @@ platform :ios do
     )
   end
 
-  desc "Upload screenshots only (fastlane/screenshots)"
-  lane :screenshots do
+  desc "Upload screenshots only (fastlane/screenshots); languages:en-US,en-GB limits it"
+  lane :screenshots do |options|
     upload_to_app_store(
       api_key: api_key,
+      languages: options[:languages]&.split(","),
       force: true,
       skip_binary_upload: true,
       skip_metadata: true,

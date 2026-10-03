@@ -168,6 +168,7 @@ class _FallingPainter extends CustomPainter {
                         )
                       : TextStyle(
                           fontFamily: AppTypography.ui,
+                          fontFamilyFallback: AppTypography.fallback,
                           fontSize: p.size,
                           fontWeight: FontWeight.w600,
                         ))

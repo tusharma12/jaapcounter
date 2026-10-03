@@ -6,4 +6,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 FLUTTER_ROOT="$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")"
 export FLUTTER_ROOT
-flutter test screenshots/store_screenshots_test.dart "$@"
+# One run per language: each draws its script font under the app's fallback
+# family, and a font family can only be registered once per run.
+for code in en hi mr gu pa ta te; do
+  SHOT_LOCALE="$code" flutter test screenshots/store_screenshots_test.dart "$@"
+done
