@@ -93,8 +93,8 @@ final musicRecorderProvider = Provider<MusicRecorderService>((ref) {
   return service;
 });
 
-/// Asks for a store rating once, after a few days or a couple of thousand
-/// beads. Overridden in tests.
+/// Asks for a store rating after a finished mala, once the app has been
+/// used for a couple of days, up to three times. Overridden in tests.
 final reviewPromptProvider = Provider<ReviewPromptService>(
   (ref) => ReviewPromptService(
     prefs: ref.watch(sharedPreferencesProvider),

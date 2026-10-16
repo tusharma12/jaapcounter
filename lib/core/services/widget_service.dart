@@ -70,17 +70,21 @@ class WidgetService {
           'updatedAt',
           DateTime.now().millisecondsSinceEpoch,
         ),
-        // The chosen theme's colours as ARGB; absent for Auto, where the
-        // widget follows the system's light and dark like the app does.
-        for (final (key, color) in [
-          ('colorBackground', palette?.background),
-          ('colorText', palette?.primaryText),
-          ('colorSecondaryText', palette?.secondaryText),
-          ('colorAccent', palette?.saffron),
-          ('colorTrack', palette?.track),
-          ('colorStreak', palette?.secondary),
-        ])
-          HomeWidget.saveWidgetData<int>(key, color?.toARGB32()),
+        // Off for Auto, where the widget follows the system's light and dark
+        // like the app does. A flag rather than clearing the colours: on iOS
+        // saving null hands UserDefaults an NSNull, which crashes the app.
+        HomeWidget.saveWidgetData<bool>('themed', palette != null),
+        // The chosen theme's colours as ARGB.
+        if (palette != null)
+          for (final (key, color) in [
+            ('colorBackground', palette.background),
+            ('colorText', palette.primaryText),
+            ('colorSecondaryText', palette.secondaryText),
+            ('colorAccent', palette.saffron),
+            ('colorTrack', palette.track),
+            ('colorStreak', palette.secondary),
+          ])
+            HomeWidget.saveWidgetData<int>(key, color.toARGB32()),
       ]);
       await HomeWidget.updateWidget(
         androidName: androidProviderName,

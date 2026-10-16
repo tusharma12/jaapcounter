@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_dimens.dart';
@@ -37,9 +38,15 @@ class SadhanaScreen extends ConsumerWidget {
     final streak = ref.watch(streakProvider).value ?? StreakInfo.empty;
     final jaap = ref.watch(jaapControllerProvider).value;
     final completedDays = ref.watch(sankalpProgressProvider).value ?? 0;
+    final router = GoRouter.maybeOf(context);
 
     return Scaffold(
       appBar: AppBar(
+        // Opened from a link (an App Store event), nothing sits underneath,
+        // so back goes to the counter instead of leaving no way out.
+        leading: Navigator.of(context).canPop() || router == null
+            ? null
+            : BackButton(onPressed: () => router.go('/jaap')),
         title: Text(l10n.mySadhana),
         actions: [
           IconButton(

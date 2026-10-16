@@ -8,7 +8,13 @@
 //   ios/fastlane/screenshots/en-US/          1320×2868 (6.9" iPhone)
 //   android/fastlane/metadata/android/en-US/images/phoneScreenshots/
 //                                            1080×1920
+//   appstore_assets/iphone-duo/en-US/{outer,inner}/
+//                                            1398×2034, 2007×2853
+//
+// 08_brand (icon, name, hand with mala) is a hand-made graphic, localized by
+// hand per locale; nothing here writes it.
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -78,35 +84,29 @@ final _shots = <_Shot>[
   _Shot(
     file: '01_counter',
     badge: 'No ads  •  Private  •  Works offline',
-    headline: [('Never lose count\nof your ', false), ('Naam Jap', true)],
-    sub: 'Tap anywhere. Every bead, counted.',
-    capture: (tester, c, router) async {},
-  ),
-  _Shot(
-    file: '02_habit',
-    headline: [('Tap Anywhere.\n', false), ('Every Bead Counts.', true)],
-    sub: 'A real 108-bead mala fills as you chant',
+    headline: [('Tap Anywhere.\n', false), ('Never Lose Count.', true)],
+    sub: 'Your mala fills up as you chant',
     card: _todayCard,
     cardAt: _CardAt.bottom,
     // The counter screen, mid-session: this morning's jaap already underway.
     capture: (tester, c, router) async {},
   ),
   _Shot(
-    file: '03_streak',
-    headline: [('Build a\n', false), ('Daily Habit', true)],
-    sub: 'Streaks, charts and every day you chanted',
-    card: _streakCard,
+    file: '02_mantras',
+    headline: [('21 Mantras Ready\n', true), ('or Add Your Own', false)],
+    sub: 'Ram, Radhe, Om Namah Shivaya, Waheguru and more',
+    card: _mantraCard,
     cardAt: _CardAt.bottom,
     capture: (tester, c, router) async {
-      router.go('/progress');
+      router.push('/mantras');
       await _settle(tester);
     },
   ),
   _Shot(
-    file: '04_music',
+    file: '03_music',
     darkStatusBar: true,
     headline: [('Chant with\n', false), ('Calming Music', true)],
-    sub: 'Soothing sounds, or record your own',
+    sub: 'Soft sounds, or record your own',
     card: _musicCard,
     // Meditation with a sound playing.
     capture: (tester, c, router) async {
@@ -121,32 +121,21 @@ final _shots = <_Shot>[
     },
   ),
   _Shot(
-    file: '05_mantras',
-    headline: [('21 Sacred Mantras\n', true), ('or Your Own', false)],
-    sub: 'Add any mantra, in any script',
-    card: _mantraCard,
+    file: '04_habit',
+    headline: [('Build a\n', false), ('Daily Habit', true)],
+    sub: 'See every day you chanted',
+    card: _streakCard,
     cardAt: _CardAt.bottom,
     capture: (tester, c, router) async {
-      router.push('/mantras');
+      router.go('/progress');
       await _settle(tester);
     },
   ),
   _Shot(
-    file: '06_sankalp',
-    headline: [('Take a ', false), ('Sankalp', true), ('.\nKeep It.', false)],
-    sub: 'An 11, 21 or 40-day vow with a daily goal',
-    card: _sankalpCard,
-    cardAt: _CardAt.bottom,
-    capture: (tester, c, router) async {
-      router.push('/sadhana');
-      await _settle(tester);
-    },
-  ),
-  _Shot(
-    file: '07_blackout',
+    file: '05_blackout',
     darkStatusBar: true,
     headline: [('Chant with Your\n', false), ('Eyes Closed', true)],
-    sub: 'Pure black. Nothing lights the room.',
+    sub: 'Black screen. Tap anywhere.',
     card: _blackoutCard,
     cardAt: _CardAt.bottom,
     capture: (tester, c, router) async {
@@ -157,10 +146,21 @@ final _shots = <_Shot>[
     },
   ),
   _Shot(
-    file: '08_themes',
+    file: '06_sankalp',
+    headline: [('Take a ', false), ('Sankalp', true), ('.\nKeep It.', false)],
+    sub: 'Chant daily for 11, 21 or 40 days',
+    card: _sankalpCard,
+    cardAt: _CardAt.bottom,
+    capture: (tester, c, router) async {
+      router.push('/sadhana');
+      await _settle(tester);
+    },
+  ),
+  _Shot(
+    file: '07_themes',
     darkStatusBar: true,
-    headline: [('Choose Your\n', false), ('Sacred Space', true)],
-    sub: '13 themes, bead mala, falling mantra',
+    headline: [('Make It\n', false), ('Your Own', true)],
+    sub: '13 colour themes, or your own photo',
     card: _themesCard,
     cardAt: _CardAt.bottom,
     capture: (tester, c, router) async {
@@ -346,12 +346,15 @@ Future<ProviderContainer> _seededApp() async {
   return container;
 }
 
-/// Captures the app itself at device size, 3×.
+/// Captures the app itself at device size, 3×. With [sequenceDir], it then
+/// taps the counter [_sequenceTaps] times and saves every frame (30 fps, 2×)
+/// there, for the App Store search-results video.
 Future<Uint8List> _captureApp(
   WidgetTester tester,
   _Shot shot,
-  Locale locale,
-) async {
+  Locale locale, {
+  String? sequenceDir,
+}) async {
   tester.view.physicalSize = _device * 3;
   tester.view.devicePixelRatio = 3;
   tester.view.padding = const FakeViewPadding(
@@ -413,11 +416,38 @@ Future<Uint8List> _captureApp(
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     bytes = data!.buffer.asUint8List();
   });
+  if (sequenceDir != null) {
+    final dir = Directory(sequenceDir);
+    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    dir.createSync(recursive: true);
+    final jaap = container.read(jaapControllerProvider.notifier);
+    var frame = 0;
+    for (var t = 0; t < _sequenceTaps; t++) {
+      jaap.count();
+      for (var f = 0; f < _framesPerTap; f++) {
+        await tester.pump(const Duration(microseconds: 33333));
+        await tester.runAsync(() async {
+          final boundary = tester.renderObject<RenderRepaintBoundary>(
+            find.byKey(key),
+          );
+          final image = await boundary.toImage(pixelRatio: 2);
+          final data = await image.toByteData(format: ui.ImageByteFormat.png);
+          File(
+            '$sequenceDir/${(frame++).toString().padLeft(3, '0')}.png',
+          ).writeAsBytesSync(data!.buffer.asUint8List());
+        });
+      }
+    }
+  }
   await container.read(jaapControllerProvider.notifier).flushPendingWrites();
   // Unmount so the next shot starts from a clean tree.
   await tester.pumpWidget(const SizedBox());
   return bytes;
 }
+
+/// The search-results video's counting: taps, and frames per tap at 30 fps.
+const _sequenceTaps = 12;
+const _framesPerTap = 15;
 
 /// Frames a capture under its headline and writes the PNG.
 Future<void> _compose(
@@ -483,9 +513,13 @@ class _StoreCanvas extends StatelessWidget {
     final w = size.width;
     final h = size.height;
     final tall = h / w > 2;
+    // Text and cards are sized to this width. On a wide canvas (iPhone Duo)
+    // it is capped by the height, so they stay in proportion to the phone
+    // instead of growing with the page.
+    final u = math.min(w, h * 0.62);
     // Tamil and Telugu letters are wider and taller, so they are set smaller.
     final headlineScale = const {'ta': 0.76, 'te': 0.86}[code] ?? 1.0;
-    final headlineSize = w * (tall ? 0.092 : 0.082) * headlineScale;
+    final headlineSize = u * (tall ? 0.092 : 0.082) * headlineScale;
     final phoneTop = h * (tall ? 0.268 : 0.305);
     // The phone runs a little off the bottom edge, as if held up to you.
     final phoneHeight = h - phoneTop + h * 0.035;
@@ -507,6 +541,7 @@ class _StoreCanvas extends StatelessWidget {
     final copy = _headlines[shot.file]?[code];
     final headline = copy == null ? shot.headline : _spans(copy.$1);
     final sub = copy?.$2 ?? shot.sub;
+    final badge = shot.badge == null ? null : _badges[code] ?? shot.badge;
 
     return SizedBox(
       width: w,
@@ -543,16 +578,16 @@ class _StoreCanvas extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: w * 0.07,
-            right: w * 0.07,
+            left: (w - u * 0.86) / 2,
+            right: (w - u * 0.86) / 2,
             top: h * (tall ? 0.045 : 0.035),
             child: Column(
               children: [
-                if (shot.badge != null) ...[
+                if (badge != null) ...[
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: w * 0.04,
-                      vertical: w * 0.013,
+                      horizontal: u * 0.04,
+                      vertical: u * 0.013,
                     ),
                     decoration: BoxDecoration(
                       color: badgeColor.withValues(alpha: 0.16),
@@ -562,19 +597,21 @@ class _StoreCanvas extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      shot.badge!,
+                      badge,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: w * 0.031,
+                        fontFamily: textFont,
+                        fontFamilyFallback: const ['Inter'],
+                        fontSize: u * 0.031,
                         fontWeight: FontWeight.w600,
                         color: badgeColor,
                         letterSpacing: 0.2,
                       ),
                     ),
                   ),
-                  SizedBox(height: w * 0.035),
+                  SizedBox(height: u * 0.035),
                 ] else
-                  SizedBox(height: w * 0.02),
+                  SizedBox(height: u * 0.02),
                 Text.rich(
                   TextSpan(
                     children: [
@@ -597,14 +634,14 @@ class _StoreCanvas extends StatelessWidget {
                     letterSpacing: -headlineSize * 0.025,
                   ),
                 ),
-                SizedBox(height: w * 0.03),
+                SizedBox(height: u * 0.03),
                 Text(
                   sub,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: textFont,
                     fontFamilyFallback: const ["Inter"],
-                    fontSize: w * 0.041,
+                    fontSize: u * 0.047,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                     color: subColor,
@@ -624,11 +661,11 @@ class _StoreCanvas extends StatelessWidget {
             Positioned(
               top: shot.cardAt == _CardAt.top ? phoneTop - h * 0.045 : null,
               bottom: shot.cardAt == _CardAt.bottom ? h * 0.035 : null,
-              left: w * 0.06,
-              right: w * 0.06,
+              left: (w - u * 0.88) / 2,
+              right: (w - u * 0.88) / 2,
               child: (() {
                 _cardCode = code;
-                return card(w / 440);
+                return card(u / 440);
               })(),
             ),
         ],
@@ -1247,6 +1284,10 @@ Future<void> _featureGraphic(WidgetTester tester, String path) async {
   });
 }
 
+/// iPhone Duo screenshot sizes in points (written at 3×): 1398×2034 for the
+/// outer display, 2007×2853 for the inner one.
+const _duoCanvases = [('outer', Size(466, 678)), ('inner', Size(669, 951))];
+
 /// One localized run: which screens, which text, where it lands on disk.
 class _StoreLocale {
   const _StoreLocale(this.code, this.iosDir, this.playDir);
@@ -1276,33 +1317,27 @@ const _scriptFonts = {
 
 /// Headline (`*` marks the highlighted run) and sub-line per shot and language.
 const _headlines = <String, Map<String, (String, String)>>{
-  '02_habit': {
+  '01_counter': {
     'hi': (
-      'कहीं भी टैप करें।\n*हर मनका गिना जाए।*',
-      'जप के साथ 108 मनकों की असली माला भरती है',
+      'कहीं भी टैप करें।\n*गिनती कभी न भूलें।*',
+      'जप करते ही माला भरती जाती है',
     ),
-    'mr': (
-      'कुठेही टॅप करा.\n*प्रत्येक मणी मोजा.*',
-      'जप करताना 108 मण्यांची खरी माळ भरते',
-    ),
+    'mr': ('कुठेही टॅप करा.\n*मोजणी चुकणार नाही.*', 'जप करताना माळ भरत जाते'),
     'gu': (
-      'ગમે ત્યાં ટૅપ કરો.\n*દરેક મણકો ગણાય.*',
-      'જપ સાથે 108 મણકાની સાચી માળા ભરાય છે',
+      'ગમે ત્યાં ટૅપ કરો.\n*ગણતરી ક્યારેય ન ભૂલો.*',
+      'જપ કરતાં જ માળા ભરાતી જાય',
     ),
     'pa': (
-      'ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ।\n*ਹਰ ਮਣਕਾ ਗਿਣੋ।*',
-      'ਜਪ ਨਾਲ 108 ਮਣਕਿਆਂ ਦੀ ਅਸਲੀ ਮਾਲਾ ਭਰਦੀ ਹੈ',
+      'ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ।\n*ਗਿਣਤੀ ਕਦੇ ਨਾ ਭੁੱਲੋ।*',
+      'ਜਪ ਕਰਦਿਆਂ ਮਾਲਾ ਭਰਦੀ ਜਾਂਦੀ ਹੈ',
     ),
-    'ta': (
-      'ஒவ்வொரு மணியும்\n*எண்ணப்படும்*',
-      'ஜபிக்கும்போது 108 மணி மாலை நிரம்பும்',
-    ),
+    'ta': ('எங்கும் தட்டி\n*எண்ணுங்கள்*', 'ஜபிக்கும்போது மாலை நிரம்பும்'),
     'te': (
-      'ట్యాప్ చేయండి.\n*ప్రతి పూసా లెక్కే*',
-      'జపంతో 108 పూసల మాల నిండుతుంది',
+      'ఎక్కడైనా ట్యాప్ చేయండి\n*లెక్క తప్పదు*',
+      'జపం చేస్తుంటే మాల నిండుతుంది',
     ),
   },
-  '03_streak': {
+  '04_habit': {
     'hi': ('रोज़ की\n*आदत बनाएं*', 'लगातार दिन, चार्ट और हर जप का हिसाब'),
     'mr': ('रोजची\n*सवय घडवा*', 'सातत्य, आलेख आणि जपाचा प्रत्येक दिवस'),
     'gu': ('રોજની\n*ટેવ બનાવો*', 'સાતત્ય, ચાર્ટ અને જપનો દરેક દિવસ'),
@@ -1313,7 +1348,7 @@ const _headlines = <String, Map<String, (String, String)>>{
     ),
     'te': ('రోజువారీ\n*అలవాటు*', 'క్రమం, చార్టులు, జపించిన ప్రతి రోజు'),
   },
-  '04_music': {
+  '03_music': {
     'hi': (
       'जप करें\n*शांत संगीत* के साथ',
       'सुकून भरी ध्वनियाँ, या अपनी रिकॉर्डिंग',
@@ -1333,92 +1368,81 @@ const _headlines = <String, Map<String, (String, String)>>{
       'హాయైన శబ్దాలు, లేదా మీ సొంత రికార్డింగ్',
     ),
   },
-  '05_mantras': {
+  '02_mantras': {
     'hi': (
       '*21 पवित्र मंत्र*\nया अपना खुद का',
-      'कोई भी मंत्र, किसी भी लिपि में जोड़ें',
+      'राम, राधे, ॐ नमः शिवाय, वाहेगुरु और भी',
     ),
     'mr': (
       '*21 पवित्र मंत्र*\nकिंवा स्वतःचा',
-      'कोणताही मंत्र, कोणत्याही लिपीत जोडा',
+      'राम, राधे, ॐ नमः शिवाय, वाहेगुरु आणि बरेच',
     ),
     'gu': (
       '*21 પવિત્ર મંત્રો*\nઅથવા તમારો પોતાનો',
-      'કોઈપણ મંત્ર, કોઈપણ લિપિમાં ઉમેરો',
+      'રામ, રાધે, ૐ નમઃ શિવાય, વાહેગુરુ અને વધુ',
     ),
-    'pa': ('*21 ਪਵਿੱਤਰ ਮੰਤਰ*\nਜਾਂ ਆਪਣਾ', 'ਕੋਈ ਵੀ ਮੰਤਰ, ਕਿਸੇ ਵੀ ਲਿਪੀ ਵਿੱਚ ਜੋੜੋ'),
+    'pa': (
+      '*21 ਪਵਿੱਤਰ ਮੰਤਰ*\nਜਾਂ ਆਪਣਾ',
+      'ਰਾਮ, ਰਾਧੇ, ਓਮ ਨਮਃ ਸ਼ਿਵਾਏ, ਵਾਹਿਗੁਰੂ ਅਤੇ ਹੋਰ',
+    ),
     'ta': (
       '*21 புனித மந்திரங்கள்*\nஅல்லது சொந்தம்',
-      'எந்த மந்திரமும், எந்த எழுத்திலும் சேர்க்கலாம்',
+      'ராம், ராதே, ஓம் நம சிவாய, வாஹேகுரு மேலும்',
     ),
     'te': (
       '*21 పవిత్ర మంత్రాలు*\nలేదా మీ సొంతం',
-      'ఏ మంత్రాన్నైనా, ఏ లిపిలోనైనా చేర్చండి',
+      'రామ, రాధే, ఓం నమః శివాయ, వాహెగురు ఇంకా',
     ),
   },
   '06_sankalp': {
-    'hi': (
-      'एक *संकल्प* लें।\nउसे निभाएं।',
-      '11, 21 या 40 दिन का संकल्प, रोज़ के लक्ष्य के साथ',
-    ),
-    'mr': (
-      'एक *संकल्प* घ्या.\nतो निभवा.',
-      '11, 21 किंवा 40 दिवसांचा संकल्प, रोजच्या ध्येयासह',
-    ),
-    'gu': (
-      'એક *સંકલ્પ* લો.\nતેને નિભાવો.',
-      '11, 21 કે 40 દિવસનો સંકલ્પ, રોજના લક્ષ્ય સાથે',
-    ),
-    'pa': (
-      'ਇੱਕ *ਸੰਕਲਪ* ਲਓ।\nਇਸ ਨੂੰ ਨਿਭਾਓ।',
-      '11, 21 ਜਾਂ 40 ਦਿਨਾਂ ਦਾ ਸੰਕਲਪ, ਰੋਜ਼ ਦੇ ਟੀਚੇ ਨਾਲ',
-    ),
-    'ta': (
-      'ஒரு *சங்கல்பம்*\nஎடுங்கள்',
-      '11, 21 அல்லது 40 நாள் உறுதி, தினசரி இலக்குடன்',
-    ),
+    'hi': ('एक *संकल्प* लें।\nउसे निभाएं।', '11, 21 या 40 दिन रोज़ जप करें'),
+    'mr': ('एक *संकल्प* घ्या.\nतो निभवा.', '11, 21 किंवा 40 दिवस रोज जप करा'),
+    'gu': ('એક *સંકલ્પ* લો.\nતેને નિભાવો.', '11, 21 કે 40 દિવસ રોજ જપ કરો'),
+    'pa': ('ਇੱਕ *ਸੰਕਲਪ* ਲਓ।\nਇਸ ਨੂੰ ਨਿਭਾਓ।', '11, 21 ਜਾਂ 40 ਦਿਨ ਰੋਜ਼ ਜਪ ਕਰੋ'),
+    'ta': ('ஒரு *சங்கல்பம்*\nஎடுங்கள்', '11, 21 அல்லது 40 நாள் தினமும் ஜபம்'),
     'te': (
       'ఒక *సంకల్పం* చేయండి.\nనిలబెట్టుకోండి.',
-      '11, 21 లేదా 40 రోజుల దీక్ష, రోజువారీ లక్ష్యంతో',
+      '11, 21 లేదా 40 రోజులు రోజూ జపం',
     ),
   },
-  '07_blackout': {
+  '05_blackout': {
     'hi': (
       'आंखें बंद करके\n*जप करें*',
-      'पूरी काली स्क्रीन। कमरे में रोशनी नहीं।',
+      'काली स्क्रीन। कहीं भी टैप करके गिनें।',
     ),
-    'mr': ('डोळे मिटून\n*जप करा*', 'पूर्ण काळी स्क्रीन. खोलीत प्रकाश नाही.'),
+    'mr': ('डोळे मिटून\n*जप करा*', 'काळी स्क्रीन. कुठेही टॅप करून मोजा.'),
     'gu': (
       'આંખો બંધ કરીને\n*જપ કરો*',
-      'સંપૂર્ણ કાળી સ્ક્રીન. રૂમમાં પ્રકાશ નહીં.',
+      'કાળી સ્ક્રીન. ગમે ત્યાં ટૅપ કરીને ગણો.',
     ),
-    'pa': (
-      'ਅੱਖਾਂ ਬੰਦ ਕਰ ਕੇ\n*ਜਪ ਕਰੋ*',
-      'ਪੂਰੀ ਕਾਲੀ ਸਕ੍ਰੀਨ। ਕਮਰੇ ਵਿੱਚ ਰੌਸ਼ਨੀ ਨਹੀਂ।',
-    ),
+    'pa': ('ਅੱਖਾਂ ਬੰਦ ਕਰ ਕੇ\n*ਜਪ ਕਰੋ*', 'ਕਾਲੀ ਸਕ੍ਰੀਨ। ਕਿਤੇ ਵੀ ਟੈਪ ਕਰ ਕੇ ਗਿਣੋ।'),
     'ta': (
       'கண்களை மூடி\n*ஜபம் செய்யுங்கள்*',
-      'முழுக் கருப்பு. அறையில் ஒளி இல்லை.',
+      'கருப்புத் திரை. எங்கும் தட்டி எண்ணுங்கள்.',
     ),
     'te': (
       'కళ్ళు మూసుకుని\n*జపం చేయండి*',
-      'పూర్తిగా నలుపు. గదిలో వెలుతురు లేదు.',
+      'నల్లని స్క్రీన్. ఎక్కడైనా ట్యాప్ చేసి లెక్కించండి.',
     ),
   },
-  '08_themes': {
-    'hi': ('अपना *पवित्र स्थान*\nचुनें', '13 थीम, माला के मनके, गिरता मंत्र'),
-    'mr': ('तुमचे *पवित्र स्थान*\nनिवडा', '13 थीम, माळेचे मणी, पडणारा मंत्र'),
-    'gu': (
-      'તમારું *પવિત્ર સ્થાન*\nપસંદ કરો',
-      '13 થીમ, માળાના મણકા, પડતો મંત્ર',
-    ),
-    'pa': ('ਆਪਣੀ *ਪਵਿੱਤਰ ਥਾਂ*\nਚੁਣੋ', '13 ਥੀਮ, ਮਾਲਾ ਦੇ ਮਣਕੇ, ਡਿੱਗਦਾ ਮੰਤਰ'),
-    'ta': ('உங்கள்\n*புனித இடம்*', '13 தீம்கள், மணி மாலை, விழும் மந்திரம்'),
-    'te': (
-      'మీ *పవిత్ర స్థలాన్ని*\nఎంచుకోండి',
-      '13 థీమ్‌లు, పూసల మాల, పడే మంత్రం',
-    ),
+  '07_themes': {
+    'hi': ('अपनी पसंद का\n*रंग चुनें*', '13 थीम, या अपनी फ़ोटो'),
+    'mr': ('तुमच्या आवडीचा\n*रंग निवडा*', '13 थीम, किंवा तुमचा फोटो'),
+    'gu': ('તમારી પસંદનો\n*રંગ પસંદ કરો*', '13 થીમ, અથવા તમારો ફોટો'),
+    'pa': ('ਆਪਣੀ ਪਸੰਦ ਦਾ\n*ਰੰਗ ਚੁਣੋ*', '13 ਥੀਮ, ਜਾਂ ਆਪਣੀ ਫੋਟੋ'),
+    'ta': ('உங்களுக்குப் பிடித்த\n*வண்ணம்*', '13 தீம்கள், அல்லது உங்கள் படம்'),
+    'te': ('మీకు నచ్చిన\n*రంగు ఎంచుకోండి*', '13 థీమ్‌లు, లేదా మీ ఫోటో'),
   },
+};
+
+/// The trust badge over the first shot, per language.
+const _badges = {
+  'hi': 'विज्ञापन नहीं  •  निजी  •  बिना इंटरनेट',
+  'mr': 'जाहिराती नाहीत  •  खाजगी  •  इंटरनेटशिवाय',
+  'gu': 'જાહેરાત નહીં  •  ખાનગી  •  ઇન્ટરનેટ વગર',
+  'pa': 'ਕੋਈ ਇਸ਼ਤਿਹਾਰ ਨਹੀਂ  •  ਨਿੱਜੀ  •  ਬਿਨਾਂ ਇੰਟਰਨੈੱਟ',
+  'ta': 'விளம்பரமில்லை  •  ஆஃப்லைன்',
+  'te': 'ప్రకటనలు లేవు  •  ప్రైవేట్  •  ఆఫ్‌లైన్',
 };
 
 /// Words on the feature cards, per language.
@@ -1704,10 +1728,18 @@ void main() {
       Directory(playDir).createSync(recursive: true);
 
       for (final shot in _shots) {
-        // The hero cover image (icon, name, hand with mala) is a hand-made
-        // graphic, localized by hand per locale; never overwrite it here.
-        if (shot.file == '01_counter') continue;
-        final bytes = await _captureApp(tester, shot, Locale(loc.code));
+        final bytes = await _captureApp(
+          tester,
+          shot,
+          Locale(loc.code),
+          sequenceDir: shot.file == '01_counter'
+              ? '$root/build/store_raw/${loc.iosDir}/counter_seq'
+              : null,
+        );
+        // The bare capture, for the App Store creative assets (tool/make_creative_assets.py).
+        File('$root/build/store_raw/${loc.iosDir}/${shot.file}.png')
+          ..parent.createSync(recursive: true)
+          ..writeAsBytesSync(bytes);
         late ui.Image screen;
         await tester.runAsync(() async {
           screen = await decodeImageFromList(bytes);
@@ -1728,6 +1760,19 @@ void main() {
           path: '$playDir/${shot.file}.png',
           code: loc.code,
         );
+        // iPhone Duo, outer and inner displays. Kept out of fastlane's
+        // folder and uploaded by hand until fastlane knows the new sizes.
+        for (final (name, canvas) in _duoCanvases) {
+          await _compose(
+            tester,
+            shot,
+            screen,
+            canvas: canvas,
+            path:
+                '$root/appstore_assets/iphone-duo/${loc.iosDir}/$name/${shot.file}.png',
+            code: loc.code,
+          );
+        }
       }
     }
   });

@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:japmala/core/providers.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
 import 'package:japmala/features/sadhana/presentation/sadhana_controllers.dart';
 import 'package:japmala/features/sadhana/presentation/sadhana_screen.dart';
 import 'package:japmala/features/settings/presentation/settings_controller.dart';
+import 'package:japmala/l10n/app_localizations.dart';
 
 import '../../support/test_harness.dart';
 
@@ -113,5 +117,39 @@ void main() {
 
     await tester.scrollUntilVisible(find.text('Best streak'), 200);
     expect(find.text('Best streak'), findsOneWidget);
+  });
+
+  testWidgets('opened from a link, back goes to the counter', (tester) async {
+    // jaapmitra://app/sadhana lands here with nothing underneath.
+    final router = GoRouter(
+      initialLocation: '/sadhana',
+      routes: [
+        GoRoute(path: '/jaap', builder: (_, _) => const Text('counter')),
+        GoRoute(path: '/sadhana', builder: (_, _) => const SadhanaScreen()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await usePhoneSurface(tester);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: const [
+            AppL10n.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppL10n.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('counter'), findsOneWidget);
   });
 }

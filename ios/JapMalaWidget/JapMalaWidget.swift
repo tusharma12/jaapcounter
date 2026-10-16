@@ -24,6 +24,9 @@ struct WidgetTheme {
 
     static func read(_ store: UserDefaults?) -> WidgetTheme {
         var theme = WidgetTheme()
+        // Colours from an earlier theme stay stored; only use them while
+        // the app says a theme is chosen.
+        guard store?.bool(forKey: "themed") == true else { return theme }
         func color(_ key: String) -> Color? {
             guard let store, store.object(forKey: key) != nil else { return nil }
             let argb = UInt32(truncatingIfNeeded: store.integer(forKey: key))
