@@ -531,7 +531,7 @@ def render_post(pid, t):
     for b in P['beats']:
         if b['start'] - 0.01 <= t <= b['end'] + 0.01:
             draw_beat(cv, b, t, P)
-    return R.finish(cv, t, P['dur'], 0.8, to=P['bgk'])
+    return R.safe_area(R.finish(cv, t, P['dur'], 0.8, to=P['bgk']))
 
 
 # ---------------------------------------------------------------- devotional sound palette

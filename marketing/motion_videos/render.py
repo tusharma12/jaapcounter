@@ -364,12 +364,54 @@ def bg(kind):
     return Image.fromarray(rgba, 'RGBA')
 
 
-def base(kind='light', other=None, x=0.0):
+def _mix(kind, other=None, x=0.0):
     if other is None or x <= 0:
         return bg(kind).copy()
     if x >= 1:
         return bg(other).copy()
     return Image.blend(bg(kind), bg(other), x)
+
+
+# The background this frame was painted on (base(), then finish()), so
+# safe_area() can lift the drawing off it.
+_frame_bg = [('light', None, 0.0), None, 0.0]
+
+
+def base(kind='light', other=None, x=0.0):
+    _frame_bg[:] = [(kind, other, x), None, 0.0]
+    return _mix(kind, other, x)
+
+
+# Instagram Reels draws its own UI over the video: the top bar, the
+# caption/username/audio rows along the bottom and the like/comment column
+# on the right. Layouts use y 250..1860 of the frame; safe_area() shrinks
+# that span into y 250..1440 (centred, so x stays inside 144..936) and keeps
+# the background full-bleed.
+SAFE_TOP, SAFE_BOTTOM = 250, 1440
+SRC_TOP, SRC_BOTTOM = 250, 1860
+SAFE_S = (SAFE_BOTTOM - SAFE_TOP) / (SRC_BOTTOM - SRC_TOP)
+SAFE_FEATHER = 48
+
+
+@functools.lru_cache(None)
+def _safe_mask():
+    sw, sh = int(W * SAFE_S), int(H * SAFE_S)
+    ramp = lambda n: np.clip(np.minimum(np.arange(n), np.arange(n)[::-1]) / SAFE_FEATHER, 0, 1)
+    return (ramp(sh)[:, None] * ramp(sw)[None, :])[..., None].astype(np.float32)
+
+
+def safe_area(cv):
+    (kind, other, x), to, f = _frame_bg
+    back = _mix(kind, other, x)
+    if to is not None and f > 0:
+        back = Image.blend(back, bg(to), f)
+    sw, sh = int(W * SAFE_S), int(H * SAFE_S)
+    x0, y0 = (W - sw) // 2, int(round(SAFE_TOP - SRC_TOP * SAFE_S))
+    small = lambda im: np.asarray(im.convert('RGB').resize((sw, sh), Image.LANCZOS), np.float32)
+    drawn = (small(cv) - small(back)) * _safe_mask()
+    out = np.asarray(back.convert('RGB'), np.float32).copy()
+    out[y0:y0 + sh, x0:x0 + sw] += drawn
+    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), 'RGB')
 
 
 _rng = np.random.default_rng(108)
@@ -860,6 +902,7 @@ def finish(cv, t, dur, fade, to='light'):
     x = prog(t, dur - fade, dur)
     if x > 0:
         cv = Image.blend(cv, bg(to), ease_in_out(x))
+        _frame_bg[1:] = [to, ease_in_out(x)]
     return cv
 
 
@@ -2195,9 +2238,13 @@ def write_sfx(vid, spec, path):
 
 # ---------------------------------------------------------------- driver
 
+def frame(vid, t):
+    return safe_area(VIDEOS[vid]['render'](t))
+
+
 def frame_job(args):
     vid, i = args
-    return VIDEOS[vid]['render'](i / FPS).convert('RGB').tobytes()
+    return frame(vid, i / FPS).tobytes()
 
 
 def render_video(vid):
@@ -2234,7 +2281,7 @@ def contact_sheet(vid, step=1.0, cols=6):
     sheet = Image.new('RGB', (cols * tw, rows * (th + 24)), (255, 255, 255))
     d = ImageDraw.Draw(sheet)
     for k, t in enumerate(times):
-        im = spec['render'](float(t)).convert('RGB').resize((tw, th), Image.LANCZOS)
+        im = frame(vid, float(t)).resize((tw, th), Image.LANCZOS)
         x, y = (k % cols) * tw, (k // cols) * (th + 24)
         sheet.paste(im, (x, y + 24))
         d.text((x + 6, y + 4), f'{t:.1f}s', fill=(0, 0, 0))
@@ -2252,7 +2299,7 @@ if __name__ == '__main__':
     elif argv and argv[0] == '--still':
         vid, t = int(argv[1]), float(argv[2])
         os.makedirs(OUT, exist_ok=True)
-        VIDEOS[vid]['render'](t).convert('RGB').save(os.path.join(OUT, f'still_{vid}_{t}.png'))
+        frame(vid, t).save(os.path.join(OUT, f'still_{vid}_{t}.png'))
     else:
         for v in [int(a) for a in argv] or sorted(VIDEOS):
             render_video(v)
