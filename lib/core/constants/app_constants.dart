@@ -24,8 +24,8 @@ abstract final class AppConstants {
 
   static const String supportEmail = 'codivolabs@gmail.com';
   static const String privacyPolicyUrl =
-      'https://codivolabs.com/apps/smaran/privacy';
-  static const String termsUrl = 'https://codivolabs.com/apps/smaran/terms';
+      'https://jaapmitra.codivolabs.com/privacy';
+  static const String termsUrl = 'https://jaapmitra.codivolabs.com/terms';
   static const String androidStoreUrl =
       'https://play.google.com/store/apps/details?id=com.naamjapcounter.smaran';
   static const String iosStoreUrl =

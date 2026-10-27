@@ -117,8 +117,8 @@ Regenerate after any visible UI change, then run the `screenshots` /
 
 ## Before the first release
 
-- `https://codivolabs.com/apps/smaran/privacy` (privacy),
-  `https://codivolabs.com/apps/smaran/terms` (terms) and
+- `https://jaapmitra.codivolabs.com/privacy` (privacy),
+  `https://jaapmitra.codivolabs.com/terms` (terms) and
   `https://codivolabs.com/contact` (support) are used in both listings and
   in the app. All three must be live pages before review. Play Console's
   App content section also asks for the privacy policy URL and a support
