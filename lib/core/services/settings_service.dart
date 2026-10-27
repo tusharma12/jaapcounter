@@ -35,6 +35,7 @@ class SettingsService {
   static const _kGraceDays = 'settings.graceDays';
   static const _kFestivalReminders = 'settings.festivalReminders';
   static const _kLockScreenCounter = 'settings.lockScreenCounter';
+  static const _kUsageStats = 'settings.usageStats';
   static const _kFavouriteStories = 'stories.favourites';
   static const _kAutoJaap = 'autoJaap.config';
   static const _kMeditationChant = 'meditation.chant';
@@ -82,6 +83,7 @@ class SettingsService {
       graceDaysEnabled: _prefs.getBool(_kGraceDays) ?? true,
       festivalReminders: _prefs.getBool(_kFestivalReminders) ?? false,
       lockScreenCounter: _prefs.getBool(_kLockScreenCounter) ?? false,
+      usageStats: _prefs.getBool(_kUsageStats) ?? true,
     );
   }
 
@@ -118,6 +120,7 @@ class SettingsService {
     await _prefs.setBool(_kGraceDays, settings.graceDaysEnabled);
     await _prefs.setBool(_kFestivalReminders, settings.festivalReminders);
     await _prefs.setBool(_kLockScreenCounter, settings.lockScreenCounter);
+    await _prefs.setBool(_kUsageStats, settings.usageStats);
   }
 
   List<String> favouriteStoryIds() =>

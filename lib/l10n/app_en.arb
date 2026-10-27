@@ -149,6 +149,8 @@
   "shareApp": "Invite Family and Friends",
   "feedback": "Feedback",
   "privacyPolicy": "Privacy Policy",
+  "usageStats": "Share anonymous usage stats",
+  "usageStatsHint": "Which screens and features get used. Never your mantras or counts.",
   "terms": "Terms",
   "aboutApp": "About JaapMitra",
   "version": "Version {version}",

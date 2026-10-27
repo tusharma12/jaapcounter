@@ -84,8 +84,8 @@ final _shots = <_Shot>[
   _Shot(
     file: '01_counter',
     badge: 'No ads  •  Private  •  Works offline',
-    headline: [('Tap Anywhere.\n', false), ('Never Lose Count.', true)],
-    sub: 'Your mala fills up as you chant',
+    headline: [('Naam Jaap for\n', false), ('Radha, Ram & Shiv', true)],
+    sub: 'Tap anywhere. Your mala fills up.',
     card: _todayCard,
     cardAt: _CardAt.bottom,
     // The counter screen, mid-session: this morning's jaap already underway.
@@ -346,6 +346,83 @@ Future<ProviderContainer> _seededApp() async {
   return container;
 }
 
+/// An In-App Event's Sankalp a few days in: [mantraId] on the counter, three
+/// malas a day so far, and two malas and half of the third done today.
+Future<ProviderContainer> _eventApp(_Event event) async {
+  final clock = TestClock(event.now);
+  final container = await createTestContainer(
+    clock: clock,
+    overrides: [ambientChantProvider.overrideWithValue(_SilentChants())],
+  );
+  await AppDatabase.clearAll(container.read(databaseProvider));
+  final settings = container.read(settingsProvider.notifier);
+  await settings.completeOnboarding();
+  await settings.setHaptics(false);
+  container.read(counterHintSeenProvider.notifier).markSeen();
+
+  final repo = container.read(jaapRepositoryProvider);
+  for (var d = event.day - 1; d >= 1; d--) {
+    clock.set(event.now.subtract(Duration(days: d)).copyWith(hour: 6));
+    await repo.addBeads(mantraId: event.mantraId, delta: 324);
+  }
+  await container
+      .read(sadhanaRepositoryProvider)
+      .create(
+        mantraId: event.mantraId,
+        dailyGoal: 324,
+        durationDays: event.days,
+        startAt: event.now.subtract(Duration(days: event.day - 1)),
+      );
+  clock.set(event.now);
+  await repo.addBeads(mantraId: event.mantraId, delta: 270);
+  await settings.setActiveMantra(event.mantraId);
+  container.read(ledgerRevisionProvider.notifier).bump();
+  return container;
+}
+
+class _Event {
+  const _Event(this.name, this.now, this.mantraId, this.days, this.day);
+
+  final String name;
+  final DateTime now;
+  final String mantraId;
+  final int days;
+
+  /// Which day of the Sankalp "today" is.
+  final int day;
+}
+
+/// The In-App Events whose images show the app (tool/make_festival_events.py).
+final _events = [
+  _Event(
+    'diwali',
+    DateTime(2026, 10, 31, 6, 40),
+    'builtin.om-shri-mahalakshmyai-namah',
+    11,
+    3,
+  ),
+  _Event('kartik', DateTime(2026, 11, 2, 6, 40), 'builtin.hare-krishna', 29, 7),
+];
+
+/// The two screens each event image shows: the counter, and the Sankalp.
+final _eventScreens = <_Shot>[
+  _Shot(
+    file: 'counter',
+    headline: const [],
+    sub: '',
+    capture: (tester, c, router) async {},
+  ),
+  _Shot(
+    file: 'sadhana',
+    headline: const [],
+    sub: '',
+    capture: (tester, c, router) async {
+      router.push('/sadhana');
+      await _settle(tester);
+    },
+  ),
+];
+
 /// Captures the app itself at device size, 3×. With [sequenceDir], it then
 /// taps the counter [_sequenceTaps] times and saves every frame (30 fps, 2×)
 /// there, for the App Store search-results video.
@@ -354,6 +431,7 @@ Future<Uint8List> _captureApp(
   _Shot shot,
   Locale locale, {
   String? sequenceDir,
+  Future<ProviderContainer> Function() seed = _seededApp,
 }) async {
   tester.view.physicalSize = _device * 3;
   tester.view.devicePixelRatio = 3;
@@ -366,7 +444,7 @@ Future<Uint8List> _captureApp(
     bottom: _homeIndicator * 3,
   );
 
-  final container = await _seededApp();
+  final container = await seed();
   await container.read(jaapControllerProvider.future);
   final router = container.read(routerProvider);
   const key = ValueKey('app');
@@ -1319,22 +1397,22 @@ const _scriptFonts = {
 const _headlines = <String, Map<String, (String, String)>>{
   '01_counter': {
     'hi': (
-      'कहीं भी टैप करें।\n*गिनती कभी न भूलें।*',
-      'जप करते ही माला भरती जाती है',
+      'नाम जप करें\n*राधा, राम, शिव*',
+      'कहीं भी टैप करें, माला भरती जाएगी',
     ),
-    'mr': ('कुठेही टॅप करा.\n*मोजणी चुकणार नाही.*', 'जप करताना माळ भरत जाते'),
-    'gu': (
-      'ગમે ત્યાં ટૅપ કરો.\n*ગણતરી ક્યારેય ન ભૂલો.*',
-      'જપ કરતાં જ માળા ભરાતી જાય',
-    ),
+    'mr': ('नामजप करा\n*राधा, राम, शिव*', 'कुठेही टॅप करा, माळ भरत जाते'),
+    'gu': ('નામ જપ કરો\n*રાધા, રામ, શિવ*', 'ગમે ત્યાં ટૅપ કરો, માળા ભરાતી જાય'),
     'pa': (
-      'ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ।\n*ਗਿਣਤੀ ਕਦੇ ਨਾ ਭੁੱਲੋ।*',
-      'ਜਪ ਕਰਦਿਆਂ ਮਾਲਾ ਭਰਦੀ ਜਾਂਦੀ ਹੈ',
+      'ਨਾਮ ਜਪੋ\n*ਵਾਹਿਗੁਰੂ, ਰਾਮ, ਰਾਧਾ*',
+      'ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ, ਮਾਲਾ ਭਰਦੀ ਜਾਂਦੀ ਹੈ',
     ),
-    'ta': ('எங்கும் தட்டி\n*எண்ணுங்கள்*', 'ஜபிக்கும்போது மாலை நிரம்பும்'),
+    'ta': (
+      'நாம ஜபம்\n*ராம, கிருஷ்ண, சிவ*',
+      'எங்கும் தட்டுங்கள், மாலை நிரம்பும்',
+    ),
     'te': (
-      'ఎక్కడైనా ట్యాప్ చేయండి\n*లెక్క తప్పదు*',
-      'జపం చేస్తుంటే మాల నిండుతుంది',
+      'నామ జపం\n*రామ, కృష్ణ, శివ*',
+      'ఎక్కడైనా ట్యాప్ చేయండి, మాల నిండుతుంది',
     ),
   },
   '04_habit': {
@@ -1776,4 +1854,29 @@ void main() {
       }
     }
   });
+
+  // In-App Event captures, only when asked: SHOT_EVENTS=1 with SHOT_LOCALE.
+  testWidgets('event captures', (tester) async {
+    await tester.runAsync(_loadFonts);
+    addTearDown(tester.view.reset);
+    final root = Directory.current.path;
+    for (final loc in _locales) {
+      if (_runLocale != null && loc.code != _runLocale) continue;
+      for (final event in _events) {
+        for (final screen in _eventScreens) {
+          final bytes = await _captureApp(
+            tester,
+            screen,
+            Locale(loc.code),
+            seed: () => _eventApp(event),
+          );
+          File(
+              '$root/build/store_raw/${loc.iosDir}/event_${event.name}_${screen.file}.png',
+            )
+            ..parent.createSync(recursive: true)
+            ..writeAsBytesSync(bytes);
+        }
+      }
+    }
+  }, skip: Platform.environment['SHOT_EVENTS'] == null);
 }

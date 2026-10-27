@@ -15,6 +15,10 @@
 
 default_platform(:ios)
 
+# Firebase Analytics without the advertising ID (FirebaseAnalyticsCore): the
+# app does not track, and the Swift package picks its product from this.
+ENV["FIREBASE_ANALYTICS_WITHOUT_ADID"] = "true"
+
 WORKSPACE = "Runner.xcworkspace"
 SCHEME = "Runner"
 PROJECT_ROOT = File.expand_path("../..", __dir__)
@@ -44,6 +48,7 @@ platform :ios do
       # makes it think it's missing dependencies. Run flutter with the shell
       # environment as it was before `bundle exec fastlane` touched it.
       Bundler.with_original_env do
+        ENV["FIREBASE_ANALYTICS_WITHOUT_ADID"] = "true"
         sh("flutter", "pub", "get")
         sh("flutter", "build", "ios", "--release", "--no-codesign",
            "--build-number=#{build}")

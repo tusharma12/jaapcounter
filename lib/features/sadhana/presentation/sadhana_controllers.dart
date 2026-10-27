@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
@@ -49,6 +51,11 @@ class ActiveSadhanaController extends AsyncNotifier<Sadhana?> {
         );
     // The goal a Sankalp sets becomes the app's daily goal from now on.
     await ref.read(settingsProvider.notifier).setFallbackDailyGoal(dailyGoal);
+    unawaited(
+      ref
+          .read(analyticsProvider)
+          .sankalpStarted(days: durationDays, dailyGoal: dailyGoal),
+    );
     ref.invalidateSelf();
     return sadhana;
   }

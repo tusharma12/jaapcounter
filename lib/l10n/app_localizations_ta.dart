@@ -448,6 +448,13 @@ class AppL10nTa extends AppL10n {
   String get privacyPolicy => 'தனியுரிமைக் கொள்கை';
 
   @override
+  String get usageStats => 'அநாமதேய பயன்பாட்டுத் தரவைப் பகிர்';
+
+  @override
+  String get usageStatsHint =>
+      'எந்தத் திரைகள், வசதிகள் பயன்படுகின்றன என்பது மட்டும். உங்கள் மந்திரமோ எண்ணிக்கையோ ஒருபோதும் இல்லை.';
+
+  @override
   String get terms => 'விதிமுறைகள்';
 
   @override

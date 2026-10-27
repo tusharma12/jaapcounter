@@ -37,6 +37,7 @@ class ReviewPromptService {
     required this.repository,
     Future<void> Function()? requestReview,
     DateTime Function()? now,
+    this.onAsked,
   }) : _requestReview = requestReview ?? _systemRequest,
        _now = now ?? DateTime.now;
 
@@ -47,6 +48,9 @@ class ReviewPromptService {
 
   final SharedPreferences prefs;
   final JaapRepository repository;
+
+  /// Told each time the app asks, with how many times it has now asked.
+  final Future<void> Function(int times)? onAsked;
   final Future<void> Function() _requestReview;
   final DateTime Function() _now;
 
@@ -93,6 +97,7 @@ class ReviewPromptService {
       await prefs.setInt(_kTimesAsked, times + 1);
       await prefs.setInt(_kLastAsked, now.millisecondsSinceEpoch);
       await _requestReview();
+      await onAsked?.call(times + 1);
       return true;
     } on Object catch (error, stack) {
       AppLogger.e('Could not ask for a rating', error, stack);

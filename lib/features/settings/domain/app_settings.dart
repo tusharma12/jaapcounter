@@ -27,6 +27,7 @@ class AppSettings {
     this.graceDaysEnabled = true,
     this.festivalReminders = false,
     this.lockScreenCounter = false,
+    this.usageStats = true,
   });
 
   /// Choices for [beadMarkerInterval]; 0 means off.
@@ -89,6 +90,10 @@ class AppSettings {
   /// per-device choice, so it is not part of a backup.
   final bool lockScreenCounter;
 
+  /// Anonymous usage analytics: which screens and features get used, never
+  /// what is chanted. A per-device choice, so it is not part of a backup.
+  final bool usageStats;
+
   Locale? get locale => localeCode == null ? null : Locale(localeCode!);
 
   /// Light or dark as far as the platform is concerned.
@@ -118,6 +123,7 @@ class AppSettings {
     bool? graceDaysEnabled,
     bool? festivalReminders,
     bool? lockScreenCounter,
+    bool? usageStats,
   }) {
     return AppSettings(
       themeId: themeId ?? this.themeId,
@@ -146,6 +152,7 @@ class AppSettings {
       graceDaysEnabled: graceDaysEnabled ?? this.graceDaysEnabled,
       festivalReminders: festivalReminders ?? this.festivalReminders,
       lockScreenCounter: lockScreenCounter ?? this.lockScreenCounter,
+      usageStats: usageStats ?? this.usageStats,
     );
   }
 
@@ -239,7 +246,8 @@ class AppSettings {
       other.beadMarkerInterval == beadMarkerInterval &&
       other.graceDaysEnabled == graceDaysEnabled &&
       other.festivalReminders == festivalReminders &&
-      other.lockScreenCounter == lockScreenCounter;
+      other.lockScreenCounter == lockScreenCounter &&
+      other.usageStats == usageStats;
 
   @override
   int get hashCode => Object.hashAll([
@@ -262,6 +270,7 @@ class AppSettings {
     graceDaysEnabled,
     festivalReminders,
     lockScreenCounter,
+    usageStats,
   ]);
 }
 

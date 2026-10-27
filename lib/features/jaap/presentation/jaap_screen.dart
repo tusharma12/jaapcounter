@@ -60,13 +60,24 @@ class _JaapScreenState extends ConsumerState<JaapScreen> {
   }
 
   void _onMalaCompleted() {
+    unawaited(
+      ref
+          .read(analyticsProvider)
+          .malaCompleted(autoJaap: ref.read(autoJaapProvider).running),
+    );
     _celebrationTimer?.cancel();
     setState(() => _celebrating = true);
     _celebrationTimer = Timer(Motion.celebration, () {
-      if (mounted) setState(() => _celebrating = false);
+      if (!mounted) return;
+      setState(() => _celebrating = false);
+      // A finished mala is the happiest moment to ask for a rating - once
+      // the celebration has had its moment, and never over Auto Jaap, where
+      // the user may be chanting with eyes closed. A skipped ask is not
+      // counted, so the next mala tries again.
+      if (!ref.read(autoJaapProvider).running) {
+        unawaited(ref.read(reviewPromptProvider).maybeAsk());
+      }
     });
-    // A finished mala is the happiest moment to ask for a rating.
-    unawaited(ref.read(reviewPromptProvider).maybeAsk());
   }
 
   /// A lifetime milestone is marked without stopping the count: a snackbar,

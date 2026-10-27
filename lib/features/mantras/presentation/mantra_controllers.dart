@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -23,6 +25,7 @@ class MantraListController extends AsyncNotifier<List<Mantra>> {
     final mantra = await ref
         .read(mantraRepositoryProvider)
         .create(name: name, description: description, malaSize: malaSize);
+    unawaited(ref.read(analyticsProvider).mantraAdded());
     ref.invalidateSelf();
     return mantra;
   }

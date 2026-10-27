@@ -863,6 +863,18 @@ abstract class AppL10n {
   /// **'Privacy Policy'**
   String get privacyPolicy;
 
+  /// No description provided for @usageStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Share anonymous usage stats'**
+  String get usageStats;
+
+  /// No description provided for @usageStatsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Which screens and features get used. Never your mantras or counts.'**
+  String get usageStatsHint;
+
   /// No description provided for @terms.
   ///
   /// In en, this message translates to:

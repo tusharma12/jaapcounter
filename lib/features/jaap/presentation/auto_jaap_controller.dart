@@ -152,6 +152,7 @@ class AutoJaapController extends Notifier<AutoJaapState> {
     final generation = ++_generation;
     state = state.copyWith(running: true);
     _applyWakelock(true);
+    unawaited(ref.read(analyticsProvider).autoJaapStarted());
     if (state.config.playMusic) {
       unawaited(ref.read(musicPlaybackProvider.notifier).startForAuto());
     }

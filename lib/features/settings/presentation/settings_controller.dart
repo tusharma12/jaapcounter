@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -142,8 +143,15 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setLockScreenCounter(bool enabled) =>
       _save(state.copyWith(lockScreenCounter: enabled));
 
-  Future<void> completeOnboarding() =>
-      _save(state.copyWith(onboardingComplete: true));
+  Future<void> setUsageStats(bool enabled) async {
+    await _save(state.copyWith(usageStats: enabled));
+    await ref.read(analyticsProvider).setEnabled(enabled);
+  }
+
+  Future<void> completeOnboarding() async {
+    await _save(state.copyWith(onboardingComplete: true));
+    unawaited(ref.read(analyticsProvider).onboardingCompleted());
+  }
 }
 
 /// Tap feedback follows the haptics and sound settings without every caller

@@ -436,6 +436,13 @@ class AppL10nMr extends AppL10n {
   String get privacyPolicy => 'गोपनीयता धोरण';
 
   @override
+  String get usageStats => 'निनावी वापर आकडेवारी पाठवा';
+
+  @override
+  String get usageStatsHint =>
+      'कोणत्या स्क्रीन आणि सुविधा वापरल्या जातात. तुमचे मंत्र किंवा मोजणी कधीच नाही.';
+
+  @override
   String get terms => 'अटी';
 
   @override

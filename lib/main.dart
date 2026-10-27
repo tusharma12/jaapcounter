@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app.dart';
 import 'core/database/app_database.dart';
 import 'core/providers.dart';
+import 'core/services/analytics_service.dart';
 import 'core/services/app_logger.dart';
 import 'core/services/user_music_store.dart';
 import 'core/utils/formatters.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
   // Everything the app needs to render its first frame is opened here, so no
   // screen has to deal with an uninitialised repository.
   final preferences = await SharedPreferences.getInstance();
+  await AnalyticsService.initialize();
   final database = await AppDatabase.open();
 
   // Per-mantra voice notes no longer exist; their audio is cleared once.

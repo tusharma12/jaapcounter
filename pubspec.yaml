@@ -1,7 +1,7 @@
 name: japmala
 description: "JaapMitra: your peaceful digital mala for daily Naam Jap."
 publish_to: 'none'
-version: 1.0.2+7
+version: 1.0.3+8
 
 environment:
   sdk: ^3.12.0
@@ -53,6 +53,11 @@ dependencies:
   record: ^7.1.1
   audioplayers: ^6.8.1
   in_app_review: ^2.0.12
+
+  # Anonymous usage analytics (never mantra names or counts)
+  firebase_core: ^5.1.0
+  firebase_analytics: ^13.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

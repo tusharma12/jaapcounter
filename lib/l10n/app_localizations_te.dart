@@ -448,6 +448,13 @@ class AppL10nTe extends AppL10n {
   String get privacyPolicy => 'గోప్యతా విధానం';
 
   @override
+  String get usageStats => 'అనామక వినియోగ గణాంకాలు పంపండి';
+
+  @override
+  String get usageStatsHint =>
+      'ఏ స్క్రీన్‌లు, ఫీచర్లు వాడతారో మాత్రమే. మీ మంత్రాలు లేదా లెక్కలు ఎప్పుడూ కాదు.';
+
+  @override
   String get terms => 'నిబంధనలు';
 
   @override

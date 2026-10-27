@@ -448,6 +448,13 @@ class AppL10nGu extends AppL10n {
   String get privacyPolicy => 'ગોપનીયતા નીતિ';
 
   @override
+  String get usageStats => 'અનામી ઉપયોગના આંકડા મોકલો';
+
+  @override
+  String get usageStatsHint =>
+      'કઈ સ્ક્રીન અને સુવિધાઓ વપરાય છે. તમારા મંત્ર કે ગણતરી ક્યારેય નહીં.';
+
+  @override
   String get terms => 'શરતો';
 
   @override

@@ -448,6 +448,13 @@ class AppL10nEn extends AppL10n {
   String get privacyPolicy => 'Privacy Policy';
 
   @override
+  String get usageStats => 'Share anonymous usage stats';
+
+  @override
+  String get usageStatsHint =>
+      'Which screens and features get used. Never your mantras or counts.';
+
+  @override
   String get terms => 'Terms';
 
   @override

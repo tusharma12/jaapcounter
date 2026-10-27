@@ -28,7 +28,8 @@ Create these in App Store Connect under In-App Events. From 1.0.2 (7) the app op
 - **Badge:** Challenge
 - **Deep link:** `jaapmitra://app/sadhana`
 - **Purpose:** Attract new users, and bring back lapsed ones
-- **Media:** App Store Connect asks for a 16:9 event card and a 9:16 details image; `appstore_assets/creative/<locale>/universal_16x9.png` can be scaled down for the card, but check the size it asks for. Apple overlays the event name on the card.
+- **Media:** `appstore_assets/events/kartik/<locale>/card_16x9.png` and `details_9x16.png`, English and Hindi. They show only the festival name, one line, diyas, and the app's counter on the event's mantra. Regenerate: `for code in en hi; do SHOT_EVENTS=1 SHOT_LOCALE=$code flutter test screenshots/store_screenshots_test.dart --plain-name 'event captures'; done`, then `python3 tool/make_festival_events.py`.
+- **Timing:** starts 27 Oct and runs four weeks, the longest stretch of search exposure this season. Submit it first.
 
 **English**
 
@@ -42,21 +43,25 @@ Create these in App Store Connect under In-App Events. From 1.0.2 (7) the app op
 - Short description (35/50): पवित्र कार्तिक मास में रोज़ जप करें
 - Long description (94/120): कार्तिक मास के लिए संकल्प लें। रोज़ की माला तय करें, लगातार जप करें और हर दिन पूरा होते देखें।
 
-## Diwali: Sun 8 Nov 2026
+## 11 Days to Diwali: Thu 29 Oct – Sun 8 Nov 2026
 
-- **Badge:** Special Event
-- **Deep link:** `jaapmitra://app/mantras`
+- **Badge:** Challenge
+- **Deep link:** `jaapmitra://app/sadhana`
 - **Purpose:** Attract new users, and bring back lapsed ones
-- **Media:** App Store Connect asks for a 16:9 event card and a 9:16 details image; `appstore_assets/creative/<locale>/universal_16x9.png` can be scaled down for the card, but check the size it asks for. Apple overlays the event name on the card.
+- **Media:** `appstore_assets/events/diwali/<locale>/card_16x9.png` and `details_9x16.png`, English and Hindi. They show only the festival name, one line, diyas, and the app's counter on the event's mantra. Regenerate: `for code in en hi; do SHOT_EVENTS=1 SHOT_LOCALE=$code flutter test screenshots/store_screenshots_test.dart --plain-name 'event captures'; done`, then `python3 tool/make_festival_events.py`.
+- **Why 11 days, not just Diwali day:** an event card only shows while the event is upcoming or running, so a one-day event barely appears. An 11-day Sankalp (a built-in length) ends on Lakshmi Puja night and brings people back daily; after two active days the rating prompt can fire on a finished mala, in the most devotional week of the year.
+- **Timing:** submit by 28 Oct so it is live on the 29th. Approved late, it still runs to Diwali.
+- **Check first:** in the app, an 11-day Sankalp can be started from any day with Om Shri Mahalakshmyai Namah.
+- **Promotional text** (no review needed, change any time; 143/170): This Diwali, chant Om Shri Mahalakshmyai Namah for 11 days. Take a Sankalp, keep your streak, and chant in the dark with Blackout mode. No ads.
 
 **English**
 
-- Name (19/30): Diwali Lakshmi Jaap
-- Short description (45/50): Chant Om Shri Mahalakshmyai Namah this Diwali
-- Long description (110/120): Welcome Lakshmi with jaap this Diwali. Om Shri Mahalakshmyai Namah is ready in the app. Tap anywhere to count.
+- Name (26/30): Diwali 11-Day Lakshmi Jaap
+- Short description (40/50): Chant for Lakshmi every day until Diwali
+- Long description (106/120): Take an 11-day Sankalp with Om Shri Mahalakshmyai Namah and finish on Diwali night. Tap anywhere to count.
 
 **Hindi**
 
-- Name (17/30): दिवाली लक्ष्मी जप
-- Short description (44/50): इस दिवाली ॐ श्री महालक्ष्म्यै नमः का जप करें
-- Long description (107/120): इस दिवाली जप से लक्ष्मी जी का स्वागत करें। ॐ श्री महालक्ष्म्यै नमः ऐप में तैयार है। कहीं भी टैप करके गिनें।
+- Name (27/30): दिवाली तक 11 दिन लक्ष्मी जप
+- Short description (36/50): दिवाली तक रोज़ लक्ष्मी जी का जप करें
+- Long description (103/120): ॐ श्री महालक्ष्म्यै नमः के साथ 11 दिन का संकल्प लें और दिवाली की रात पूरा करें। कहीं भी टैप करके गिनें।

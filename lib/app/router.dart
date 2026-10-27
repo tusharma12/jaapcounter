@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/providers.dart';
 import '../features/backup/presentation/backup_screen.dart';
 import '../features/jaap/presentation/jaap_screen.dart';
 import '../features/mantras/presentation/mantras_screen.dart';
@@ -22,7 +25,7 @@ import '../features/progress/presentation/year_review_screen.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-  return GoRouter(
+  final router = GoRouter(
     navigatorKey: rootKey,
     initialLocation: '/jaap',
     // Read, not watch: the router is built once, and the check runs on every
@@ -143,4 +146,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  // Each screen once per visit, by its route pattern (`/stories/:storyId`),
+  // so no story or setting id is ever sent.
+  String? lastScreen;
+  void reportScreen() {
+    final screen = router.routerDelegate.currentConfiguration.fullPath;
+    if (screen.isEmpty || screen == lastScreen) return;
+    lastScreen = screen;
+    unawaited(ref.read(analyticsProvider).screen(screen));
+  }
+
+  router.routerDelegate.addListener(reportScreen);
+  ref.onDispose(() => router.routerDelegate.removeListener(reportScreen));
+  return router;
 });

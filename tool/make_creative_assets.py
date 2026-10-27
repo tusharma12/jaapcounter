@@ -1,6 +1,7 @@
 """Builds the App Store creative assets (product page header + search results).
 
   appstore_assets/creative/<locale>/universal_16x9.png   5244×2950, fits both
+  appstore_assets/creative/header_motion.mp4              the header, moving, 8 s loop
   appstore_assets/creative/<locale>/search_3x2.mp4       1920×1280, 8 s loop
 
 The PNG is the one size App Store Connect accepts in both slots. It is cropped
@@ -14,7 +15,7 @@ import math
 import os
 import subprocess
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = f'{ROOT}/build/store_raw'
@@ -314,6 +315,168 @@ def doodle_header(locale, line_alpha, out):
     return out
 
 
+# The brand header's signs: (doodle, x, y as fractions of the canvas, size in
+# px, rotation in degrees). The middle is left clear for the name.
+SIGNS = [
+    ('mala', 0.06, 0.25, 760, -12), ('sun', 0.80, 0.16, 640, 0), ('diya', 0.25, 0.83, 700, 6),
+    ('lotus', 0.88, 0.78, 760, -8), ('bell', 0.33, 0.13, 520, 10), ('flame', 0.64, 0.86, 460, -8),
+    ('trishul', 0.95, 0.40, 560, 10), ('lotus', 0.10, 0.70, 520, -6), ('om', 0.58, 0.12, 520, -8),
+    ('diya', 0.42, 0.90, 420, 8), ('sparkle', 0.74, 0.20, 170, 0),
+    ('sparkle', 0.50, 0.97, 150, 0), ('sparkle', 0.93, 0.08, 180, 0), ('sparkle', 0.14, 0.08, 150, 0),
+    ('sparkle', 0.87, 0.60, 150, 0), ('sparkle', 0.31, 0.74, 140, 0),
+]
+# Faint chants in the background, as the app's falling mantra, each a
+# different one: (text, x, y, text height in px, alpha). The first sits above
+# the name, inside the iPhone window.
+CHANTS = [
+    ('राधे राधे', 0.50, 0.33, 120, 0.30), ('राम राम', 0.14, 0.50, 140, 0.20),
+    ('ॐ ॐ', 0.85, 0.53, 140, 0.20), ('हरे कृष्ण', 0.70, 0.66, 110, 0.18),
+    ('जय श्री राम', 0.36, 0.64, 110, 0.18), ('ॐ नमः शिवाय', 0.17, 0.93, 120, 0.16),
+    ('वाहेगुरु', 0.82, 0.95, 120, 0.16),
+]
+MOTION_SECONDS, MOTION_FPS = 8, 30
+
+
+def _sign(kind, size, angle, width, colour, alpha):
+    tile = Image.new('RGBA', (size * 2, size * 2), (0, 0, 0, 0))
+    DOODLES[kind](ImageDraw.Draw(tile), size, size, width)
+    if angle:
+        tile = tile.rotate(angle, resample=Image.BICUBIC)
+    out = Image.new('RGBA', tile.size, (*colour, 0))
+    out.putalpha(tile.getchannel('A').point(lambda v: round(v * alpha)))
+    return out
+
+
+def _brand_parts(scale):
+    """Everything the brand header is made of, at `scale`, so the still and
+    each video frame are put together from the same pieces."""
+    # Even sizes, as the video encoder needs.
+    w, h = (W, H) if scale == 1 else (round(W * scale) // 2 * 2, round(H * scale) // 2 * 2)
+    bg = maroon((W * 0.1, H * 0.98, W * 0.9, H * 1.8))
+    bg = bg if scale == 1 else bg.resize((w, h), Image.LANCZOS)
+    signs = []
+    for kind, fx, fy, size, angle in SIGNS:
+        tile = _sign(kind, size, angle, 11, (255, 255, 255), 0.24)
+        if scale != 1:
+            tile = tile.resize((round(tile.width * scale), round(tile.height * scale)), Image.LANCZOS)
+        signs.append((kind, fx * w - tile.width / 2, fy * h - tile.height / 2, tile))
+    chants = []
+    for text, fx, fy, size, alpha in CHANTS:
+        f = font(DEVANAGARI[1], round(size * scale))
+        tile = Image.new('RGBA', (round(f.getlength(text) + size * scale), round(size * scale * 2.2)), (0, 0, 0, 0))
+        ImageDraw.Draw(tile).text((tile.width / 2, tile.height / 2), text, font=f,
+                                  fill=(255, 200, 120, round(255 * alpha)), anchor='mm')
+        chants.append((fx * w - tile.width / 2, fy * h - tile.height / 2, tile))
+
+    cy = (IPHONE[1] + IPHONE[3]) / 2 * scale
+    f_name = fit('JaapMitra', FONT['en'][0], 1800, 480)
+    f_name = font(FONT['en'][0], round(f_name.size * scale))
+    name = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    gradient_text(name, (w / 2, cy), 'JaapMitra', f_name, 'mm', (255, 236, 200), (255, 178, 63))
+    glow = name.getchannel('A').filter(ImageFilter.GaussianBlur(60 * scale))
+    return bg, signs, chants, name, glow, h
+
+
+def _turned(tile, degrees, scale=1.0):
+    """The tile rotated about its centre and scaled, keeping its size so it
+    stays put on the canvas."""
+    if scale != 1:
+        w, h = tile.size
+        big = tile.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.BICUBIC)
+        tile = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        # paste, unlike alpha_composite, takes a negative offset for a tile that grew.
+        tile.paste(big, ((w - big.width) // 2, (h - big.height) // 2), big)
+    return tile.rotate(degrees, resample=Image.BICUBIC) if degrees else tile
+
+
+def _brand_frame(parts, t=None):
+    """One picture of the brand header; with t (seconds) it moves, on an 8 s
+    loop: the signs drift and sway, the sparkles pulse, the chants rise and
+    fade, a shine sweeps across the name and its glow breathes. Without t it
+    is the still."""
+    bg, signs, chants, name, glow, h = parts
+    img = bg.copy()
+    k = 0 if t is None else t / MOTION_SECONDS
+    wave = lambda phase: math.sin(2 * math.pi * (k + phase))
+    for i, (fx, fy, tile) in enumerate(chants):
+        if t is None:
+            img.alpha_composite(tile, (round(fx), round(fy)))
+            continue
+        # Rises over each loop and fades in and out, so the wrap is unseen.
+        p = (k + i / len(chants)) % 1
+        a = min(1.0, 1.6 * math.sin(math.pi * p))
+        faded = tile.copy()
+        faded.putalpha(tile.getchannel('A').point(lambda v: min(255, round(v * a * 1.4))))
+        img.alpha_composite(faded, (round(fx), round(fy + h * 0.16 * (0.5 - p))))
+    for i, (kind, x, y, tile) in enumerate(signs):
+        dx = dy = 0
+        if t is not None:
+            if kind == 'sparkle':
+                pulse = 0.5 + 0.5 * wave(i * 0.37)
+                tile = _turned(tile, 45 * pulse, 0.55 + 0.7 * pulse)
+                tile.putalpha(tile.getchannel('A').point(lambda v: round(v * (0.3 + 0.7 * pulse))))
+            else:
+                tile = _turned(tile, 5 * wave(i * 0.13 + 0.25))
+            dx = h * 0.010 * math.cos(2 * math.pi * (k + i * 0.17))
+            dy = h * 0.022 * wave(i * 0.21)
+        img.alpha_composite(tile, (round(x + dx), round(y + dy)))
+    breathe = 0.45 if t is None else 0.25 + 0.5 * (0.5 + 0.5 * wave(0))
+    img.paste((255, 150, 40), (0, 0), glow.point(lambda v: round(v * breathe)))
+    img.alpha_composite(name)
+    if t is not None:
+        # A shine across the name in the first 2 s of each loop.
+        p = (t % MOTION_SECONDS) / 2.0
+        if p < 1:
+            box = name.getbbox()
+            cx = box[0] - 300 * h / 1474 + (box[2] - box[0] + 600 * h / 1474) * p
+            band = Image.new('L', img.size, 0)
+            bw = 45 * h / 1474
+            ImageDraw.Draw(band).polygon([(cx - bw, box[3]), (cx, box[3]), (cx + bw, box[1]), (cx + 2 * bw, box[1])], fill=255)
+            band = band.filter(ImageFilter.GaussianBlur(bw / 3))
+            mask = ImageChops.multiply(band, name.getchannel('A'))
+            img.paste((255, 255, 255), (0, 0), mask)
+            # A soft flare around the letters as the shine passes.
+            img.paste((255, 225, 160), (0, 0), mask.filter(ImageFilter.GaussianBlur(bw / 2)).point(lambda v: v // 2))
+    return img
+
+
+def app_header(locale, out):
+    """The brand header: the name JaapMitra among Hindu signs and faint
+    chants (राधे राधे, राम राम, ॐ नमः शिवाय…), the same in every language.
+    The name sits alone inside the iPhone window; the rest fills the wider
+    crops."""
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    _brand_frame(_brand_parts(1)).convert('RGB').save(out, optimize=True)
+    return out
+
+
+def header_motion(out, size=(3840, 1646)):
+    """The brand header as a silent 8 s loop: the still, gently alive. The
+    header video is 21:9 (3840x1646), the middle band of the 16:9 still, so
+    the canvas is scaled to that width and the top and bottom are cropped."""
+    vw, vh = size
+    parts = _brand_parts(vw / W)
+    full = parts[0].size
+    top = (full[1] - vh) // 2
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    # H.264 High at 30 fps with a silent stereo track, as App Store video asks.
+    enc = subprocess.Popen(
+        ['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+         '-s', f'{vw}x{vh}', '-r', str(MOTION_FPS), '-i', '-',
+         '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000',
+         '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-b:v', '12M', '-maxrate', '14M',
+         '-bufsize', '24M', '-pix_fmt', 'yuv420p', '-r', str(MOTION_FPS),
+         '-c:a', 'aac', '-b:a', '128k', '-shortest', '-movflags', '+faststart', out],
+        stdin=subprocess.PIPE)
+    for n in range(MOTION_SECONDS * MOTION_FPS):
+        frame = _brand_frame(parts, n / MOTION_FPS).crop((0, top, vw, top + vh))
+        enc.stdin.write(frame.convert('RGB').tobytes())
+    enc.stdin.close()
+    if enc.wait():
+        raise RuntimeError('ffmpeg failed')
+    return out
+
+
 def maroon(glow_box):
     """The screenshots' maroon gradient, dark at the top, with a saffron glow
     inside glow_box."""
@@ -543,6 +706,7 @@ def search_motion(locale):
 
 if __name__ == '__main__':
     for locale in COPY:
-        print(doodle_header(locale, 0.30, f'{OUT}/{locale}/universal_16x9.png'))
+        print(app_header(locale, f'{OUT}/{locale}/universal_16x9.png'))
+    print(header_motion(f'{OUT}/header_motion.mp4'))
     for locale in COPY:
         print(search_motion(locale))

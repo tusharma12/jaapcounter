@@ -449,6 +449,13 @@ class AppL10nPa extends AppL10n {
   String get privacyPolicy => 'ਪਰਦੇਦਾਰੀ ਨੀਤੀ';
 
   @override
+  String get usageStats => 'ਗੁਮਨਾਮ ਵਰਤੋਂ ਅੰਕੜੇ ਭੇਜੋ';
+
+  @override
+  String get usageStatsHint =>
+      'ਕਿਹੜੀਆਂ ਸਕ੍ਰੀਨਾਂ ਅਤੇ ਸਹੂਲਤਾਂ ਵਰਤੀਆਂ ਜਾਂਦੀਆਂ ਹਨ। ਤੁਹਾਡੇ ਮੰਤਰ ਜਾਂ ਗਿਣਤੀ ਕਦੇ ਨਹੀਂ।';
+
+  @override
   String get terms => 'ਸ਼ਰਤਾਂ';
 
   @override

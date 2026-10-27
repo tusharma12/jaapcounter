@@ -328,6 +328,13 @@ class SettingsScreen extends ConsumerWidget {
               _SectionHeader(SettingsSection.about.header(l10n)),
             AppCardGroup(
               children: [
+                _SwitchRow(
+                  label: l10n.usageStats,
+                  subtitle: l10n.usageStatsHint,
+                  icon: Icons.insights_outlined,
+                  value: settings.usageStats,
+                  onChanged: controller.setUsageStats,
+                ),
                 _NavRow(
                   label: l10n.privacyPolicy,
                   icon: Icons.lock_outline_rounded,

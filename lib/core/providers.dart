@@ -7,6 +7,7 @@ import '../features/mantras/data/mantra_repository.dart';
 import '../features/reminders/data/reminder_repository.dart';
 import '../features/sadhana/data/sadhana_repository.dart';
 import '../features/stories/data/story_repository.dart';
+import 'services/analytics_service.dart';
 import 'services/dictation_service.dart';
 import 'services/lock_screen_counter_service.dart';
 import 'services/ambient_chant_service.dart';
@@ -93,12 +94,23 @@ final musicRecorderProvider = Provider<MusicRecorderService>((ref) {
   return service;
 });
 
+/// Anonymous usage analytics, on unless the user turned it off. Firebase
+/// itself is started in `main`; without it (as in tests) nothing is sent.
+final analyticsProvider = Provider<AnalyticsService>(
+  (ref) => AnalyticsService(
+    enabled: ref.read(settingsServiceProvider).read().usageStats,
+  ),
+);
+
 /// Asks for a store rating after a finished mala, once the app has been
 /// used for a couple of days, up to three times. Overridden in tests.
 final reviewPromptProvider = Provider<ReviewPromptService>(
   (ref) => ReviewPromptService(
     prefs: ref.watch(sharedPreferencesProvider),
     repository: ref.watch(jaapRepositoryProvider),
+    onAsked: (times) => ref.read(analyticsProvider).reviewPromptShown(
+      times: times,
+    ),
   ),
 );
 
