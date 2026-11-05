@@ -38,6 +38,8 @@ void main() {
       'pa': (0x0A00, 0x0A7F),
       'ta': (0x0B80, 0x0BFF),
       'te': (0x0C00, 0x0C7F),
+      'ru': (0x0400, 0x04FF),
+      'th': (0x0E00, 0x0E7F),
     };
 
     for (final MapEntry(key: code, value: (start, end)) in blocks.entries) {

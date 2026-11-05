@@ -17,6 +17,8 @@ abstract final class MantraScripts {
     'pa': _gurmukhi,
     'ta': _tamil,
     'te': _telugu,
+    'ru': _cyrillic,
+    'th': _thai,
   };
 
   static const Map<String, String> _gujarati = {
@@ -47,6 +49,7 @@ abstract final class MantraScripts {
     'builtin.om-namo-narayanaya': 'ૐ નમો નારાયણાય',
     'builtin.om-sai-ram': 'ૐ સાંઈ રામ',
     'builtin.hare-rama': 'હરે રામ હરે રામ રામ રામ હરે હરે',
+    'builtin.shri-krishna': 'શ્રી કૃષ્ણ',
   };
 
   /// Gurmukhi has no Om sign of its own, so Om is written ਓਮ.
@@ -78,6 +81,7 @@ abstract final class MantraScripts {
     'builtin.om-namo-narayanaya': 'ਓਮ ਨਮੋ ਨਾਰਾਯਣਾਯ',
     'builtin.om-sai-ram': 'ਓਮ ਸਾਈਂ ਰਾਮ',
     'builtin.hare-rama': 'ਹਰੇ ਰਾਮ ਹਰੇ ਰਾਮ ਰਾਮ ਰਾਮ ਹਰੇ ਹਰੇ',
+    'builtin.shri-krishna': 'ਸ਼੍ਰੀ ਕ੍ਰਿਸ਼ਨ',
   };
 
   /// Sanskrit sounds Tamil script lacks are written with the Grantha letters
@@ -110,6 +114,7 @@ abstract final class MantraScripts {
     'builtin.om-namo-narayanaya': 'ஓம் நமோ நாராயணாய',
     'builtin.om-sai-ram': 'ஓம் ஸாயி ராம',
     'builtin.hare-rama': 'ஹரே ராம ஹரே ராம ராம ராம ஹரே ஹரே',
+    'builtin.shri-krishna': 'ஸ்ரீ கிருஷ்ண',
   };
 
   static const Map<String, String> _telugu = {
@@ -140,5 +145,72 @@ abstract final class MantraScripts {
     'builtin.om-namo-narayanaya': 'ఓం నమో నారాయణాయ',
     'builtin.om-sai-ram': 'ఓం సాయి రామ',
     'builtin.hare-rama': 'హరే రామ హరే రామ రామ రామ హరే హరే',
+    'builtin.shri-krishna': 'శ్రీ కృష్ణ',
+  };
+
+  /// Russian, as Russian Vaishnava printing writes these names: Харе Кришна,
+  /// Рама, Радха, with Ом for Om.
+  static const Map<String, String> _cyrillic = {
+    'builtin.ram': 'Рам Рам',
+    'builtin.radha': 'Радха Радха',
+    'builtin.om-namah-shivaya': 'Ом Намах Шивая',
+    'builtin.om-hanumate-namah': 'Ом Хануматэ Намах',
+    'builtin.hare-krishna': 'Харе Кришна',
+    'builtin.hare-krishna-mahamantra':
+        'Харе Кришна Харе Кришна Кришна Кришна Харе Харе\n'
+        'Харе Рама Харе Рама Рама Рама Харе Харе',
+    'builtin.om-namo-bhagavate-vasudevaya': 'Ом Намо Бхагавате Васудевая',
+    'builtin.gayatri':
+        'Ом Бхур Бхувах Сваха Тат Савитур Варениям\n'
+        'Бхарго Девасья Дхимахи Дхийо Йо Нах Прачодаят',
+    'builtin.mahamrityunjaya':
+        'Ом Трьямбакам Яджамахе Сугандхим Пуштивардханам\n'
+        'Урварукамива Бандханан Мритьор Мукшия Мамритат',
+    'builtin.waheguru': 'Вахегуру Вахегуру',
+    'builtin.satnam-waheguru': 'Сатнам Вахегуру',
+    'builtin.sita-ram': 'Сита Рам',
+    'builtin.shri-ram-jai-ram': 'Шри Рам Джай Рам Джай Джай Рам',
+    'builtin.om-gam-ganapataye-namah': 'Ом Гам Ганапатайе Намах',
+    'builtin.om-shri-mahalakshmyai-namah': 'Ом Шри Махалакшмьяй Намах',
+    'builtin.om-aim-saraswatyai-namah': 'Ом Айм Сарасватьяй Намах',
+    'builtin.om': 'Ом',
+    'builtin.radhe-krishna': 'Радхе Кришна',
+    'builtin.om-namo-narayanaya': 'Ом Намо Нараянайя',
+    'builtin.om-sai-ram': 'Ом Саи Рам',
+    'builtin.hare-rama': 'Харе Рама Харе Рама Рама Рама Харе Харе',
+    'builtin.shri-krishna': 'Шри Кришна',
+  };
+
+  /// Thai, as Thai devotional printing writes Sanskrit: โอม for Om, the
+  /// visarga as ห์ (นมะห์), and the familiar Thai names สีดา and กฤษณะ.
+  static const Map<String, String> _thai = {
+    'builtin.ram': 'ราม ราม',
+    'builtin.radha': 'ราธา ราธา',
+    'builtin.om-namah-shivaya': 'โอม นมัส ศิวายะ',
+    'builtin.om-hanumate-namah': 'โอม หนุมะเต นมะห์',
+    'builtin.hare-krishna': 'ฮาเร กฤษณะ',
+    'builtin.hare-krishna-mahamantra':
+        'ฮาเร กฤษณะ ฮาเร กฤษณะ กฤษณะ กฤษณะ ฮาเร ฮาเร\n'
+        'ฮาเร ราม ฮาเร ราม ราม ราม ฮาเร ฮาเร',
+    'builtin.om-namo-bhagavate-vasudevaya': 'โอม นโม ภควเต วาสุเทวายะ',
+    'builtin.gayatri':
+        'โอม ภูร์ ภุวะห์ สวะห์ ตัต สะวิตุร์ วะเรณยัม\n'
+        'ภัรโค เทวัสยะ ธีมะหิ ธิโย โย นะห์ ประโจทะยาต',
+    'builtin.mahamrityunjaya':
+        'โอม ตรยัมพะกัม ยะชามะเห สุคันธิม ปุษฏิวรรธะนัม\n'
+        'อุรวารุกะมิวะ พันธะนาน มฤตโยร์ มุกษียะ มามฤตาต',
+    'builtin.waheguru': 'วาเหคุรุ วาเหคุรุ',
+    'builtin.satnam-waheguru': 'สัตนาม วาเหคุรุ',
+    'builtin.sita-ram': 'สีดา ราม',
+    'builtin.shri-ram-jai-ram': 'ศรี ราม ชัย ราม ชัย ชัย ราม',
+    'builtin.om-gam-ganapataye-namah': 'โอม กัม คณปตเย นมะห์',
+    'builtin.om-shri-mahalakshmyai-namah': 'โอม ศรี มหาลักษมไย นมะห์',
+    'builtin.om-aim-saraswatyai-namah': 'โอม ไอม สรัสวัตไย นมะห์',
+    'builtin.om': 'โอม',
+    'builtin.radhe-krishna': 'ราเธ กฤษณะ',
+    'builtin.om-namo-narayanaya': 'โอม นโม นารายณายะ',
+    'builtin.om-sai-ram': 'โอม ไซ ราม',
+    'builtin.hare-rama': 'ฮาเร ราม ฮาเร ราม ราม ราม ฮาเร ฮาเร',
+    'builtin.shri-krishna': 'ศรี กฤษณะ',
   };
 }

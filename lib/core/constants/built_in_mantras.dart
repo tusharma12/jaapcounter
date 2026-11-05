@@ -161,6 +161,14 @@ abstract final class BuiltInMantras {
       isBuiltIn: true,
       sortOrder: 20,
     ),
+    // The greeting and remembrance most Gujarati homes say: Jai Shri Krishna.
+    Mantra(
+      id: 'builtin.shri-krishna',
+      name: 'श्री कृष्ण',
+      malaSize: 108,
+      isBuiltIn: true,
+      sortOrder: 21,
+    ),
   ];
 
   /// Each built-in in Roman letters, shown when the app is in English. Kept
@@ -194,6 +202,7 @@ abstract final class BuiltInMantras {
     'builtin.om-namo-narayanaya': 'Om Namo Narayanaya',
     'builtin.om-sai-ram': 'Om Sai Ram',
     'builtin.hare-rama': 'Hare Rama Hare Rama Rama Rama Hare Hare',
+    'builtin.shri-krishna': 'Shri Krishna',
   };
 
   static final Map<String, String> _shipped = {

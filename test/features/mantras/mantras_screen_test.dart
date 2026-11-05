@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:japmala/features/mantras/presentation/mantra_controllers.dart';
 import 'package:japmala/features/mantras/presentation/mantra_tile.dart';
 import 'package:japmala/features/mantras/presentation/mantras_screen.dart';
+import 'package:japmala/features/settings/presentation/settings_controller.dart';
 
 import '../../support/test_harness.dart';
 
@@ -36,6 +37,43 @@ void main() {
 
     expect(find.text('Active'), findsOneWidget);
     expect(container.read(activeMantraProvider)!.id, 'builtin.ram');
+  });
+
+  testWidgets('a Punjabi counter starts on Waheguru until one is chosen', (
+    tester,
+  ) async {
+    await container.read(settingsProvider.notifier).setLocale('pa');
+    await container.read(mantraListProvider.future);
+
+    expect(container.read(activeMantraProvider)!.id, 'builtin.waheguru');
+
+    // A choice the user makes is kept, whatever the language.
+    await container
+        .read(mantraListProvider.notifier)
+        .setActive('builtin.radha');
+    expect(container.read(activeMantraProvider)!.id, 'builtin.radha');
+  });
+
+  testWidgets('each language starts on its own default mantra', (
+    tester,
+  ) async {
+    await container.read(mantraListProvider.future);
+    const expected = {
+      'pa': 'builtin.waheguru',
+      'ta': 'builtin.om-namah-shivaya',
+      'ne': 'builtin.om-namah-shivaya',
+      'id': 'builtin.om-namah-shivaya',
+      'gu': 'builtin.shri-krishna',
+      'ru': 'builtin.hare-rama',
+      'ms': 'builtin.om-namah-shivaya',
+      'th': 'builtin.om-gam-ganapataye-namah',
+      'hi': 'builtin.ram',
+      'en': 'builtin.ram',
+    };
+    for (final MapEntry(key: code, value: id) in expected.entries) {
+      await container.read(settingsProvider.notifier).setLocale(code);
+      expect(container.read(activeMantraProvider)!.id, id, reason: code);
+    }
   });
 
   testWidgets('tapping a mantra makes it the active one', (tester) async {

@@ -9,6 +9,10 @@ abstract final class AppLanguages {
     'pa': 'ਪੰਜਾਬੀ',
     'ta': 'தமிழ்',
     'te': 'తెలుగు',
+    'ru': 'Русский',
+    'id': 'Bahasa Indonesia',
+    'ms': 'Bahasa Melayu',
+    'th': 'ไทย',
   };
 
   /// Languages written in Devanagari, which show the built-in mantras in
@@ -25,6 +29,10 @@ abstract final class AppLanguages {
   /// The speech recogniser's locale for dictating a mantra.
   static String dictationLocale(String code) => switch (code) {
     'en' => 'en_US',
+    'ru' => 'ru_RU',
+    'id' => 'id_ID',
+    'ms' => 'ms_MY',
+    'th' => 'th_TH',
     _ when names.containsKey(code) => '${code}_IN',
     _ => 'en_US',
   };

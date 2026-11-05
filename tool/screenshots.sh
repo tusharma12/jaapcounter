@@ -9,7 +9,7 @@ FLUTTER_ROOT="$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")"
 export FLUTTER_ROOT
 # One run per language: each draws its script font under the app's fallback
 # family, and a font family can only be registered once per run.
-for code in en hi mr gu pa ta te; do
+for code in en hi mr gu pa ta te ru id ms th; do
   SHOT_LOCALE="$code" flutter test screenshots/store_screenshots_test.dart "$@"
 done
 # en-GB and en-AU show the same English set.

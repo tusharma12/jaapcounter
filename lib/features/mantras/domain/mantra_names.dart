@@ -9,7 +9,7 @@ import '../../../core/constants/app_languages.dart';
 /// app's language: राम in Hindi, Ram in English.
 extension MantraNames on Mantra {
   /// [languageCode] is the app's language: Devanagari languages read the
-  /// mantra as written, Gujarati, Punjabi, Tamil and Telugu in their own
+  /// mantra as written, Gujarati, Punjabi, Tamil, Telugu and Russian in their own
   /// script, and everything else in Roman letters.
   ///
   /// A built-in the user has rewritten is theirs, and shows as they wrote

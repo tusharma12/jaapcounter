@@ -103,6 +103,10 @@
 		<string>pa</string>
 		<string>ta</string>
 		<string>te</string>
+		<string>ru</string>
+		<string>id</string>
+		<string>ms</string>
+		<string>th</string>
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>

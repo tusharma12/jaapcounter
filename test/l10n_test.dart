@@ -64,7 +64,9 @@ void main() {
     for (final code in AppLanguages.names.keys) {
       expect(
         Fmt.count(100000, code),
-        matches(RegExp(r'^[0-9,]+$')),
+        // Latin digits, grouped as the language groups them: 1,00,000,
+        // 100 000 (Russian), 100.000 (Indonesian).
+        matches(RegExp('^[0-9][0-9,.\u00A0\u202F ]*\$')),
         reason: code,
       );
       expect(
@@ -94,5 +96,20 @@ void main() {
     expect(AppLanguages.dictationLocale('en'), 'en_US');
     expect(AppLanguages.dictationLocale('te'), 'te_IN');
     expect(AppLanguages.dictationLocale('fr'), 'en_US');
+  });
+
+  test('Russian and Indonesian dictate in their own country\'s variant', () {
+    expect(AppLanguages.dictationLocale('ru'), 'ru_RU');
+    expect(AppLanguages.dictationLocale('id'), 'id_ID');
+    expect(AppLanguages.dictationLocale('ms'), 'ms_MY');
+    expect(AppLanguages.dictationLocale('th'), 'th_TH');
+  });
+
+  test('Russian reads the built-ins in Cyrillic, Indonesian in Roman', () {
+    final shiva = BuiltInMantras.all.firstWhere(
+      (m) => m.id == 'builtin.om-namah-shivaya',
+    );
+    expect(shiva.nameIn('ru'), 'Ом Намах Шивая');
+    expect(shiva.nameIn('id'), 'Om Namah Shivaya');
   });
 }

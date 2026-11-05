@@ -14,6 +14,7 @@ import '../../../app/theme/app_themes.dart';
 import '../../../core/services/ambient_chant_service.dart';
 import '../../../core/widgets/app_feedback.dart';
 import '../../jaap/presentation/counter_prefs.dart';
+import '../../jaap/presentation/widgets/mala_ring.dart';
 import '../../mantras/presentation/mantra_controllers.dart';
 import '../../meditation/presentation/music_controllers.dart';
 import '../../meditation/presentation/music_playback.dart';
@@ -38,16 +39,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _controller = PageController();
   int _page = 0;
   int? _goal;
-  bool _iconPrecached = false;
+  bool _companionPrecached = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Every page shows this icon, so it is loaded once up front rather than
-    // popping in on whichever page happens to be first.
-    if (!_iconPrecached) {
-      _iconPrecached = true;
-      precacheImage(const AssetImage('assets/branding/app_icon.png'), context);
+    // Every page shows the companion, so it is loaded once up front rather
+    // than popping in on whichever page happens to be first.
+    if (!_companionPrecached) {
+      _companionPrecached = true;
+      precacheImage(const AssetImage(_companionAsset), context);
     }
   }
 
@@ -197,22 +198,90 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-/// The app's own icon, used on every onboarding page so the app introduces
-/// itself once and consistently rather than switching symbols each screen.
-class _AppIconMark extends StatelessWidget {
-  const _AppIconMark({this.size = 96});
+/// JaapMitra's companion, a young bhakt with his mala, on every onboarding
+/// page so the app introduces itself once and consistently.
+class _Companion extends StatelessWidget {
+  const _Companion({this.height = 96});
 
-  final double size;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(size * 0.22),
+    return ExcludeSemantics(
       child: Image.asset(
-        'assets/branding/app_icon.png',
-        width: size,
-        height: size,
+        _companionAsset,
+        height: height,
         filterQuality: FilterQuality.medium,
+      ),
+    );
+  }
+}
+
+const _companionAsset = 'assets/branding/companion.png';
+
+/// The companion beside the app's own counter, counting up once, so the
+/// first page says plainly that this is a jaap counter.
+class _CompanionCounter extends StatelessWidget {
+  const _CompanionCounter();
+
+  static const double _height = 180;
+  static const double _ring = 92;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return ExcludeSemantics(
+      child: SizedBox(
+        width: 250,
+        height: _height,
+        child: Stack(
+          children: [
+            const Positioned(
+              left: 0,
+              bottom: 0,
+              child: _Companion(height: _height),
+            ),
+            Positioned(
+              right: 0,
+              top: 4,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: palette.card,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 27),
+                  duration: const Duration(milliseconds: 1800),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, _) {
+                    final beads = value.round();
+                    return MalaRing(
+                      beads: beads,
+                      malaSize: AppConstants.defaultMalaSize,
+                      diameter: _ring,
+                      child: Padding(
+                        padding: const EdgeInsets.all(22),
+                        child: MalaRingLabel(
+                          beads: beads,
+                          malaSize: AppConstants.defaultMalaSize,
+                          compact: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -265,7 +334,7 @@ class _WelcomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const _AppIconMark(size: 112),
+              const _CompanionCounter(),
               const SizedBox(height: Insets.xxl),
               Text(
                 l10n.onb1Title,
@@ -483,7 +552,7 @@ class _StepHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        const _AppIconMark(size: 64),
+        const _Companion(height: 72),
         const SizedBox(height: Insets.md),
         Text(
           title,

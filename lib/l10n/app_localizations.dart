@@ -8,10 +8,14 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_en.dart';
 import 'app_localizations_gu.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_id.dart';
 import 'app_localizations_mr.dart';
+import 'app_localizations_ms.dart';
 import 'app_localizations_pa.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_ta.dart';
 import 'app_localizations_te.dart';
+import 'app_localizations_th.dart';
 
 // ignore_for_file: type=lint
 
@@ -101,10 +105,14 @@ abstract class AppL10n {
     Locale('en'),
     Locale('gu'),
     Locale('hi'),
+    Locale('id'),
     Locale('mr'),
+    Locale('ms'),
     Locale('pa'),
+    Locale('ru'),
     Locale('ta'),
     Locale('te'),
+    Locale('th'),
   ];
 
   /// No description provided for @appName.
@@ -2209,10 +2217,14 @@ class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
     'en',
     'gu',
     'hi',
+    'id',
     'mr',
+    'ms',
     'pa',
+    'ru',
     'ta',
     'te',
+    'th',
   ].contains(locale.languageCode);
 
   @override
@@ -2228,14 +2240,22 @@ AppL10n lookupAppL10n(Locale locale) {
       return AppL10nGu();
     case 'hi':
       return AppL10nHi();
+    case 'id':
+      return AppL10nId();
     case 'mr':
       return AppL10nMr();
+    case 'ms':
+      return AppL10nMs();
     case 'pa':
       return AppL10nPa();
+    case 'ru':
+      return AppL10nRu();
     case 'ta':
       return AppL10nTa();
     case 'te':
       return AppL10nTe();
+    case 'th':
+      return AppL10nTh();
   }
 
   throw FlutterError(

@@ -11,8 +11,9 @@
 //   appstore_assets/iphone-duo/en-US/{outer,inner}/
 //                                            1398×2034, 2007×2853
 //
-// 08_brand (icon, name, hand with mala) is a hand-made graphic, localized by
-// hand per locale; nothing here writes it.
+// 08_brand (icon, name, the companion with the app's mala counter) is drawn
+// here too, from appstore_assets/appicon-fullbleed.png and
+// assets/branding/companion.png.
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -27,15 +28,20 @@ import 'package:go_router/go_router.dart';
 import 'package:japmala/app/router.dart';
 import 'package:japmala/app/theme/app_theme.dart';
 import 'package:japmala/app/theme/app_themes.dart';
+import 'package:japmala/core/constants/app_languages.dart';
+import 'package:japmala/core/constants/built_in_mantras.dart';
 import 'package:japmala/core/database/app_database.dart';
 import 'package:japmala/core/providers.dart';
 import 'package:japmala/features/jaap/presentation/counter_prefs.dart';
+import 'package:japmala/features/jaap/presentation/auto_jaap_controller.dart';
 import 'package:japmala/features/jaap/presentation/jaap_controller.dart';
+import 'package:japmala/features/jaap/presentation/widgets/mala_ring.dart';
 import 'package:japmala/features/meditation/presentation/music_playback.dart';
 import 'package:japmala/core/services/ambient_chant_service.dart';
 import 'package:japmala/core/services/user_music_store.dart';
 import 'package:japmala/features/settings/domain/counter_background.dart';
 import 'package:japmala/features/settings/presentation/settings_controller.dart';
+import 'package:japmala/features/mantras/domain/mantra_names.dart';
 import 'package:japmala/l10n/app_localizations.dart';
 
 import '../test/support/test_harness.dart';
@@ -253,6 +259,31 @@ Future<void> _loadFonts() async {
       );
     await loader.load();
   }
+  // Every script in one family (fontTools merge of the Noto Regulars), the
+  // last fallback, so a screen that lists the languages shows each in its
+  // own script whatever language this run is drawing.
+  final indic = FontLoader('NotoSansIndicAll')
+    ..addFont(
+      Future.value(
+        ByteData.sublistView(
+          File(
+            'screenshots/fonts/NotoSansIndic-Merged-Regular.ttf',
+          ).readAsBytesSync(),
+        ),
+      ),
+    );
+  await indic.load();
+  // Thai under its own name too, last of all, for the ไทย chip on the
+  // languages shot whatever language is being drawn.
+  final thai = FontLoader('NotoSansThaiAll')
+    ..addFont(
+      Future.value(
+        ByteData.sublistView(
+          File('screenshots/fonts/NotoSansThai-Regular.ttf').readAsBytesSync(),
+        ),
+      ),
+    );
+  await thai.load();
   if (script != null) {
     final loader = FontLoader('NotoSansDevanagari');
     for (final weight in ['Regular', 'Bold']) {
@@ -265,8 +296,12 @@ Future<void> _loadFonts() async {
   }
 }
 
-/// 23 days in a row of steady Jaap, a gap, and some earlier practice.
-Future<ProviderContainer> _seededApp() async {
+/// 23 days in a row of steady Jaap, a gap, and some earlier practice:
+/// [main] every day and on the counter, [side] now and then.
+Future<ProviderContainer> _seededApp({
+  String main = 'builtin.ram',
+  String side = 'builtin.radha',
+}) async {
   final clock = TestClock(_now);
   final music = Directory.systemTemp.createTempSync('shotmusic');
   final container = await createTestContainer(
@@ -286,6 +321,7 @@ Future<ProviderContainer> _seededApp() async {
   await settings.completeOnboarding();
   await settings.setHaptics(false);
   container.read(counterHintSeenProvider.notifier).markSeen();
+  if (main != 'builtin.ram') await settings.setActiveMantra(main);
 
   final repo = container.read(jaapRepositoryProvider);
   const streakDays = 23;
@@ -317,23 +353,23 @@ Future<ProviderContainer> _seededApp() async {
   for (var d = streakDays - 1; d >= 1; d--) {
     clock.set(_now.subtract(Duration(days: d)).copyWith(hour: 6));
     await repo.addBeads(
-      mantraId: 'builtin.ram',
+      mantraId: main,
       delta: daily[(streakDays - 1 - d) % daily.length],
     );
     if (d % 4 == 0) {
-      await repo.addBeads(mantraId: 'builtin.radha', delta: 216);
+      await repo.addBeads(mantraId: side, delta: 216);
     }
   }
   for (final d in [26, 27, 29, 30, 33, 34, 35]) {
     clock.set(_now.subtract(Duration(days: d)).copyWith(hour: 7));
-    await repo.addBeads(mantraId: 'builtin.ram', delta: 540);
+    await repo.addBeads(mantraId: main, delta: 540);
   }
 
   // A 40-day Sankalp begun on the first day of the streak.
   await container
       .read(sadhanaRepositoryProvider)
       .create(
-        mantraId: 'builtin.ram',
+        mantraId: main,
         dailyGoal: 1080,
         durationDays: 40,
         startAt: _now.subtract(const Duration(days: streakDays - 1)),
@@ -341,87 +377,10 @@ Future<ProviderContainer> _seededApp() async {
 
   // This morning: five malas and part of the sixth.
   clock.set(_now);
-  await repo.addBeads(mantraId: 'builtin.ram', delta: 612);
+  await repo.addBeads(mantraId: main, delta: 612);
   container.read(ledgerRevisionProvider.notifier).bump();
   return container;
 }
-
-/// An In-App Event's Sankalp a few days in: [mantraId] on the counter, three
-/// malas a day so far, and two malas and half of the third done today.
-Future<ProviderContainer> _eventApp(_Event event) async {
-  final clock = TestClock(event.now);
-  final container = await createTestContainer(
-    clock: clock,
-    overrides: [ambientChantProvider.overrideWithValue(_SilentChants())],
-  );
-  await AppDatabase.clearAll(container.read(databaseProvider));
-  final settings = container.read(settingsProvider.notifier);
-  await settings.completeOnboarding();
-  await settings.setHaptics(false);
-  container.read(counterHintSeenProvider.notifier).markSeen();
-
-  final repo = container.read(jaapRepositoryProvider);
-  for (var d = event.day - 1; d >= 1; d--) {
-    clock.set(event.now.subtract(Duration(days: d)).copyWith(hour: 6));
-    await repo.addBeads(mantraId: event.mantraId, delta: 324);
-  }
-  await container
-      .read(sadhanaRepositoryProvider)
-      .create(
-        mantraId: event.mantraId,
-        dailyGoal: 324,
-        durationDays: event.days,
-        startAt: event.now.subtract(Duration(days: event.day - 1)),
-      );
-  clock.set(event.now);
-  await repo.addBeads(mantraId: event.mantraId, delta: 270);
-  await settings.setActiveMantra(event.mantraId);
-  container.read(ledgerRevisionProvider.notifier).bump();
-  return container;
-}
-
-class _Event {
-  const _Event(this.name, this.now, this.mantraId, this.days, this.day);
-
-  final String name;
-  final DateTime now;
-  final String mantraId;
-  final int days;
-
-  /// Which day of the Sankalp "today" is.
-  final int day;
-}
-
-/// The In-App Events whose images show the app (tool/make_festival_events.py).
-final _events = [
-  _Event(
-    'diwali',
-    DateTime(2026, 10, 31, 6, 40),
-    'builtin.om-shri-mahalakshmyai-namah',
-    11,
-    3,
-  ),
-  _Event('kartik', DateTime(2026, 11, 2, 6, 40), 'builtin.hare-krishna', 29, 7),
-];
-
-/// The two screens each event image shows: the counter, and the Sankalp.
-final _eventScreens = <_Shot>[
-  _Shot(
-    file: 'counter',
-    headline: const [],
-    sub: '',
-    capture: (tester, c, router) async {},
-  ),
-  _Shot(
-    file: 'sadhana',
-    headline: const [],
-    sub: '',
-    capture: (tester, c, router) async {
-      router.push('/sadhana');
-      await _settle(tester);
-    },
-  ),
-];
 
 /// Captures the app itself at device size, 3×. With [sequenceDir], it then
 /// taps the counter [_sequenceTaps] times and saves every frame (30 fps, 2×)
@@ -615,7 +574,9 @@ class _StoreCanvas extends StatelessWidget {
     const badgeColor = _saffron;
     // Every non-English run loads its script's font as 'NotoSansDevanagari',
     // the family the app already falls back to (see _loadFonts).
-    final textFont = code == 'en' ? 'Inter' : 'NotoSansDevanagari';
+    final textFont = const {'en', 'ru', 'id', 'ms'}.contains(code)
+        ? 'Inter'
+        : 'NotoSansDevanagari';
     final copy = _headlines[shot.file]?[code];
     final headline = copy == null ? shot.headline : _spans(copy.$1);
     final sub = copy?.$2 ?? shot.sub;
@@ -1249,6 +1210,2285 @@ class _StatusBar extends StatelessWidget {
   }
 }
 
+/// The name per language for 08_brand: `*` marks the highlighted run.
+const _brandCopy = <String, (String, String)>{
+  'en': ('Naam Jaap\n*Counter*', 'JaapMitra'),
+  'hi': ('नाम जप\n*काउंटर*', 'जापमित्र'),
+  'mr': ('नाम जप\n*काउंटर*', 'जापमित्र'),
+  'gu': ('નામ જપ\n*કાઉન્ટર*', 'જાપમિત્ર'),
+  'pa': ('ਨਾਮ ਜਪ\n*ਕਾਊਂਟਰ*', 'ਜਾਪਮਿੱਤਰ'),
+  'ta': ('நாம ஜப\n*கவுண்டர்*', 'ஜாப்மித்ரா'),
+  'te': ('నామ జప\n*కౌంటర్*', 'జాపమిత్ర'),
+  'ru': ('Счётчик\n*джапы*', 'JaapMitra'),
+  'id': ('Penghitung\n*Japa*', 'JaapMitra'),
+  'ms': ('Pengira\n*Japa*', 'JaapMitra'),
+  'th': ('ตัวนับ\n*การสวดมนต์*', 'JaapMitra'),
+};
+
+/// 08_brand: the icon and name, then the companion under the app's own mala
+/// counter, so the last shot says what the app is at a glance.
+class _BrandCanvas extends StatelessWidget {
+  const _BrandCanvas({
+    required this.size,
+    required this.code,
+    required this.icon,
+    required this.companion,
+  });
+
+  final Size size;
+  final String code;
+  final ui.Image icon;
+  final ui.Image companion;
+
+  static const _cream = Color(0xFFFFF4E2);
+  static const _saffron = Color(0xFFFFB23F);
+
+  @override
+  Widget build(BuildContext context) {
+    final w = size.width;
+    final h = size.height;
+    final tall = h / w > 2;
+    final u = math.min(w, h * 0.62);
+    final headlineScale = const {'ta': 0.76, 'te': 0.86}[code] ?? 1.0;
+    final headlineSize = u * (tall ? 0.105 : 0.09) * headlineScale;
+    final textFont = const {'en', 'ru', 'id', 'ms'}.contains(code)
+        ? 'Inter'
+        : 'NotoSansDevanagari';
+    final (title, name) = _brandCopy[code] ?? _brandCopy['en']!;
+    final iconSize = u * (tall ? 0.24 : 0.2);
+
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF2A0A04),
+                    Color(0xFF5A1A07),
+                    Color(0xFF8A3A0C),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Column(
+              children: [
+                SizedBox(height: h * (tall ? 0.05 : 0.035)),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(iconSize * 0.225),
+                  child: RawImage(
+                    image: icon,
+                    width: iconSize,
+                    height: iconSize,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+                SizedBox(height: u * 0.045),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      for (final (text, highlight) in _spans(title))
+                        TextSpan(
+                          text: text,
+                          style: TextStyle(
+                            color: highlight ? _saffron : _cream,
+                          ),
+                        ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: textFont,
+                    fontFamilyFallback: const ['Inter'],
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.w800,
+                    height: 1.08,
+                    letterSpacing: -headlineSize * 0.025,
+                  ),
+                ),
+                SizedBox(height: u * 0.025),
+                Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: textFont,
+                    fontFamilyFallback: const ['Inter'],
+                    fontSize: u * 0.052,
+                    fontWeight: FontWeight.w500,
+                    color: _cream.withValues(alpha: 0.78),
+                  ),
+                ),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, box) {
+                      final ringSize = math.min(w * 0.66, box.maxHeight * 0.5);
+                      final figure = math.min(
+                        box.maxHeight * 0.56,
+                        w * 0.62 * companion.height / companion.width,
+                      );
+                      final ringTop = box.maxHeight * 0.06;
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        clipBehavior: Clip.none,
+                        children: [
+                          // The diya glow behind the counter.
+                          Positioned(
+                            top: ringTop - ringSize * 0.35,
+                            width: ringSize * 1.7,
+                            height: ringSize * 1.7,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: RadialGradient(
+                                  colors: [
+                                    _saffron.withValues(alpha: 0.3),
+                                    _saffron.withValues(alpha: 0),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: ringTop,
+                            child: Theme(
+                              data: AppTheme.dark(),
+                              child: MalaRing(
+                                beads: 81,
+                                malaSize: 108,
+                                diameter: ringSize,
+                                child: Padding(
+                                  padding: EdgeInsets.all(ringSize * 0.2),
+                                  child: MalaRingLabel(
+                                    beads: 81,
+                                    malaSize: 108,
+                                    color: _cream,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -h * 0.012,
+                            height: figure,
+                            child: RawImage(
+                              image: companion,
+                              height: figure,
+                              filterQuality: FilterQuality.high,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Draws [child] at [canvas] points, 3×, and writes it to [path].
+Future<void> _renderTo(
+  WidgetTester tester,
+  Widget child,
+  Size canvas,
+  String path,
+) async {
+  tester.view.physicalSize = canvas * 3;
+  tester.view.devicePixelRatio = 3;
+  tester.view.padding = FakeViewPadding.zero;
+  tester.view.viewPadding = FakeViewPadding.zero;
+  const key = ValueKey('render');
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: RepaintBoundary(key: key, child: child),
+    ),
+  );
+  await tester.pump(const Duration(seconds: 1));
+  await tester.runAsync(() async {
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byKey(key),
+    );
+    final image = await boundary.toImage(pixelRatio: 3);
+    final data = await image.toByteData(format: ui.ImageByteFormat.png);
+    File(path)
+      ..parent.createSync(recursive: true)
+      ..writeAsBytesSync(data!.buffer.asUint8List());
+  });
+  await tester.pumpWidget(const SizedBox());
+}
+
+// ---------------------------------------------------------------------------
+// The phone shots of the store gallery (see _hybrid): gold, black or night
+// canvases, a large phone and a benefit-first headline.
+
+enum _V2Look { gold, black, night }
+
+/// What floats beside the phone on a v2 shot.
+enum _V2Extra { none, companion, badges, paces, nowPlaying }
+
+class _V2Shot {
+  const _V2Shot({
+    required this.file,
+    required this.headline,
+    required this.sub,
+    required this.capture,
+    this.look = _V2Look.gold,
+    this.badge,
+    this.darkStatusBar = false,
+    this.extra = _V2Extra.none,
+    this.chips = const [],
+    this.headlineScale = 1,
+  });
+
+  final String file;
+  final List<_Span> headline;
+  final String sub;
+  final Future<void> Function(WidgetTester, ProviderContainer, GoRouter)
+  capture;
+  final _V2Look look;
+  final String? badge;
+  final bool darkStatusBar;
+  final _V2Extra extra;
+
+  /// Short facts pinned over the phone, each with its icon.
+  final List<(IconData, String)> chips;
+
+  /// Below 1 for headlines with a long line.
+  final double headlineScale;
+}
+
+/// Auto Jaap's pace in seconds when 04 was captured.
+int _v2Pace = 1;
+
+/// Stops 04's Auto Jaap once the gallery is drawn, so no timer outlives it.
+AutoJaapController? _v2Auto;
+
+final _v2Shots = <_V2Shot>[
+  _V2Shot(
+    file: '01_jaap',
+    badge: 'Ad‑free  •  No subscriptions',
+    headline: [('Naam Jaap for\n', false), ('Radha, Ram & Shiv', true)],
+    sub: '',
+    extra: _V2Extra.companion,
+    capture: (tester, c, router) async {},
+  ),
+  _V2Shot(
+    file: '02_habit',
+    headline: [('Build a\n', false), ('Daily Habit', true)],
+    sub: 'Daily goals, streaks and Sankalp.',
+    chips: [(Icons.local_fire_department_rounded, '22 days in a row')],
+    capture: (tester, c, router) async {
+      router.go('/progress');
+      await _settle(tester);
+      // The daily chart: Jaap for each day, so the streak is a bar per day.
+      await tester.tap(find.text('Daily'));
+      await _settle(tester);
+    },
+  ),
+  _V2Shot(
+    file: '03_blackout',
+    look: _V2Look.black,
+    darkStatusBar: true,
+    headline: [('Chant Without\n', false), ('Distractions', true)],
+    chips: [
+      (Icons.touch_app_rounded, 'Tap anywhere'),
+      (Icons.volume_up_rounded, 'Volume buttons count'),
+    ],
+    sub: 'A completely dark screen for peaceful Jaap.',
+    capture: (tester, c, router) async {
+      router.push('/blackout');
+      await _settle(tester);
+      await tester.tap(find.byKey(const ValueKey('blackout-show-mantra')));
+      await _settle(tester);
+    },
+  ),
+  _V2Shot(
+    file: '04_auto_jaap',
+    headline: [('Let Your\n', false), ('Jaap Flow', true)],
+    sub: 'Chant hands-free at your own pace.',
+    extra: _V2Extra.paces,
+    capture: (tester, c, router) async {
+      c.read(autoJaapProvider.notifier).start();
+      await tester.pump(const Duration(seconds: 3));
+      await _settle(tester);
+      _v2Pace = c.read(autoJaapProvider).config.interval.inSeconds;
+      _v2Auto = c.read(autoJaapProvider.notifier);
+    },
+  ),
+  _V2Shot(
+    file: '05_music',
+    look: _V2Look.night,
+    darkStatusBar: true,
+    headline: [('Make Every Jaap\n', false), ('Peaceful', true)],
+    extra: _V2Extra.nowPlaying,
+    sub: 'Chant with calming sounds and music.',
+    capture: (tester, c, router) async {
+      await c.read(settingsProvider.notifier).setTheme(AppThemeId.meditative);
+      router.push('/meditation');
+      await _settle(tester);
+      await c
+          .read(musicPlaybackProvider.notifier)
+          .choose(AmbientChantService.chants[1].id, play: true);
+      await _settle(tester);
+    },
+  ),
+  _V2Shot(
+    file: '06_mantras',
+    headline: [('Your Favourite Naam.\n', false), ('All in One Place.', true)],
+    headlineScale: 0.8,
+    sub: 'Ram, Radha, Krishna, Shiva and more.',
+    chips: [(Icons.add_rounded, 'Add your own mantra')],
+    capture: (tester, c, router) async {
+      router.push('/mantras');
+      await _settle(tester);
+    },
+  ),
+  _V2Shot(
+    file: '07_mala',
+    darkStatusBar: true,
+    headline: [('Your ', false), ('108-Bead\n', true), ('Digital Mala', false)],
+    sub: 'Feel every bead with gentle haptic feedback.',
+    chips: [(Icons.vibration_rounded, 'Haptic on every bead')],
+    // One bead from a full mala, on a warm theme of its own, so it does
+    // not repeat 01.
+    capture: (tester, c, router) async {
+      await c.read(settingsProvider.notifier).setTheme(AppThemeId.spiritual);
+      final jaap = c.read(jaapControllerProvider.notifier);
+      final left =
+          107 -
+          c.read(jaapControllerProvider).value!.position.beadsInCurrentMala;
+      for (var i = 0; i < left; i++) {
+        jaap.count();
+        await tester.pump(const Duration(milliseconds: 30));
+      }
+      await _settle(tester);
+    },
+  ),
+  _V2Shot(
+    file: '08_language',
+    headline: [('Your Practice.\n', false), ('Your Language.', true)],
+    sub: 'Eleven languages. Ad‑free, no subscriptions.',
+    extra: _V2Extra.badges,
+    capture: (tester, c, router) async {
+      router.go('/settings');
+      await _settle(tester);
+      final tile = find.text('Language');
+      await tester.scrollUntilVisible(
+        tile,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await _settle(tester);
+      await tester.tap(tile);
+      await _settle(tester);
+    },
+  ),
+];
+
+class _V2Canvas extends StatelessWidget {
+  const _V2Canvas({
+    required this.shot,
+    required this.screen,
+    required this.size,
+    required this.companion,
+  });
+
+  final _V2Shot shot;
+  final ui.Image screen;
+  final Size size;
+  final ui.Image companion;
+
+  static const _ink = Color(0xFF2B1608);
+  static const _inkSoft = Color(0xFF6E5442);
+  static const _saffron = Color(0xFFE8770E);
+  static const _burnt = Color(0xFFB83A06);
+  static const _gold = Color(0xFFFFB23F);
+  static const _cream = Color(0xFFFFF4E2);
+
+  @override
+  Widget build(BuildContext context) {
+    final w = size.width;
+    final h = size.height;
+    final dark = shot.look != _V2Look.gold;
+    final headlineSize =
+        w *
+        0.098 *
+        shot.headlineScale *
+        (const {'ta': 0.76, 'te': 0.86}[_hyCode] ?? 1.0);
+    final phoneTop = h * 0.235;
+    // The phone runs off the bottom edge: the screen's top two thirds carry
+    // the story, at a size that reads in the store.
+    final phoneWidth = w * 0.80;
+    final phoneHeight = phoneWidth * _device.height / _device.width;
+    final phoneLeft = (w - phoneWidth) / 2;
+    final ink = dark ? _cream : _ink;
+    final highlight = dark ? _gold : _burnt;
+    final soft = dark ? _cream.withValues(alpha: 0.7) : _inkSoft;
+    final (headline, sub, badge) = _hyText(
+      shot.file,
+      shot.headline,
+      shot.sub,
+      shot.badge,
+    );
+
+    TextStyle text(double size, FontWeight weight, Color color) => TextStyle(
+      fontFamily: 'Inter',
+      fontFamilyFallback: _hyFallback,
+      fontSize: size,
+      fontWeight: weight,
+      color: color,
+      decoration: TextDecoration.none,
+    );
+
+    Widget chip(IconData icon, String label, {double k = 1}) => Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: w * 0.04 * k,
+        vertical: w * 0.025 * k,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6A3A10).withValues(alpha: 0.22),
+            blurRadius: w * 0.05,
+            offset: Offset(0, w * 0.015),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: w * 0.05 * k, color: _saffron),
+          SizedBox(width: w * 0.02 * k),
+          Text(label, style: text(w * 0.038 * k, FontWeight.w600, _ink)),
+        ],
+      ),
+    );
+
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: switch (shot.look) {
+                    _V2Look.black => const [
+                      Color(0xFF000000),
+                      Color(0xFF120A05),
+                    ],
+                    _V2Look.night => const [
+                      Color(0xFF2A0A04),
+                      Color(0xFF5A1A07),
+                      Color(0xFF8A3A0C),
+                    ],
+                    _V2Look.gold => const [
+                      Color(0xFFFFE2A0),
+                      Color(0xFFFFC25C),
+                      Color(0xFFF5962A),
+                    ],
+                  },
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: w * 0.05,
+            right: w * 0.05,
+            top: h * 0.055,
+            child: Column(
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      for (final (t, hi) in headline)
+                        TextSpan(
+                          text: t,
+                          style: TextStyle(color: hi ? highlight : ink),
+                        ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  style: text(
+                    headlineSize,
+                    FontWeight.w800,
+                    ink,
+                  ).copyWith(height: 1.08, letterSpacing: -headlineSize * 0.03),
+                ),
+                if (sub.isNotEmpty) ...[
+                  SizedBox(height: w * 0.03),
+                  Text(
+                    sub,
+                    textAlign: TextAlign.center,
+                    style: text(w * 0.041, FontWeight.w500, soft),
+                  ),
+                ],
+                if (badge case final badge?) ...[
+                  SizedBox(height: w * 0.035),
+                  Container(
+                    constraints: BoxConstraints(maxWidth: w * 0.9),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: w * 0.04,
+                      vertical: w * 0.02,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        badge,
+                        maxLines: 1,
+                        style: text(w * 0.036, FontWeight.w700, _burnt),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Positioned(
+            top: phoneTop,
+            left: phoneLeft,
+            width: phoneWidth,
+            height: phoneHeight,
+            child: _Phone(screen: screen, darkStatusBar: shot.darkStatusBar),
+          ),
+          if (shot.extra == _V2Extra.companion)
+            Positioned(
+              left: -w * 0.03,
+              bottom: -h * 0.005,
+              height: h * 0.25,
+              child: RawImage(
+                image: companion,
+                height: h * 0.25,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          if (shot.extra == _V2Extra.paces)
+            Positioned(
+              left: w * 0.06,
+              right: w * 0.06,
+              bottom: h * 0.05,
+              child: Container(
+                padding: EdgeInsets.all(w * 0.04),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(w * 0.06),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF6A3A10).withValues(alpha: 0.25),
+                      blurRadius: w * 0.06,
+                      offset: Offset(0, w * 0.02),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.play_circle_fill_rounded,
+                          color: _saffron,
+                          size: w * 0.06,
+                        ),
+                        SizedBox(width: w * 0.02),
+                        Text(
+                          '${_hyL10n.autoJaap}  ·  ${_hyL10n.autoJaapPace}',
+                          style: text(w * 0.04, FontWeight.w700, _ink),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: w * 0.03),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        for (final sec in AutoJaapConfig.paces)
+                          Container(
+                            width: w * 0.145,
+                            padding: EdgeInsets.symmetric(vertical: w * 0.022),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: sec == _v2Pace
+                                  ? _saffron
+                                  : const Color(0xFFFFF1DF),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              _hyL10n.autoJaapSeconds(sec),
+                              style: text(
+                                w * 0.038,
+                                FontWeight.w700,
+                                sec == _v2Pace ? Colors.white : _ink,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (shot.chips.isNotEmpty)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: h * 0.028,
+              child: SizedBox(
+                width: w,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (final (i, (icon, label)) in shot.chips.indexed) ...[
+                        if (i > 0) SizedBox(width: w * 0.025),
+                        chip(
+                          icon,
+                          _tr(label),
+                          k: shot.chips.length > 1 ? 0.9 : 1,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (shot.extra == _V2Extra.nowPlaying)
+            Positioned(
+              left: w * 0.06,
+              right: w * 0.06,
+              bottom: h * 0.05,
+              child: Container(
+                padding: EdgeInsets.all(w * 0.04),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(w * 0.06),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      blurRadius: w * 0.06,
+                      offset: Offset(0, w * 0.02),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: w * 0.1,
+                          height: w * 0.1,
+                          decoration: const BoxDecoration(
+                            color: _saffron,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.music_note_rounded,
+                            color: Colors.white,
+                            size: w * 0.055,
+                          ),
+                        ),
+                        SizedBox(width: w * 0.03),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _tr('NOW PLAYING'),
+                                style: text(
+                                  w * 0.027,
+                                  FontWeight.w700,
+                                  _saffron,
+                                ).copyWith(letterSpacing: 1),
+                              ),
+                              Text(
+                                AmbientChantService.chants[1].label,
+                                style: text(w * 0.041, FontWeight.w700, _ink),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.pause_circle_filled_rounded,
+                          color: _saffron,
+                          size: w * 0.09,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: w * 0.03),
+                    Wrap(
+                      spacing: w * 0.02,
+                      runSpacing: w * 0.02,
+                      children: [
+                        for (final i in const [3, 5, 0])
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: w * 0.03,
+                              vertical: w * 0.015,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF1DF),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              AmbientChantService.chants[i].label,
+                              style: text(w * 0.032, FontWeight.w600, _ink),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (shot.extra == _V2Extra.badges)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: h * 0.022,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  chip(Icons.block_rounded, _tr('Ad‑free'), k: 0.9),
+                  SizedBox(width: w * 0.025),
+                  chip(
+                    Icons.credit_card_off_rounded,
+                    _tr('No subscriptions'),
+                    k: 0.9,
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The graphic shots of the store gallery (see _hybrid): drawn from the
+// app's own parts (its mala ring, its mantras, sounds and paces, the seeded
+// practice) instead of phone captures.
+
+class _GfxShot {
+  const _GfxShot({
+    required this.file,
+    required this.headline,
+    required this.sub,
+    required this.art,
+    this.look = _V2Look.gold,
+    this.badge,
+    this.headlineScale = 1,
+  });
+
+  final String file;
+  final List<_Span> headline;
+  final String sub;
+  final _V2Look look;
+  final String? badge;
+  final double headlineScale;
+
+  /// The graphic under the headline, in a box [w] wide and [h] tall.
+  final Widget Function(double w, double h, ui.Image companion) art;
+}
+
+/// The app icon, shown on 08 in place of a second companion. Loaded by the
+/// test.
+late ui.Image _gIcon;
+
+/// One grid for every graphic, as fractions of the area under the headline
+/// (and of the width, for the ring): where the mantra's name sits, where the
+/// ring starts and how big it is, and how far bottom chips and cards sit
+/// from the edge.
+const _gTitleTop = 0.03;
+const _gRingTop = 0.11;
+const _gRingSize = 0.8;
+const _gBottom = 0.06;
+
+const _gInk = Color(0xFF2B1608);
+const _gSaffron = Color(0xFFE8770E);
+const _gBurnt = Color(0xFFB83A06);
+const _gGold = Color(0xFFFFB23F);
+const _gCream = Color(0xFFFFF4E2);
+const _gChip = Color(0xFFFFF1DF);
+
+TextStyle _gt(double size, FontWeight weight, Color color) => TextStyle(
+  fontFamily: 'Inter',
+  fontFamilyFallback: _hyFallback,
+  fontSize: size,
+  fontWeight: weight,
+  color: color,
+  decoration: TextDecoration.none,
+);
+
+BoxDecoration _gCardDeco(double w, {Color color = Colors.white}) =>
+    BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(w * 0.06),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF5A2A08).withValues(alpha: 0.28),
+          blurRadius: w * 0.07,
+          offset: Offset(0, w * 0.025),
+        ),
+      ],
+    );
+
+Widget _gChipW(double w, IconData icon, String label, {double k = 1}) =>
+    Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: w * 0.04 * k,
+        vertical: w * 0.025 * k,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF5A2A08).withValues(alpha: 0.22),
+            blurRadius: w * 0.05,
+            offset: Offset(0, w * 0.015),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: w * 0.05 * k, color: _gSaffron),
+          SizedBox(width: w * 0.02 * k),
+          Text(label, style: _gt(w * 0.038 * k, FontWeight.w600, _gInk)),
+        ],
+      ),
+    );
+
+/// The app's own mala ring with its count, on a disc.
+Widget _gRing(
+  double size, {
+  required int beads,
+  required bool dark,
+  Color? disc,
+}) => Container(
+  width: size,
+  height: size,
+  decoration: BoxDecoration(
+    shape: BoxShape.circle,
+    color: disc ?? (dark ? const Color(0xFF1C1B2E) : Colors.white),
+    boxShadow: [
+      BoxShadow(
+        color: const Color(0xFF5A2A08).withValues(alpha: 0.3),
+        blurRadius: size * 0.12,
+        offset: Offset(0, size * 0.04),
+      ),
+    ],
+  ),
+  alignment: Alignment.center,
+  child: Theme(
+    data: dark ? AppTheme.dark() : AppTheme.light(),
+    child: MalaRing(
+      beads: beads,
+      malaSize: 108,
+      diameter: size * 0.84,
+      child: Padding(
+        padding: EdgeInsets.all(size * 0.2),
+        child: MalaRingLabel(
+          beads: beads,
+          malaSize: 108,
+          color: dark ? _gCream : _gInk,
+        ),
+      ),
+    ),
+  ),
+);
+
+Widget _gCompanion(ui.Image companion, double height) => RawImage(
+  image: companion,
+  height: height,
+  filterQuality: FilterQuality.high,
+);
+
+/// Daily Jaap, Sep 21 to 27, as seeded for v2 (all mantras; goal 1,080).
+const _gDays = [
+  ('21', 1080),
+  ('22', 1404),
+  ('23', 1404),
+  ('24', 1080),
+  ('25', 1296),
+  ('26', 1188),
+  ('27', 612),
+];
+
+final _gfxShots = <_GfxShot>[
+  _GfxShot(
+    file: '01_jaap',
+    badge: 'Ad‑free  •  No subscriptions',
+    headline: [('Naam Jaap for\n', false), ('Radha, Ram & Shiv', true)],
+    sub: '',
+    art: (w, h, companion) => Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: h * _gTitleTop,
+          child: Text(
+            _mName(_hyMain),
+            style: _gt(w * 0.1, FontWeight.w800, _gInk),
+          ),
+        ),
+        Positioned(
+          top: h * _gRingTop,
+          child: _gRing(w * _gRingSize, beads: 72, dark: false),
+        ),
+        Positioned(
+          left: -w * 0.02,
+          bottom: -h * 0.01,
+          child: _gCompanion(companion, h * 0.4),
+        ),
+      ],
+    ),
+  ),
+  _GfxShot(
+    file: '02_habit',
+    headline: [('Build a\n', false), ('Daily Habit', true)],
+    sub: 'Daily goals, streaks and Sankalp.',
+    art: (w, h, companion) {
+      final barMax = h * 0.34;
+      return Column(
+        children: [
+          SizedBox(height: h * 0.03),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: w * 0.06,
+              vertical: w * 0.03,
+            ),
+            decoration: BoxDecoration(
+              color: _gInk,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.local_fire_department_rounded,
+                  color: _gGold,
+                  size: w * 0.08,
+                ),
+                SizedBox(width: w * 0.02),
+                Text(
+                  _tr('22 days in a row'),
+                  style: _gt(w * 0.06, FontWeight.w800, _gCream),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: h * 0.04),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: w * 0.06),
+            padding: EdgeInsets.fromLTRB(
+              w * 0.06,
+              w * 0.06,
+              w * 0.06,
+              w * 0.04,
+            ),
+            decoration: _gCardDeco(w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      _tr('Daily Jaap'),
+                      style: _gt(w * 0.05, FontWeight.w700, _gInk),
+                    ),
+                    const Spacer(),
+                    Text(
+                      _tr('Goal 1,080'),
+                      style: _gt(w * 0.036, FontWeight.w600, _gBurnt),
+                    ),
+                  ],
+                ),
+                SizedBox(height: w * 0.05),
+                SizedBox(
+                  height: barMax + w * 0.08,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for (final (i, (day, jaap)) in _gDays.indexed)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: w * 0.085,
+                              height: barMax * jaap / 1404,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(w * 0.02),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: i == _gDays.length - 1
+                                      ? const [_gSaffron, _gBurnt]
+                                      : const [
+                                          Color(0xFFFFD48A),
+                                          Color(0xFFF5A623),
+                                        ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: w * 0.02),
+                            Text(
+                              day,
+                              style: _gt(
+                                w * 0.035,
+                                i == _gDays.length - 1
+                                    ? FontWeight.w800
+                                    : FontWeight.w500,
+                                _gInk,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: h * 0.03),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: w * 0.06),
+            padding: EdgeInsets.all(w * 0.05),
+            decoration: _gCardDeco(w),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _tr("TODAY'S JAAP"),
+                      style: _gt(
+                        w * 0.03,
+                        FontWeight.w700,
+                        _gSaffron,
+                      ).copyWith(letterSpacing: 1),
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '612',
+                            style: _gt(w * 0.075, FontWeight.w800, _gInk),
+                          ),
+                          TextSpan(
+                            text: ' / 1,080',
+                            style: _gt(w * 0.04, FontWeight.w500, _gInk),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: w * 0.035,
+                    vertical: w * 0.02,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _gChip,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    _tr('5 malas done'),
+                    style: _gt(w * 0.036, FontWeight.w700, _gBurnt),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  ),
+  _GfxShot(
+    file: '03_blackout',
+    look: _V2Look.black,
+    headline: [('Chant Without\n', false), ('Distractions', true)],
+    sub: 'A completely dark screen for peaceful Jaap.',
+    art: (w, h, companion) => Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        // What Blackout looks like: the mala barely lit, the count in grey.
+        Positioned(
+          top: h * _gTitleTop,
+          left: w * 0.06,
+          right: w * 0.06,
+          // A long mantra (Hare Rama) shrinks to fit rather than run off.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              _mName(_hyMain),
+              maxLines: 1,
+              style: _gt(
+                w * 0.1,
+                FontWeight.w600,
+                Colors.white.withValues(alpha: 0.42),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: h * _gRingTop - w * 0.16,
+          width: w * 1.1,
+          height: w * 1.1,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  _gGold.withValues(alpha: 0.10),
+                  _gGold.withValues(alpha: 0),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: h * _gRingTop + w * _gRingSize * 0.08,
+          child: Opacity(
+            opacity: 0.38,
+            child: Theme(
+              data: AppTheme.dark(),
+              child: MalaRing(
+                beads: 72,
+                malaSize: 108,
+                diameter: w * _gRingSize * 0.84,
+                child: Text(
+                  '72 / 108',
+                  style: _gt(w * 0.075, FontWeight.w500, Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // A tap landing anywhere on the dark screen; only where there is
+        // room under the mala (not on the shorter Play and Duo canvases).
+        if (h / w > 1.5)
+          Positioned(
+            bottom: h * 0.16,
+            child: SizedBox(
+              width: w * 0.34,
+              height: w * 0.34,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  for (final (size, alpha) in const [
+                    (1.0, 0.05),
+                    (0.72, 0.09),
+                    (0.46, 0.14),
+                  ])
+                    Container(
+                      width: w * 0.34 * size,
+                      height: w * 0.34 * size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: alpha * 2.5),
+                          width: 1.5,
+                        ),
+                        color: Colors.white.withValues(alpha: alpha),
+                      ),
+                    ),
+                  Icon(
+                    Icons.touch_app_rounded,
+                    size: w * 0.1,
+                    color: Colors.white.withValues(alpha: 0.55),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        Positioned(
+          bottom: h * _gBottom,
+          child: SizedBox(
+            width: w * 0.94,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _gChipW(
+                    w,
+                    Icons.touch_app_rounded,
+                    _tr('Tap anywhere'),
+                    k: 0.9,
+                  ),
+                  SizedBox(width: w * 0.025),
+                  _gChipW(
+                    w,
+                    Icons.volume_up_rounded,
+                    _tr('Volume buttons count'),
+                    k: 0.9,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+  _GfxShot(
+    file: '04_auto_jaap',
+    headline: [('Let Your\n', false), ('Jaap Flow', true)],
+    sub: 'Chant hands-free at your own pace.',
+    art: (w, h, companion) => Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: h * _gTitleTop,
+          child: Text(
+            _mName(_hyMain),
+            style: _gt(w * 0.1, FontWeight.w800, _gInk),
+          ),
+        ),
+        Positioned(
+          top: h * _gRingTop,
+          child: _gRing(w * _gRingSize, beads: 77, dark: false),
+        ),
+        Positioned(
+          top: h * _gRingTop,
+          right: w * 0.08,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: w * 0.04,
+              vertical: w * 0.022,
+            ),
+            decoration: BoxDecoration(
+              color: _gSaffron,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: w * 0.06,
+                ),
+                Text(
+                  _tr('Auto Jaap'),
+                  style: _gt(w * 0.04, FontWeight.w800, Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          left: w * 0.06,
+          right: w * 0.06,
+          bottom: h * 0.06,
+          child: Container(
+            padding: EdgeInsets.all(w * 0.05),
+            decoration: _gCardDeco(w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _tr('One bead every'),
+                  style: _gt(w * 0.045, FontWeight.w700, _gInk),
+                ),
+                SizedBox(height: w * 0.035),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    for (final sec in AutoJaapConfig.paces)
+                      Container(
+                        width: w * 0.145,
+                        padding: EdgeInsets.symmetric(vertical: w * 0.025),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: sec == 1 ? _gSaffron : _gChip,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          _hyL10n.autoJaapSeconds(sec),
+                          style: _gt(
+                            w * 0.042,
+                            FontWeight.w700,
+                            sec == 1 ? Colors.white : _gInk,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+  _GfxShot(
+    file: '05_music',
+    look: _V2Look.night,
+    headline: [('Make Every Jaap\n', false), ('Peaceful', true)],
+    sub: 'Chant with calming sounds and music.',
+    art: (w, h, companion) {
+      // A still of a sound wave: a soft rise and fall.
+      final bars = [
+        for (var i = 0; i < 23; i++)
+          0.25 +
+              0.75 *
+                  (0.5 + 0.5 * math.sin(i * 0.7)) *
+                  (1 - (i - 11).abs() / 16),
+      ];
+      return Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          Positioned(
+            top: h * 0.05,
+            child: Container(
+              width: w * 0.5,
+              height: w * 0.5,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const RadialGradient(colors: [_gGold, _gSaffron]),
+                boxShadow: [
+                  BoxShadow(
+                    color: _gGold.withValues(alpha: 0.5),
+                    blurRadius: w * 0.2,
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.music_note_rounded,
+                color: Colors.white,
+                size: w * 0.24,
+              ),
+            ),
+          ),
+          Positioned(
+            top: h * 0.37,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                for (final b in bars)
+                  Container(
+                    width: w * 0.018,
+                    height: w * 0.2 * b,
+                    margin: EdgeInsets.symmetric(horizontal: w * 0.007),
+                    decoration: BoxDecoration(
+                      color: _gGold.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: w * 0.06,
+            right: w * 0.06,
+            bottom: h * 0.06,
+            child: Container(
+              padding: EdgeInsets.all(w * 0.05),
+              decoration: _gCardDeco(w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _tr('NOW PLAYING'),
+                    style: _gt(
+                      w * 0.03,
+                      FontWeight.w700,
+                      _gSaffron,
+                    ).copyWith(letterSpacing: 1),
+                  ),
+                  SizedBox(height: w * 0.01),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AmbientChantService.chants[1].label,
+                          style: _gt(w * 0.05, FontWeight.w800, _gInk),
+                        ),
+                      ),
+                      Icon(
+                        Icons.pause_circle_filled_rounded,
+                        color: _gSaffron,
+                        size: w * 0.11,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: w * 0.03),
+                  Wrap(
+                    spacing: w * 0.02,
+                    runSpacing: w * 0.02,
+                    children: [
+                      for (final i in const [3, 5, 0, 4])
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: w * 0.03,
+                            vertical: w * 0.016,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _gChip,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            AmbientChantService.chants[i].label,
+                            style: _gt(w * 0.034, FontWeight.w600, _gInk),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  ),
+  _GfxShot(
+    file: '06_mantras',
+    headline: [('Your Favourite Naam.\n', false), ('All in One Place.', true)],
+    headlineScale: 0.8,
+    sub: 'Ram, Radha, Krishna, Shiva and more.',
+    art: (w, h, companion) {
+      Widget row(String name, {bool active = false}) => Container(
+        margin: EdgeInsets.only(bottom: w * 0.03),
+        padding: EdgeInsets.symmetric(
+          horizontal: w * 0.05,
+          vertical: w * 0.042,
+        ),
+        decoration:
+            _gCardDeco(
+              w,
+              color: active ? const Color(0xFFFFF4DF) : Colors.white,
+            ).copyWith(
+              border: active ? Border.all(color: _gSaffron, width: 2) : null,
+            ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(name, style: _gt(w * 0.05, FontWeight.w700, _gInk)),
+            ),
+            Text('108', style: _gt(w * 0.034, FontWeight.w600, _gBurnt)),
+            if (active) ...[
+              SizedBox(width: w * 0.02),
+              Icon(
+                Icons.check_circle_rounded,
+                color: _gSaffron,
+                size: w * 0.06,
+              ),
+            ],
+          ],
+        ),
+      );
+      // On the shorter Play canvas the list shrinks to fit, never spills.
+      return Padding(
+        padding: EdgeInsets.fromLTRB(w * 0.07, h * 0.03, w * 0.07, 0),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: w * 0.86,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: w * 0.04),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: w * 0.05,
+                    vertical: w * 0.02,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _gInk,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    _tr('22 mantras ready'),
+                    style: _gt(w * 0.045, FontWeight.w800, _gCream),
+                  ),
+                ),
+                for (final (i, id) in _hyMantraList().indexed)
+                  row(_mName(id), active: i == 0),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: w * 0.04),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(w * 0.06),
+                    border: Border.all(color: _gBurnt.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_rounded, color: _gBurnt, size: w * 0.06),
+                      SizedBox(width: w * 0.02),
+                      Text(
+                        _tr('Add your own mantra'),
+                        style: _gt(w * 0.045, FontWeight.w700, _gBurnt),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  ),
+  _GfxShot(
+    file: '07_mala',
+    headline: [('Your ', false), ('108-Bead\n', true), ('Digital Mala', false)],
+    sub: 'Feel every bead with gentle haptic feedback.',
+    art: (w, h, companion) => Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: h * _gTitleTop,
+          child: Text(
+            _mName(_hyMain),
+            style: _gt(w * 0.1, FontWeight.w800, _gInk),
+          ),
+        ),
+        Positioned(
+          top: h * _gRingTop,
+          child: _gRing(w * _gRingSize, beads: 107, dark: true),
+        ),
+        Positioned(
+          bottom: h * _gBottom,
+          child: _gChipW(
+            w,
+            Icons.vibration_rounded,
+            _tr('Haptic on every bead'),
+          ),
+        ),
+      ],
+    ),
+  ),
+  _GfxShot(
+    file: '08_language',
+    headline: [('Your Practice.\n', false), ('Your Language.', true)],
+    sub: 'Eleven languages. Ad‑free, no subscriptions.',
+    art: (w, h, companion) => Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: h * _gTitleTop,
+          left: w * 0.07,
+          right: w * 0.07,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: w * 0.03,
+            runSpacing: w * 0.03,
+            children: [
+              for (final (code, name) in AppLanguages.names.entries.map(
+                (e) => (e.key, e.value),
+              ))
+                // Nine languages, three to a row.
+                Container(
+                  width: w * 0.26,
+                  height: w * 0.15,
+                  padding: EdgeInsets.symmetric(
+                    vertical: w * 0.02,
+                    horizontal: w * 0.02,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: _gCardDeco(
+                    w,
+                    color: code == _hyCode ? _gInk : Colors.white,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      // Bahasa Indonesia takes two lines, like a wrapped name.
+                      name.replaceAll(' ', '\n'),
+                      textAlign: TextAlign.center,
+                      style: _gt(
+                        w * 0.05,
+                        FontWeight.w700,
+                        code == _hyCode ? _gCream : _gInk,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Positioned(
+          right: w * 0.07,
+          bottom: h * 0.06,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(w * 0.08),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF5A2A08).withValues(alpha: 0.35),
+                  blurRadius: w * 0.08,
+                  offset: Offset(0, w * 0.03),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(w * 0.08),
+              child: RawImage(
+                image: _gIcon,
+                width: w * 0.36,
+                height: w * 0.36,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: w * 0.06,
+          bottom: h * 0.06,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _gChipW(w, Icons.block_rounded, _tr('Ad‑free')),
+              SizedBox(height: w * 0.03),
+              _gChipW(
+                w,
+                Icons.credit_card_off_rounded,
+                _tr('No subscriptions'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+];
+
+class _GfxCanvas extends StatelessWidget {
+  const _GfxCanvas({
+    required this.shot,
+    required this.size,
+    required this.companion,
+  });
+
+  final _GfxShot shot;
+  final Size size;
+  final ui.Image companion;
+
+  @override
+  Widget build(BuildContext context) {
+    final w = size.width;
+    final h = size.height;
+    final dark = shot.look != _V2Look.gold;
+    final headlineSize =
+        w *
+        0.098 *
+        shot.headlineScale *
+        (const {'ta': 0.76, 'te': 0.86}[_hyCode] ?? 1.0);
+    final ink = dark ? _gCream : _gInk;
+    final highlight = dark ? _gGold : _gBurnt;
+    final (headline, sub, badge) = _hyText(
+      shot.file,
+      shot.headline,
+      shot.sub,
+      shot.badge,
+    );
+    final soft = dark
+        ? _gCream.withValues(alpha: 0.7)
+        : const Color(0xFF6E5442);
+    // The same for every shot, and level with the phones of the v2 set,
+    // so a gallery mixing the two lines up.
+    final artTop = h * 0.235;
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: switch (shot.look) {
+                    _V2Look.black => const [
+                      Color(0xFF000000),
+                      Color(0xFF120A05),
+                    ],
+                    _V2Look.night => const [
+                      Color(0xFF2A0A04),
+                      Color(0xFF5A1A07),
+                      Color(0xFF8A3A0C),
+                    ],
+                    _V2Look.gold => const [
+                      Color(0xFFFFE2A0),
+                      Color(0xFFFFC25C),
+                      Color(0xFFF5962A),
+                    ],
+                  },
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: w * 0.05,
+            right: w * 0.05,
+            top: h * 0.055,
+            child: Column(
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      for (final (t, hi) in headline)
+                        TextSpan(
+                          text: t,
+                          style: TextStyle(color: hi ? highlight : ink),
+                        ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  style: _gt(
+                    headlineSize,
+                    FontWeight.w800,
+                    ink,
+                  ).copyWith(height: 1.08, letterSpacing: -headlineSize * 0.03),
+                ),
+                if (sub.isNotEmpty) ...[
+                  SizedBox(height: w * 0.03),
+                  Text(
+                    sub,
+                    textAlign: TextAlign.center,
+                    style: _gt(w * 0.041, FontWeight.w500, soft),
+                  ),
+                ],
+                if (badge case final badge?) ...[
+                  SizedBox(height: w * 0.035),
+                  Container(
+                    constraints: BoxConstraints(maxWidth: w * 0.9),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: w * 0.04,
+                      vertical: w * 0.02,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        badge,
+                        maxLines: 1,
+                        style: _gt(w * 0.036, FontWeight.w700, _gBurnt),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Positioned(
+            top: artTop,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: shot.art(w, h - artTop, companion),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The store gallery: 8 shots, phones where the counter is the story and
+// graphics for the rest, then 09_brand. Drawn per language (_hyCode).
+
+/// The language being drawn, and the mantra on its counter: Radha, the most
+/// searched; otherwise what each language's readers chant most (the app's
+/// own defaultMantraByLanguage, plus Krishna for Telugu).
+String _hyCode = 'en';
+String _hyMain = 'builtin.radha';
+const _hyMains = {
+  'pa': 'builtin.waheguru',
+  'ta': 'builtin.om-namah-shivaya',
+  'te': 'builtin.hare-krishna',
+  'gu': 'builtin.shri-krishna',
+  'ru': 'builtin.hare-rama',
+  'id': 'builtin.om-namah-shivaya',
+  'ms': 'builtin.om-namah-shivaya',
+  'th': 'builtin.om-gam-ganapataye-namah',
+};
+
+/// The second mantra on the counter's history: Radhe for Russian devotees,
+/// Ram for everyone else.
+const _hySides = {'ru': 'builtin.radha'};
+
+/// Inter, then this run's script, then every script.
+const _hyFallback = [
+  'NotoSansDevanagari',
+  'NotoSansIndicAll',
+  'NotoSansThaiAll',
+];
+
+AppL10n get _hyL10n => lookupAppL10n(Locale(_hyCode));
+
+/// A built-in mantra's name as the app shows it in [_hyCode].
+String _mName(String id) =>
+    BuiltInMantras.all.firstWhere((m) => m.id == id).nameIn(_hyCode);
+
+/// The mantra list on 06: this language's mantra first, then five more.
+List<String> _hyMantraList() => [
+  _hyMain,
+  ...[
+    'builtin.ram',
+    'builtin.radha',
+    'builtin.om-namah-shivaya',
+    'builtin.hare-krishna',
+    'builtin.waheguru',
+    'builtin.om-namo-narayanaya',
+  ].where((id) => id != _hyMain).take(5),
+];
+
+/// [english] in [_hyCode], or as it is.
+String _tr(String english) => _hyUi[_hyCode]?[english] ?? english;
+
+/// A shot's headline, sub-line and badge in [_hyCode].
+(List<_Span>, String, String?) _hyText(
+  String file,
+  List<_Span> headline,
+  String sub,
+  String? badge,
+) {
+  if (_hyCode == 'en') return (headline, sub, badge);
+  final copy = switch (file) {
+    '01_jaap' => (_headlines['01_counter']![_hyCode]!.$1, ''),
+    '02_habit' => (_headlines['04_habit']![_hyCode]!.$1, _hyHabitSub[_hyCode]!),
+    _ => _hyHead[file]?[_hyCode],
+  };
+  return (
+    copy == null ? headline : _spans(copy.$1),
+    copy?.$2 ?? sub,
+    badge == null ? null : _hyBadge[_hyCode] ?? badge,
+  );
+}
+
+const _hyBadge = {
+  'hi': 'विज्ञापन नहीं  •  सब्सक्रिप्शन नहीं',
+  'mr': 'जाहिराती नाहीत  •  सबस्क्रिप्शन नाही',
+  'gu': 'જાહેરાત નહીં  •  સબ્સ્ક્રિપ્શન નહીં',
+  'pa': 'ਕੋਈ ਇਸ਼ਤਿਹਾਰ ਨਹੀਂ  •  ਕੋਈ ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਨਹੀਂ',
+  'ta': 'விளம்பரமில்லை  •  சந்தா இல்லை',
+  'te': 'ప్రకటనలు లేవు  •  సబ్‌స్క్రిప్షన్ లేదు',
+  'ru': 'Без рекламы  •  Без подписок',
+  'id': 'Tanpa iklan  •  Tanpa langganan',
+  'ms': 'Tanpa iklan  •  Tanpa langganan',
+  'th': 'ไม่มีโฆษณา  •  ไม่ต้องสมัครสมาชิก',
+};
+
+const _hyHabitSub = {
+  'hi': 'रोज़ का लक्ष्य, लगातार दिन और संकल्प।',
+  'mr': 'रोजचे ध्येय, सातत्य आणि संकल्प.',
+  'gu': 'રોજનું લક્ષ્ય, સાતત્ય અને સંકલ્પ.',
+  'pa': 'ਰੋਜ਼ ਦਾ ਟੀਚਾ, ਲਗਾਤਾਰ ਦਿਨ ਅਤੇ ਸੰਕਲਪ।',
+  'ta': 'தினசரி இலக்கு, தொடர்ச்சி, சங்கல்பம்.',
+  'te': 'రోజువారీ లక్ష్యం, క్రమం, సంకల్పం.',
+  'ru': 'Цели на день, серии дней и санкальпа.',
+  'id': 'Target harian, hari beruntun, dan Sankalpa.',
+  'ms': 'Sasaran harian, rekod berturut dan sankalpa.',
+  'th': 'เป้าหมายรายวัน สถิติต่อเนื่อง และสังกัลปะ',
+};
+
+/// Headline (`*` marks the highlight) and sub-line per shot and language.
+const _hyHead = <String, Map<String, (String, String)>>{
+  '03_blackout': {
+    'hi': ('बिना रुकावट\n*जप करें*', 'शांत जप के लिए पूरी तरह काली स्क्रीन।'),
+    'mr': ('व्यत्ययाशिवाय\n*जप करा*', 'शांत जपासाठी पूर्ण काळी स्क्रीन.'),
+    'gu': ('ખલેલ વગર\n*જપ કરો*', 'શાંત જપ માટે સંપૂર્ણ કાળી સ્ક્રીન.'),
+    'pa': ('ਬਿਨਾਂ ਰੁਕਾਵਟ\n*ਜਪ ਕਰੋ*', 'ਸ਼ਾਂਤ ਜਪ ਲਈ ਪੂਰੀ ਕਾਲੀ ਸਕ੍ਰੀਨ।'),
+    'ta': (
+      'இடையூறு இல்லாமல்\n*ஜபம்*',
+      'அமைதியான ஜபத்திற்கு முழு கருப்புத் திரை.',
+    ),
+    'te': (
+      'అంతరాయం లేకుండా\n*జపం*',
+      'ప్రశాంత జపానికి పూర్తిగా నల్లని స్క్రీన్.',
+    ),
+    'ru': (
+      'Джапа без\n*отвлечений*',
+      'Полностью тёмный экран для спокойной джапы.',
+    ),
+    'id': (
+      'Japa Tanpa\n*Gangguan*',
+      'Layar gelap total untuk japa yang tenang.',
+    ),
+    'ms': (
+      'Japa Tanpa\n*Gangguan*',
+      'Skrin gelap sepenuhnya untuk japa yang tenang.',
+    ),
+    'th': (
+      'สวดมนต์\n*ไร้สิ่งรบกวน*',
+      'หน้าจอมืดสนิท เพื่อการสวดอย่างสงบ',
+    ),
+  },
+  '04_auto_jaap': {
+    'hi': ('जप को\n*बहने दें*', 'अपनी गति से, बिना हाथ लगाए जप।'),
+    'mr': ('जप\n*सहज वाहू द्या*', 'तुमच्या गतीने, हात न लावता जप.'),
+    'gu': ('જપને\n*વહેવા દો*', 'તમારી ગતિએ, હાથ લગાવ્યા વગર જપ.'),
+    'pa': ('ਜਪ ਨੂੰ\n*ਵਹਿਣ ਦਿਓ*', 'ਆਪਣੀ ਰਫ਼ਤਾਰ ਨਾਲ, ਬਿਨਾਂ ਹੱਥ ਲਾਏ ਜਪ।'),
+    'ta': ('ஜபம்\n*தானாக ஓடட்டும்*', 'உங்கள் வேகத்தில், கை படாமல் ஜபம்.'),
+    'te': ('జపాన్ని\n*సాగనివ్వండి*', 'మీ వేగంలో, చేయి తాకకుండా జపం.'),
+    'ru': (
+      'Пусть джапа\n*течёт сама*',
+      'Повторяйте без рук, в своём темпе.',
+    ),
+    'id': (
+      'Biarkan Japa\n*Mengalir*',
+      'Japa tanpa tangan, sesuai tempo Anda.',
+    ),
+    'ms': (
+      'Biarkan Japa\n*Mengalir*',
+      'Japa tanpa tangan, mengikut rentak anda.',
+    ),
+    'th': (
+      'ให้การสวด\n*ไหลลื่น*',
+      'สวดโดยไม่ต้องใช้มือ ตามจังหวะของคุณ',
+    ),
+  },
+  '05_music': {
+    'hi': ('हर जप को\n*शांत बनाएं*', 'सुकून भरी ध्वनियों और संगीत के साथ जप।'),
+    'mr': ('प्रत्येक जप\n*शांत करा*', 'सुखद ध्वनी आणि संगीतासह जप.'),
+    'gu': ('દરેક જપ\n*શાંત બનાવો*', 'સુખદ અવાજો અને સંગીત સાથે જપ.'),
+    'pa': ('ਹਰ ਜਪ ਨੂੰ\n*ਸ਼ਾਂਤ ਬਣਾਓ*', 'ਸੁਖਦ ਧੁਨਾਂ ਅਤੇ ਸੰਗੀਤ ਨਾਲ ਜਪ।'),
+    'ta': ('ஒவ்வொரு ஜபமும்\n*அமைதியாக*', 'இதமான ஒலிகள், இசையுடன் ஜபம்.'),
+    'te': ('ప్రతి జపం\n*ప్రశాంతంగా*', 'హాయైన శబ్దాలు, సంగీతంతో జపం.'),
+    'ru': (
+      'Каждая джапа —\n*в покое*',
+      'Джапа под спокойные звуки и музыку.',
+    ),
+    'id': (
+      'Setiap Japa\n*Lebih Damai*',
+      'Japa dengan suara dan musik yang menenangkan.',
+    ),
+    'ms': (
+      'Setiap Japa\n*Lebih Tenang*',
+      'Japa diiringi bunyi dan muzik yang menenangkan.',
+    ),
+    'th': (
+      'ทุกการสวด\n*สงบใจ*',
+      'สวดพร้อมเสียงและดนตรีผ่อนคลาย',
+    ),
+  },
+  '06_mantras': {
+    'hi': ('आपका प्रिय नाम।\n*सब एक जगह।*', 'राम, राधा, कृष्ण, शिव और भी।'),
+    'mr': (
+      'तुमचे आवडते नाम.\n*सर्व एकाच ठिकाणी.*',
+      'राम, राधा, कृष्ण, शिव आणि बरेच.',
+    ),
+    'gu': (
+      'તમારું પ્રિય નામ.\n*બધું એક જગ્યાએ.*',
+      'રામ, રાધા, કૃષ્ણ, શિવ અને વધુ.',
+    ),
+    'pa': (
+      'ਤੁਹਾਡਾ ਪਿਆਰਾ ਨਾਮ।\n*ਸਭ ਇੱਕ ਥਾਂ।*',
+      'ਵਾਹਿਗੁਰੂ, ਰਾਮ, ਰਾਧਾ, ਸ਼ਿਵ ਅਤੇ ਹੋਰ।',
+    ),
+    'ta': (
+      'உங்கள் பிரிய நாமம்.\n*எல்லாம் ஒரே இடத்தில்.*',
+      'ராம், ராதா, கிருஷ்ண, சிவ மேலும்.',
+    ),
+    'te': ('మీ ప్రియ నామం.\n*అన్నీ ఒకే చోట.*', 'రామ, రాధ, కృష్ణ, శివ ఇంకా.'),
+    'ru': (
+      'Любимые мантры.\n*Всё в одном месте.*',
+      'Харе Кришна, Рама, Радха, Шива и другие.',
+    ),
+    'id': (
+      'Mantra Favorit Anda.\n*Semua di Satu Tempat.*',
+      'Om Namah Shivaya, Rama, Krishna, dan lainnya.',
+    ),
+    'ms': (
+      'Mantra Kegemaran.\n*Semua di Satu Tempat.*',
+      'Om Namah Shivaya, Rama, Krishna dan banyak lagi.',
+    ),
+    'th': (
+      'มนต์ที่คุณรัก\n*รวมไว้ที่เดียว*',
+      'พระพิฆเนศ พระศิวะ พระกฤษณะ และอื่นๆ',
+    ),
+  },
+  '07_mala': {
+    'hi': (
+      'आपकी *108 मनकों*\nकी डिजिटल माला',
+      'हर मनके पर हल्का कंपन महसूस करें।',
+    ),
+    'mr': (
+      'तुमची *108 मण्यांची*\nडिजिटल माळ',
+      'प्रत्येक मण्यावर हलके कंपन अनुभवा.',
+    ),
+    'gu': ('તમારી *108 મણકાની*\nડિજિટલ માળા', 'દરેક મણકે હળવું કંપન અનુભવો.'),
+    'pa': (
+      'ਤੁਹਾਡੀ *108 ਮਣਕਿਆਂ*\nਦੀ ਡਿਜੀਟਲ ਮਾਲਾ',
+      'ਹਰ ਮਣਕੇ ਤੇ ਹਲਕੀ ਕੰਪਨ ਮਹਿਸੂਸ ਕਰੋ।',
+    ),
+    'ta': (
+      'உங்கள் *108 மணி*\nடிஜிட்டல் மாலை',
+      'ஒவ்வொரு மணிக்கும் மெல்லிய அதிர்வு.',
+    ),
+    'te': ('మీ *108 పూసల*\nడిజిటల్ మాల', 'ప్రతి పూసకు సున్నితమైన కంపనం.'),
+    'ru': (
+      'Цифровая мала\nиз *108 бусин*',
+      'Лёгкая вибрация на каждой бусине.',
+    ),
+    'id': (
+      'Mala Digital\n*108 Butir*',
+      'Rasakan getar lembut di setiap butir.',
+    ),
+    'ms': (
+      'Mala Digital\n*108 Biji*',
+      'Rasai getaran lembut pada setiap biji.',
+    ),
+    'th': (
+      'ลูกประคำดิจิทัล\n*108 เม็ด*',
+      'สัมผัสการสั่นเบาๆ ทุกเม็ด',
+    ),
+  },
+  '08_language': {
+    'hi': (
+      'आपकी साधना।\n*आपकी भाषा।*',
+      'ग्यारह भाषाएँ। विज्ञापन नहीं, सब्सक्रिप्शन नहीं।',
+    ),
+    'mr': (
+      'तुमची साधना.\n*तुमची भाषा.*',
+      'अकरा भाषा. जाहिराती नाहीत, सबस्क्रिप्शन नाही.',
+    ),
+    'gu': (
+      'તમારી સાધના.\n*તમારી ભાષા.*',
+      'અગિયાર ભાષાઓ. જાહેરાત નહીં, સબ્સ્ક્રિપ્શન નહીં.',
+    ),
+    'pa': (
+      'ਤੁਹਾਡੀ ਸਾਧਨਾ।\n*ਤੁਹਾਡੀ ਭਾਸ਼ਾ।*',
+      'ਗਿਆਰਾਂ ਭਾਸ਼ਾਵਾਂ। ਕੋਈ ਇਸ਼ਤਿਹਾਰ ਨਹੀਂ, ਕੋਈ ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਨਹੀਂ।',
+    ),
+    'ta': (
+      'உங்கள் வழிபாடு.\n*உங்கள் மொழி.*',
+      'பதினொரு மொழிகள். விளம்பரமில்லை, சந்தா இல்லை.',
+    ),
+    'te': (
+      'మీ సాధన.\n*మీ భాష.*',
+      'పదకొండు భాషలు. ప్రకటనలు లేవు, సబ్‌స్క్రిప్షన్ లేదు.',
+    ),
+    'ru': (
+      'Ваша практика.\n*Ваш язык.*',
+      'Одиннадцать языков. Без рекламы и подписок.',
+    ),
+    'id': (
+      'Praktik Anda.\n*Bahasa Anda.*',
+      'Sebelas bahasa. Tanpa iklan, tanpa langganan.',
+    ),
+    'ms': (
+      'Amalan Anda.\n*Bahasa Anda.*',
+      'Sebelas bahasa. Tanpa iklan, tanpa langganan.',
+    ),
+    'th': (
+      'การปฏิบัติของคุณ\n*ภาษาของคุณ*',
+      '11 ภาษา ไม่มีโฆษณา ไม่ต้องสมัครสมาชิก',
+    ),
+  },
+};
+
+/// The small words on chips and cards, keyed by their English.
+final _hyUi = <String, Map<String, String>>{
+  for (final code in ['hi', 'mr', 'gu', 'pa', 'ta', 'te', 'ru', 'id', 'ms', 'th'])
+    code: {
+      '22 days in a row': _cardCopy[code]!['streakTitle']!,
+      "TODAY'S JAAP": _cardCopy[code]!['todayEyebrow']!,
+      'Tap anywhere': _cardCopy[code]!['tap']!,
+      'Volume buttons count': _cardCopy[code]!['vol']!,
+      'NOW PLAYING': _cardCopy[code]!['nowPlaying']!,
+      'Haptic on every bead': _cardCopy[code]!['haptic']!,
+      ..._hyWords[code]!,
+    },
+};
+
+const _hyWords = <String, Map<String, String>>{
+  'hi': {
+    'Daily Jaap': 'दैनिक जाप',
+    'Goal 1,080': 'लक्ष्य 1,080',
+    '5 malas done': '5 माला पूरी',
+    'One bead every': 'हर मनका',
+    '22 mantras ready': '22 मंत्र तैयार',
+    'Add your own mantra': 'अपना मंत्र जोड़ें',
+    'Ad‑free': 'विज्ञापन नहीं',
+    'No subscriptions': 'सब्सक्रिप्शन नहीं',
+  },
+  'mr': {
+    'Daily Jaap': 'दैनिक जप',
+    'Goal 1,080': 'ध्येय 1,080',
+    '5 malas done': '5 माळा पूर्ण',
+    'One bead every': 'प्रत्येक मणी',
+    '22 mantras ready': '22 मंत्र तयार',
+    'Add your own mantra': 'स्वतःचा मंत्र जोडा',
+    'Ad‑free': 'जाहिराती नाहीत',
+    'No subscriptions': 'सबस्क्रिप्शन नाही',
+  },
+  'gu': {
+    'Daily Jaap': 'દૈનિક જપ',
+    'Goal 1,080': 'લક્ષ્ય 1,080',
+    '5 malas done': '5 માળા પૂર્ણ',
+    'One bead every': 'દરેક મણકો',
+    '22 mantras ready': '22 મંત્રો તૈયાર',
+    'Add your own mantra': 'તમારો મંત્ર ઉમેરો',
+    'Ad‑free': 'જાહેરાત નહીં',
+    'No subscriptions': 'સબ્સ્ક્રિપ્શન નહીં',
+  },
+  'pa': {
+    'Daily Jaap': 'ਰੋਜ਼ਾਨਾ ਜਪ',
+    'Goal 1,080': 'ਟੀਚਾ 1,080',
+    '5 malas done': '5 ਮਾਲਾ ਪੂਰੀਆਂ',
+    'One bead every': 'ਹਰ ਮਣਕਾ',
+    '22 mantras ready': '22 ਮੰਤਰ ਤਿਆਰ',
+    'Add your own mantra': 'ਆਪਣਾ ਮੰਤਰ ਜੋੜੋ',
+    'Ad‑free': 'ਕੋਈ ਇਸ਼ਤਿਹਾਰ ਨਹੀਂ',
+    'No subscriptions': 'ਕੋਈ ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਨਹੀਂ',
+  },
+  'ta': {
+    'Daily Jaap': 'தினசரி ஜபம்',
+    'Goal 1,080': 'இலக்கு 1,080',
+    '5 malas done': '5 மாலை முடிந்தது',
+    'One bead every': 'ஒவ்வொரு மணியும்',
+    '22 mantras ready': '22 மந்திரங்கள் தயார்',
+    'Add your own mantra': 'உங்கள் மந்திரம் சேர்க்கவும்',
+    'Ad‑free': 'விளம்பரமில்லை',
+    'No subscriptions': 'சந்தா இல்லை',
+  },
+  'te': {
+    'Daily Jaap': 'రోజువారీ జపం',
+    'Goal 1,080': 'లక్ష్యం 1,080',
+    '5 malas done': '5 మాలలు పూర్తి',
+    'One bead every': 'ప్రతి పూస',
+    '22 mantras ready': '22 మంత్రాలు సిద్ధం',
+    'Add your own mantra': 'మీ మంత్రం చేర్చండి',
+    'Ad‑free': 'ప్రకటనలు లేవు',
+    'No subscriptions': 'సబ్‌స్క్రిప్షన్ లేదు',
+  },
+  'ru': {
+    'Daily Jaap': 'Джапа за день',
+    'Goal 1,080': 'Цель 1 080',
+    '5 malas done': '5 кругов пройдено',
+    'One bead every': 'Бусина каждые',
+    '22 mantras ready': '22 мантры готовы',
+    'Add your own mantra': 'Добавьте свою мантру',
+    'Ad‑free': 'Без рекламы',
+    'No subscriptions': 'Без подписок',
+  },
+  'id': {
+    'Daily Jaap': 'Japa Harian',
+    'Goal 1,080': 'Target 1.080',
+    '5 malas done': '5 mala selesai',
+    'One bead every': 'Satu butir setiap',
+    '22 mantras ready': '22 mantra siap',
+    'Add your own mantra': 'Tambah mantra sendiri',
+    'Ad‑free': 'Tanpa iklan',
+    'No subscriptions': 'Tanpa langganan',
+  },
+  'ms': {
+    'Daily Jaap': 'Japa Harian',
+    'Goal 1,080': 'Sasaran 1,080',
+    '5 malas done': '5 mala selesai',
+    'One bead every': 'Satu biji setiap',
+    '22 mantras ready': '22 mantra sedia',
+    'Add your own mantra': 'Tambah mantra sendiri',
+    'Ad‑free': 'Tanpa iklan',
+    'No subscriptions': 'Tanpa langganan',
+  },
+  'th': {
+    'Daily Jaap': 'การสวดรายวัน',
+    'Goal 1,080': 'เป้าหมาย 1,080',
+    '5 malas done': 'ครบ 5 รอบ',
+    'One bead every': 'หนึ่งเม็ดทุก',
+    '22 mantras ready': 'มนต์พร้อมสวด 22 บท',
+    'Add your own mantra': 'เพิ่มมนต์ของคุณ',
+    'Ad‑free': 'ไม่มีโฆษณา',
+    'No subscriptions': 'ไม่ต้องสมัครสมาชิก',
+  },
+};
+
+/// The gallery, in order: true for a phone (v2) shot, false for a graphic.
+const _hybrid = [
+  ('01_jaap', true),
+  ('02_habit', false),
+  ('03_blackout', false),
+  ('04_auto_jaap', true),
+  ('05_music', false),
+  ('06_mantras', false),
+  ('07_mala', true),
+  ('08_language', false),
+];
+
+List<Color> _lookColors(_V2Look look) => switch (look) {
+  _V2Look.black => const [Color(0xFF000000), Color(0xFF120A05)],
+  _V2Look.night => const [
+    Color(0xFF2A0A04),
+    Color(0xFF5A1A07),
+    Color(0xFF8A3A0C),
+  ],
+  _V2Look.gold => const [
+    Color(0xFFFFE2A0),
+    Color(0xFFFFC25C),
+    Color(0xFFF5962A),
+  ],
+};
+
+/// [build] laid out as a tall phone shot, centred on [canvas]: the iPhone
+/// size as is, Play and the iPhone Duo with the background widened.
+Widget _fitted(_V2Look look, Size canvas, Widget Function(Size) build) {
+  final u = math.min(canvas.width, canvas.height / 1.8);
+  return SizedBox(
+    width: canvas.width,
+    height: canvas.height,
+    child: Stack(
+      children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: _lookColors(look),
+              ),
+            ),
+          ),
+        ),
+        Center(child: build(Size(u, canvas.height))),
+      ],
+    ),
+  );
+}
+
 /// Google Play's 1024×500 banner: icon, name and promise on the maroon.
 class _FeatureGraphic extends StatelessWidget {
   const _FeatureGraphic({required this.icon});
@@ -1382,6 +3622,10 @@ const _locales = [
   _StoreLocale('pa', 'pa-IN', 'pa'),
   _StoreLocale('ta', 'ta-IN', 'ta-IN'),
   _StoreLocale('te', 'te-IN', 'te-IN'),
+  _StoreLocale('ru', 'ru', 'ru-RU'),
+  _StoreLocale('id', 'id', 'id'),
+  _StoreLocale('ms', 'ms', 'ms'),
+  _StoreLocale('th', 'th', 'th'),
 ];
 
 /// The script font each language is drawn in; Devanagari is bundled with the
@@ -1391,6 +3635,7 @@ const _scriptFonts = {
   'pa': 'NotoSansGurmukhi',
   'ta': 'NotoSansTamil',
   'te': 'NotoSansTelugu',
+  'th': 'NotoSansThai',
 };
 
 /// Headline (`*` marks the highlighted run) and sub-line per shot and language.
@@ -1401,19 +3646,23 @@ const _headlines = <String, Map<String, (String, String)>>{
       'कहीं भी टैप करें, माला भरती जाएगी',
     ),
     'mr': ('नामजप करा\n*राधा, राम, शिव*', 'कुठेही टॅप करा, माळ भरत जाते'),
-    'gu': ('નામ જપ કરો\n*રાધા, રામ, શિવ*', 'ગમે ત્યાં ટૅપ કરો, માળા ભરાતી જાય'),
+    'gu': ('નામ જપ કરો\n*કૃષ્ણ, રામ, શિવ*', 'ગમે ત્યાં ટૅપ કરો, માળા ભરાતી જાય'),
     'pa': (
       'ਨਾਮ ਜਪੋ\n*ਵਾਹਿਗੁਰੂ, ਰਾਮ, ਰਾਧਾ*',
       'ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ, ਮਾਲਾ ਭਰਦੀ ਜਾਂਦੀ ਹੈ',
     ),
     'ta': (
-      'நாம ஜபம்\n*ராம, கிருஷ்ண, சிவ*',
+      'நாம ஜபம்\n*சிவ, ராம, கிருஷ்ண*',
       'எங்கும் தட்டுங்கள், மாலை நிரம்பும்',
     ),
     'te': (
       'నామ జపం\n*రామ, కృష్ణ, శివ*',
       'ఎక్కడైనా ట్యాప్ చేయండి, మాల నిండుతుంది',
     ),
+    'ru': ('Харе Кришна,\n*Харе Рама*', ''),
+    'id': ('Japa Nama\n*Om Namah Shivaya*', ''),
+    'ms': ('Japa Nama\n*Om Namah Shivaya*', ''),
+    'th': ('สวดมนต์ทุกวัน\n*พระพิฆเนศ พระศิวะ*', ''),
   },
   '04_habit': {
     'hi': ('रोज़ की\n*आदत बनाएं*', 'लगातार दिन, चार्ट और हर जप का हिसाब'),
@@ -1425,6 +3674,10 @@ const _headlines = <String, Map<String, (String, String)>>{
       'தொடர்ச்சி, வரைபடங்கள், ஜபித்த ஒவ்வொரு நாளும்',
     ),
     'te': ('రోజువారీ\n*అలవాటు*', 'క్రమం, చార్టులు, జపించిన ప్రతి రోజు'),
+    'ru': ('Ежедневная\n*практика*', ''),
+    'id': ('Bangun\n*Kebiasaan Harian*', ''),
+    'ms': ('Bina\n*Amalan Harian*', ''),
+    'th': ('สร้าง\n*นิสัยสวดมนต์*', ''),
   },
   '03_music': {
     'hi': (
@@ -1525,6 +3778,40 @@ const _badges = {
 
 /// Words on the feature cards, per language.
 const _cardCopy = <String, Map<String, String>>{
+  // Russian and Indonesian draw only the gallery, which uses these few;
+  // anything else falls back to English (see _ct).
+  'ru': {
+    'todayEyebrow': 'ДЖАПА СЕГОДНЯ',
+    'haptic': 'Вибрация на каждой бусине',
+    'streakTitle': '22 дня подряд',
+    'nowPlaying': 'СЕЙЧАС ИГРАЕТ',
+    'tap': 'Касание в любом месте',
+    'vol': 'Счёт кнопками громкости',
+  },
+  'id': {
+    'todayEyebrow': 'JAPA HARI INI',
+    'haptic': 'Getar di setiap butir',
+    'streakTitle': '22 hari berturut-turut',
+    'nowPlaying': 'SEDANG DIPUTAR',
+    'tap': 'Ketuk di mana saja',
+    'vol': 'Tombol volume menghitung',
+  },
+  'ms': {
+    'todayEyebrow': 'JAPA HARI INI',
+    'haptic': 'Getaran pada setiap biji',
+    'streakTitle': '22 hari berturut-turut',
+    'nowPlaying': 'SEDANG DIMAINKAN',
+    'tap': 'Ketik di mana-mana',
+    'vol': 'Butang kelantangan mengira',
+  },
+  'th': {
+    'todayEyebrow': 'การสวดวันนี้',
+    'haptic': 'สั่นทุกเม็ด',
+    'streakTitle': 'ต่อเนื่อง 22 วัน',
+    'nowPlaying': 'กำลังเล่น',
+    'tap': 'แตะที่ใดก็ได้',
+    'vol': 'นับด้วยปุ่มเสียง',
+  },
   'en': {
     'track1': 'Morning on the High Plateau',
     'track2': 'Still Waters',
@@ -1805,6 +4092,8 @@ void main() {
       Directory(iosDir).createSync(recursive: true);
       Directory(playDir).createSync(recursive: true);
 
+      // The earlier shots, captured bare for the creative assets
+      // (tool/make_creative_assets.py) and the search-results video.
       for (final shot in _shots) {
         final bytes = await _captureApp(
           tester,
@@ -1814,69 +4103,99 @@ void main() {
               ? '$root/build/store_raw/${loc.iosDir}/counter_seq'
               : null,
         );
-        // The bare capture, for the App Store creative assets (tool/make_creative_assets.py).
         File('$root/build/store_raw/${loc.iosDir}/${shot.file}.png')
           ..parent.createSync(recursive: true)
           ..writeAsBytesSync(bytes);
-        late ui.Image screen;
-        await tester.runAsync(() async {
-          screen = await decodeImageFromList(bytes);
-        });
-        await _compose(
-          tester,
-          shot,
-          screen,
-          canvas: const Size(440, 956),
-          path: '$iosDir/${shot.file}.png',
-          code: loc.code,
+      }
+
+      // The store gallery.
+      _hyCode = loc.code;
+      _hyMain = _hyMains[loc.code] ?? 'builtin.radha';
+      late ui.Image companion;
+      await tester.runAsync(() async {
+        companion = await decodeImageFromList(
+          File('$root/assets/branding/companion.png').readAsBytesSync(),
         );
-        await _compose(
-          tester,
-          shot,
-          screen,
-          canvas: const Size(360, 640),
-          path: '$playDir/${shot.file}.png',
-          code: loc.code,
+        _gIcon = await decodeImageFromList(
+          File('$root/appstore_assets/appicon-fullbleed.png').readAsBytesSync(),
         );
-        // iPhone Duo, outer and inner displays. Kept out of fastlane's
-        // folder and uploaded by hand until fastlane knows the new sizes.
-        for (final (name, canvas) in _duoCanvases) {
-          await _compose(
+      });
+      final sizes = [
+        (const Size(440, 956), iosDir),
+        (const Size(360, 640), playDir),
+        for (final (name, canvas) in _duoCanvases)
+          (canvas, '$root/appstore_assets/iphone-duo/${loc.iosDir}/$name'),
+      ];
+      for (final (file, phone) in _hybrid) {
+        late _V2Look look;
+        late Widget Function(Size) build;
+        if (phone) {
+          final shot = _v2Shots.firstWhere((s) => s.file == file);
+          final bytes = await _captureApp(
             tester,
-            shot,
-            screen,
-            canvas: canvas,
-            path:
-                '$root/appstore_assets/iphone-duo/${loc.iosDir}/$name/${shot.file}.png',
-            code: loc.code,
+            _Shot(
+              file: file,
+              headline: const [],
+              sub: '',
+              capture: shot.capture,
+            ),
+            Locale(loc.code),
+            seed: () => _seededApp(
+              main: _hyMain,
+              side: _hySides[loc.code] ?? 'builtin.ram',
+            ),
+          );
+          late ui.Image screen;
+          await tester.runAsync(() async {
+            screen = await decodeImageFromList(bytes);
+          });
+          look = shot.look;
+          build = (size) => _V2Canvas(
+            shot: shot,
+            screen: screen,
+            size: size,
+            companion: companion,
+          );
+        } else {
+          final shot = _gfxShots.firstWhere((s) => s.file == file);
+          look = shot.look;
+          build = (size) =>
+              _GfxCanvas(shot: shot, size: size, companion: companion);
+        }
+        for (final (canvas, dir) in sizes) {
+          await _renderTo(
+            tester,
+            _fitted(look, canvas, build),
+            canvas,
+            '$dir/$file.png',
           );
         }
+      }
+      _v2Auto?.stop();
+      await tester.pump(const Duration(seconds: 30));
+
+      // 09_brand, at every size: the icon, the name and the companion.
+      for (final (canvas, path) in [
+        (const Size(440, 956), '$iosDir/09_brand.png'),
+        (const Size(360, 640), '$playDir/09_brand.png'),
+        for (final (name, canvas) in _duoCanvases)
+          (
+            canvas,
+            '$root/appstore_assets/iphone-duo/${loc.iosDir}/$name/09_brand.png',
+          ),
+      ]) {
+        await _renderTo(
+          tester,
+          _BrandCanvas(
+            size: canvas,
+            code: loc.code,
+            icon: _gIcon,
+            companion: companion,
+          ),
+          canvas,
+          path,
+        );
       }
     }
   });
-
-  // In-App Event captures, only when asked: SHOT_EVENTS=1 with SHOT_LOCALE.
-  testWidgets('event captures', (tester) async {
-    await tester.runAsync(_loadFonts);
-    addTearDown(tester.view.reset);
-    final root = Directory.current.path;
-    for (final loc in _locales) {
-      if (_runLocale != null && loc.code != _runLocale) continue;
-      for (final event in _events) {
-        for (final screen in _eventScreens) {
-          final bytes = await _captureApp(
-            tester,
-            screen,
-            Locale(loc.code),
-            seed: () => _eventApp(event),
-          );
-          File(
-              '$root/build/store_raw/${loc.iosDir}/event_${event.name}_${screen.file}.png',
-            )
-            ..parent.createSync(recursive: true)
-            ..writeAsBytesSync(bytes);
-        }
-      }
-    }
-  }, skip: Platform.environment['SHOT_EVENTS'] == null);
 }

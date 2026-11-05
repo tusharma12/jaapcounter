@@ -10,7 +10,7 @@ import '../services/app_logger.dart';
 /// anywhere. [openTestDatabase] lets the same schema run in unit tests.
 abstract final class AppDatabase {
   static const String fileName = 'japmala.db';
-  static const int schemaVersion = 10;
+  static const int schemaVersion = 11;
 
   static Future<Database> open({DatabaseFactory? factory}) async {
     final f = factory ?? databaseFactory;
@@ -152,6 +152,10 @@ abstract final class AppDatabase {
       await _retireBuiltInMantras(db);
       await _applyShippedRenames(db);
       await _renumberBuiltIns(db);
+    }
+    if (from < 11) {
+      // v11 adds Shri Krishna, Gujarati's default, making 22.
+      await _seedBuiltInMantras(db);
     }
   }
 

@@ -180,7 +180,7 @@ void main() {
     };
     expect(ids, containsAll(added));
     expect(ids.length, BuiltInMantras.all.length);
-    expect(BuiltInMantras.all.length, 21);
+    expect(BuiltInMantras.all.length, 22);
     expect(await db.query('jaap_entries'), hasLength(1));
   });
 
