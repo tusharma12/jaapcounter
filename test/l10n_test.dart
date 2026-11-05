@@ -98,6 +98,22 @@ void main() {
     expect(AppLanguages.dictationLocale('fr'), 'en_US');
   });
 
+  test('Android offers every app language in its per-app language list', () {
+    final xml = File(
+      'android/app/src/main/res/xml/locales_config.xml',
+    ).readAsStringSync();
+    for (final code in AppLanguages.names.keys) {
+      expect(xml, contains('android:name="$code"'), reason: code);
+    }
+  });
+
+  test('every iOS build lists every app language', () {
+    final plist = File('ios/Runner/Info.plist').readAsStringSync();
+    for (final code in AppLanguages.names.keys) {
+      expect(plist, contains('<string>$code</string>'), reason: code);
+    }
+  });
+
   test('Russian and Indonesian dictate in their own country\'s variant', () {
     expect(AppLanguages.dictationLocale('ru'), 'ru_RU');
     expect(AppLanguages.dictationLocale('id'), 'id_ID');

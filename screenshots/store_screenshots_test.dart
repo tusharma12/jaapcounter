@@ -4174,10 +4174,10 @@ void main() {
       _v2Auto?.stop();
       await tester.pump(const Duration(seconds: 30));
 
-      // 09_brand, at every size: the icon, the name and the companion.
+      // 09_brand: the icon, the name and the companion. Not on Google Play,
+      // which takes at most 8 phone screenshots.
       for (final (canvas, path) in [
         (const Size(440, 956), '$iosDir/09_brand.png'),
-        (const Size(360, 640), '$playDir/09_brand.png'),
         for (final (name, canvas) in _duoCanvases)
           (
             canvas,

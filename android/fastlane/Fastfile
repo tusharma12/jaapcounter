@@ -9,6 +9,15 @@
 #
 # The very first upload of a new app must be done by hand in Play Console;
 # after that these lanes handle every release.
+#
+# Lanes:
+#   check_listing     local check of every listing (no key, no upload)
+#   validate_listing  Play validates the listings, publishes nothing
+#   metadata          upload listing text, screenshots and graphics
+#   screenshots       upload screenshots and graphics only
+#                     (locales:ru-RU,id,ms,th for just those)
+#   internal          build and upload to the internal testing track
+#   release           build and upload to production as a draft
 
 default_platform(:android)
 
@@ -35,6 +44,90 @@ platform :android do
     end
   end
 
+  METADATA = File.expand_path("metadata/android", __dir__)
+
+  # Play's limits, checked before anything is sent.
+  TEXT_LIMITS = {
+    "title.txt" => 30,
+    "short_description.txt" => 80,
+    "full_description.txt" => 4000,
+    "changelogs/default.txt" => 500,
+  }.freeze
+
+  # Width and height from a PNG's header, without an image library.
+  def png_size(path)
+    File.binread(path, 8, 16).unpack("NN")
+  end
+
+  desc "Check every store listing locally: text limits, screenshots, graphics (no upload, no key needed)"
+  lane :check_listing do
+    problems = []
+    locales = Dir.children(METADATA).select { |d| File.directory?(File.join(METADATA, d)) }.sort
+    locales.each do |locale|
+      dir = File.join(METADATA, locale)
+      TEXT_LIMITS.each do |file, limit|
+        path = File.join(dir, file)
+        unless File.exist?(path)
+          problems << "#{locale}: #{file} missing"
+          next
+        end
+        length = File.read(path, encoding: "UTF-8").strip.length
+        problems << "#{locale}: #{file} is empty" if length.zero?
+        problems << "#{locale}: #{file} is #{length} characters (limit #{limit})" if length > limit
+      end
+      shots = Dir.glob(File.join(dir, "images/phoneScreenshots/*.png")).sort
+      problems << "#{locale}: #{shots.size} phone screenshots (Play takes 2 to 8)" unless (2..8).cover?(shots.size)
+      shots.each do |shot|
+        w, h = png_size(shot)
+        ok = [w, h].min >= 320 && [w, h].max <= 3840 && [w, h].max <= 2 * [w, h].min
+        problems << "#{locale}: #{File.basename(shot)} is #{w}×#{h}, outside Play's size rules" unless ok
+      end
+      graphic = File.join(dir, "images/featureGraphic.png")
+      problems << "#{locale}: featureGraphic is #{png_size(graphic).join('×')} (needs 1024×500)" if File.exist?(graphic) && png_size(graphic) != [1024, 500]
+    end
+    problems << "en-US: featureGraphic.png missing (Play requires one)" unless File.exist?(File.join(METADATA, "en-US/images/featureGraphic.png"))
+    UI.message("Checked #{locales.size} listings: #{locales.join(', ')}")
+    UI.user_error!("Store listing problems:\n  " + problems.join("\n  ")) unless problems.empty?
+    UI.success("Every listing is within Play's limits")
+  end
+
+  desc "Ask Play to validate the listings and screenshots without publishing anything (needs the key)"
+  lane :validate_listing do
+    check_listing
+    upload_to_play_store(
+      validate_only: true,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+    )
+  end
+
+  desc "Upload screenshots and graphics only; locales:ru-RU,id limits it"
+  lane :screenshots do |options|
+    check_listing
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      sync_image_upload: true, # skip images already on Play
+      **(options[:locales] ? { metadata_path: filtered_metadata(options[:locales]) } : {}),
+    )
+  end
+
+  # A copy of the metadata holding only some locales, for a partial upload.
+  def filtered_metadata(list)
+    dir = File.join(PROJECT_ROOT, "build/fastlane/play-metadata")
+    FileUtils.rm_rf(dir)
+    FileUtils.mkdir_p(dir)
+    list.split(",").each do |locale|
+      source = File.join(METADATA, locale)
+      UI.user_error!("No listing for #{locale}") unless File.directory?(source)
+      FileUtils.cp_r(source, dir)
+    end
+    dir
+  end
+
   desc "Build and upload to the internal testing track"
   lane :internal do
     build_bundle
@@ -50,20 +143,24 @@ platform :android do
 
   desc "Build and upload to production as a draft, with store listing and screenshots"
   lane :release do
+    check_listing
     build_bundle
     upload_to_play_store(
       track: "production",
       aab: AAB,
       release_status: "draft",
+      sync_image_upload: true,
     )
   end
 
   desc "Upload store listing text and screenshots only"
   lane :metadata do
+    check_listing
     upload_to_play_store(
       skip_upload_apk: true,
       skip_upload_aab: true,
       skip_upload_changelogs: true,
+      sync_image_upload: true,
     )
   end
 end
